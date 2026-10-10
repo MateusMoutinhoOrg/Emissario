@@ -1,0 +1,5 @@
+description: "Every dep `agnos add-dep` can add, the adapters that fill it, and what backs each one"
+name: "DepList"
+order: 2
+themes:
+  - reference
