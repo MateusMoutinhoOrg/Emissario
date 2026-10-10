@@ -45,3 +45,7 @@ Add a table into the database called source, with the columns:
 
 
 write these font on the font source table as frontend (name)
+
+## Important: 
+Dont get git credentials, or anything like that (its supose to the user make these, only get the repo url, and the branch name)
+
