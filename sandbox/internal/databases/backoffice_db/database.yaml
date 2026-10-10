@@ -1,0 +1,45 @@
+key-prefix: backofficedb
+name: backoffice-db
+tables:
+    - fields:
+        - name: username
+          required: true
+          type: string
+        - name: email
+          required: true
+          type: string
+        - name: password-hash
+          required: true
+          type: string
+        - name: role
+          type: integer
+        - fields:
+            - name: expires-at
+              required: true
+              type: integer
+          name: session
+          type: object
+      name: backoffice-user
+    - fields:
+        - name: token-sha256
+          required: true
+          type: key
+        - name: name
+          required: true
+          type: string
+        - name: prefix
+          required: true
+          type: string
+        - name: owner-id
+          type: integer
+        - name: created-at
+          type: integer
+        - name: expires-at
+          type: integer
+        - name: ips
+          type: string
+        - name: last-used-at
+          type: integer
+        - name: last-used-ip
+          type: string
+      name: api-token

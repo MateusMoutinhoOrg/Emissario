@@ -1,0 +1,31 @@
+package restore_backup_form
+
+import (
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficesnapshots"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/snapshots"
+)
+
+// Handle answers POST /admin/root/restore-backup/{id}: the
+// snapshot starts being put back over every database — after a pre-restore
+// snapshot of them; the backoffice's own users and tokens only when the form
+// ticks include-backoffice — and the browser is sent to the list at once, with the
+// outcome. Only a ready snapshot is restored, and never while another job
+// runs.
+func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
+	if props.User == nil {
+		return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusUnauthorized, "", "no authenticated user")
+	}
+
+	outcome, err := snapshots.StartRestore(sandbox, int64(input.Id), input.Body.IncludeBackoffice)
+	if err != nil {
+		return err
+	}
+	notice := outcome
+	if outcome == snapshots.OutcomeOk {
+		notice = backofficesnapshots.NoticeRestoring
+	}
+	return sandbox.Deps.OpinionatedAgnosServer.Redirect(*response, api.StatusSeeOther, backofficesnapshots.ListLocation(sandbox, notice))
+}

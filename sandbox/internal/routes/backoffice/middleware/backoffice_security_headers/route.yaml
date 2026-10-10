@@ -1,0 +1,13 @@
+category: Middleware
+methods:
+    - ANY
+paths:
+    - end: -1
+      id: Root
+      start: 0
+      trigger:
+        type: prefix
+        value: /
+priority: 8
+response-type: text/plain
+summary: Sends the security headers on every /admin and /api/admin response, and the basic ones on every other

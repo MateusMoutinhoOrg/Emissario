@@ -1,0 +1,118 @@
+# Databases
+
+A **database** is `sandbox/internal/databases/<db>/`, declared by `database.yaml` and generated
+whole from it — the same relation `commands/<x>/command.yaml` and `routes/<x>/route.yaml` have
+with the `generated.new.go` they render.
+
+| Database | Package | Keys under |
+| --- | --- | --- |
+| [`BackofficeDb`](backoffice_db.md) | `backoffice_db` | `backofficedb` |
+| [`Backup`](backup.md) | `backup` | `backup` |
+
+## The files
+
+| File | Written by |
+| --- | --- |
+| `database.yaml` | `add-database`, `add-table`, `add-table-field` and their editors — never by hand |
+| `generated.api.go` | generated: `<T>Record`, `<T>Input`, `<T>Filter`, and the `<Db>` struct of function fields |
+| `generated.new.go` | generated: the `databasedeps.Props` and the wiring of each function field |
+| `generated.methods.go` | generated: the body of every method |
+| `methods_custom.go` | **hand-written** — the only escape; no build reads it or rewrites it |
+
+A database is not a surface of `sandbox/api/`: its methods are typed by table, so there is no
+`[]Database` standing where `Cli.Commands` stands. Whoever needs one builds it on the spot with
+`<db>.New(sandbox)`, which touches no key — building one is free and creates nothing until the
+first record is written.
+
+## Where the data lives
+
+Every database lives in one folder, `data` unless a command line says otherwise:
+`<project> start-server --database var/app` writes every database under `./var/app`. The folder is
+relative to the directory the program runs from, its segments lower-case letters, digits, `-` and
+`_` — the store resolves every key under that directory and spells any other character escaped,
+so `--database` refuses anything else. A database's `key-prefix` is a folder inside it
+(`data/app` for `key-prefix: app`).
+
+| Piece | What |
+| --- | --- |
+| `sandbox/api/generated.databaseconfig.go` | generated: `sandbox.Config.DatabaseDir`, and `api.DefaultDatabaseDir` (`data`), the value `NewConfig` starts it at |
+| `sandbox/internal/commands/middleware/database_dir/` | generated while `cli` is on: a middleware in front of every command line that reads `--database` into `sandbox.Config.DatabaseDir`; no command declares `--database` itself |
+
+A `key-prefix` under `data/` is a declaration from before `--database`: it would now read
+`data/data/<x>`, so `verify` refuses it — write `<x>`.
+
+## database.yaml
+
+```yaml
+name: app-database
+key-prefix: app
+tables:
+  - name: url
+    fields:
+      - name: alias
+        type: key
+        required: true
+      - name: link
+        type: string
+        required: true
+      - name: redirects
+        type: integer
+```
+
+| Key | What it says |
+| --- | --- |
+| `name` | the database's own name; the directory is that name with dashes turned into underscores |
+| `key-prefix` | the folder, inside the `--database` folder, every record is written under; no `.` or `..` segment, never `data/…` |
+| `tables[].name` | one collection of records; every method it generates is spelled after it |
+| `tables[].fields[].name` | one field of that collection |
+| `tables[].fields[].type` | `key`, `string`, `integer`, `number`, `bytes`, `link` or `object` |
+| `tables[].fields[].required` | an insert must carry it; ignored on an `object` field |
+| `tables[].fields[].target` | the table a `link` points at — required there, empty everywhere else |
+| `tables[].fields[].fields` | the fields of a nested `object`, one level deep; an `object` is never named `position` or `values` |
+
+## The methods
+
+| From | Method |
+| --- | --- |
+| every table | `Add<T>(props <T>Input) (<T>Record, error)` |
+| every table | `Find<T>ById(id int64) (<T>Record, bool)` |
+| a `key` field | `Find<T>By<Field>(value string) (<T>Record, bool)` |
+| every table | `List<T>s(filter <T>Filter) ([]<T>Record, error)` |
+| every table | `List<T>sPage(offset int, limit int) ([]<T>Record, error)` — `limit` 0 reads to the end |
+| every table | `Count<T>() (int, error)` |
+| every plain field | `Set<T><Field>(id int64, value <type>) error` |
+| every table | `Remove<T>(id int64) error` |
+| a `link` field | `Get<T><Field>(id int64) (<Target>Record, bool)` |
+| an `object` field | `Add<T><Sub>(parentId int64, props <T><Sub>Input) (<T><Sub>Record, error)`, `List<T><Sub>s(parentId int64) ([]<T><Sub>Record, error)` |
+
+**A `Find` is born of a `key` field alone.** It is the only field the storage indexes, so it is
+the only one a direct lookup reaches. A `key` is unique without regard to case: `Ana` and `ana`
+are one value. A `string`, `integer` or `number` field is reached through
+`List<T>s` and nowhere else: generating a `Find<T>By<Field>` that scans the whole table would
+sell a scan with the face of an indexed lookup. `<T>Filter` therefore covers **every** plain
+field — text takes `<Field>StartsWith` and `<Field>Equals`, a `bytes` field the same pair as
+`[]byte`, a number takes `<Field>Min` and `<Field>Max`, and a zero value turns its own filter off.
+
+**A `bytes` field is a `[]byte`, stored exactly as given** — no text encoding, so a file, an
+image or a hash comes back byte for byte. Like a `string` it carries no index.
+
+Three rules hold for every generated method:
+
+- **A search answers `(<T>Record, bool)`, a write answers `error`.** What failed is an error, what
+  is absent is a `false` — never one `nil` standing for both.
+- **`sandbox *api.Sandbox` comes first**, in every function of `generated.methods.go`.
+- **No type assertion without `ok`.** Every stored value is converted in the comma-ok form, so a
+  value of the wrong type is an error and never a panic.
+
+## The commands
+
+```bash
+agnos database-init                                             # install the dep, turn the mechanic on
+agnos add-database app-database --key-prefix app
+agnos add-table url --database app-database
+agnos add-table-field alias --database app-database --table url --type key --required
+agnos show-database app-database                                # read the declaration back
+```
+
+`set-table-field` and the `remove-` half of each pair are the inverses. Those commands are the
+only editors of a `database.yaml`, and they re-render the whole file.

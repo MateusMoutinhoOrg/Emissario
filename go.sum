@@ -1,0 +1,6 @@
+github.com/MateusMoutinhoOrg/Keep v0.10.0 h1:daDD5XYb2lsFozz2rc0kmufaoZltY51Bhj8x/XtB2ZU=
+github.com/MateusMoutinhoOrg/Keep v0.10.0/go.mod h1:6Bh8L0gY2jDTuELZNZYXS2Ri15TieJhHTFqpp21WIKs=
+github.com/golang-jwt/jwt/v5 v5.3.1 h1:kYf81DTWFe7t+1VvL7eS+jKFVWaUnK9cB1qbwn63YCY=
+github.com/golang-jwt/jwt/v5 v5.3.1/go.mod h1:fxCRLWMO43lRc8nhHWY6LGqRcf+1gQWArsqaEUEa5bE=
+golang.org/x/text v0.38.0 h1:sXmwo9DwP3OK9EZ7PqAdaooSGozfl/3a6/xJcbzPRhE=
+golang.org/x/text v0.38.0/go.mod h1:YXZt3QhHUKYT53r2lLKFIVi6Ao1jdzrTR/KQ09qyxF4=

@@ -11,7 +11,7 @@ agnos build      # verify + regenerate every generated file + go mod tidy + comp
 agnos verify     # the schema check alone, writes nothing
 ```
 
-`build` is the only thing that regenerates the wiring,
+`build` is the only thing that regenerates the dispatch, the wiring,
 `README.md` and `docs/`, so run it after every hand edit. It is idempotent: a second run leaves
 the tree unchanged. Every command below takes `--path <dir>` (default `.`) and `-q`, and runs
 `build` for you.
@@ -31,61 +31,165 @@ agnos disable-extension doc       # stop generating docs/, keep what is there
 mechanic off stops the generation and removes nothing: the files stay, and they are yours to
 edit. Every key is in [Extensions](../Extensions/doc.md).
 
-## Add the CLI layer
+## Change the command surface
 
 ```bash
-agnos cli-init     # sandbox/internal/cli, cmd/main, help, version and help-flag, stddeps + argvdeps + stringsdeps + OpinionatedAgnosCli
+agnos add-command <name> --summary "one line" [--category "Core"] [--pattern 'route add {name}']
+agnos add-command <name> --middleware --summary "..."      # runs in front of every command line
+agnos add-arg  <name> --command <cmd> [--type integer] [--required] [--start 1 --end -1]
+agnos add-flag <name> --command <cmd> [--key --out --key -o] [--type integer --min 1] [--enum a --enum b]
+agnos set-command <cmd> --description "..." --example "<cmd> --flag v" --identifier <alias>
+agnos set-arg <name> --command <cmd> ... / set-flag <name> --command <cmd> ...
+agnos remove-arg <name> --command <cmd> / remove-flag <name> --command <cmd> / remove-command <cmd>
+agnos list-commands / show-command <cmd> / explain-command -- <argv…>
 ```
 
-From there `agnos add-command <name> --summary "..." --category "..."` declares a command and
-`agnos add-flag` / `add-arg` its fields. `agnos cli-purge` removes the layer again.
+`add-command` writes `sandbox/internal/commands/[<--dir>/]<name>/command.yaml` (the declaration) and a
+stub `handler.go` (yours), then generates `generated.new.go` — the `api.Command` that joins
+`Cli.Commands` — and `generated.input.go`, the `Input` it is handed. Every key these editors write is
+in [CommandYaml](../CommandYaml/doc.md); never edit `command.yaml` by hand.
 
+Then write `handler.go` — the whole hand-written half of a command:
 
-## Add the server layer
-
-```bash
-agnos server-init      # serverdeps, signaldeps, sandbox/internal/server, the health and openapi routes, start-server
-emissario start-server  # listens on the first free port of 3000..4000
+```go
+func Handle(sandbox *api.Sandbox, props *commandprops.CommandProps, input *Input, response *api.CommandResponse) error {
+	result, err := something(sandbox, input.Name)
+	if err != nil {
+		return sandbox.Deps.OpinionatedAgnosCli.Fail(api.ExitFailure, "", err.Error())
+	}
+	response.Printf("%s\n", result)
+	return nil
+}
 ```
 
-From there `agnos add-route <name> --pattern '/<path>/{id}'` declares a
-route and `agnos add-path` / `add-parameter` / `add-body-field` what it reads. A
-project with no CLI gets one first: a server needs a command that starts it.
-`agnos server-purge` removes the layer again.
+Every value arrives typed, defaulted and checked: bad input was answered with exit 2 before the
+handler ran. Printing through `response` answers the line with exit 0; a returned error fails it
+with exit 1, even after a print. A command that prints nothing has still run — only a
+`--middleware` that answers nothing hands the line to the next command of the chain. [Commands](../Commands/doc.md) documents the command on the
+next build.
 
 
-## Add the front layer
+## Change the route surface
 
 ```bash
-agnos front-init      # the OpinionatedAgnosFront lib, the front route, assets/front/{index,404}.html
-emissario start-server  # serves every file of assets/front
+agnos add-route <name> --pattern '/users/{id:integer}' --method POST --summary "one line" --category "Users"
+agnos add-route <name> --trigger /admin --trigger-type prefix   # /admin and under, never /administrator
+agnos add-route <name> --middleware --trigger /admin --before <route>
+agnos set-route <route> --method PUT --response-type text/plain --example "curl localhost:8080/users"
+agnos add-path <name> --route <route> --start 1 --end 1 --type integer   # one slice of the path
+agnos add-path <name> --route <route> --start 0 --end 0 --trigger /v1
+agnos add-parameter <name> --route <route> --source header --required
+agnos add-parameter <name> --route <route> --type integer --default 1
+agnos set-body <route> --type json --required --max-bytes 2097152
+agnos add-body-field <dotted.name> --route <route> --format email --required
+agnos import-body <route> --file payload.json --required --infer-format
+agnos set-path <name> --route <route> --end -1                  # and set-parameter
+agnos set-body-field <dotted.name> --route <route> --max 130 --clear format
+agnos show-route <route>                                      # the whole declaration as a tree
+agnos list-routes                                             # the chain, in run order
+agnos explain-route GET /admin/users --header authorization=x   # which routes one request reaches
+agnos rename-route <route> <name>
+agnos rebalance-routes --step 10                              # room between the rungs again
+agnos remove-parameter <name> --route <route>                 # and remove-path
+agnos remove-body-field <dotted.name> --route <route>
+agnos remove-route <route>
 ```
 
-From there any file under `assets/front/` is served; `agnos add-page <name>`
-scaffolds an html one and `remove-page` deletes it. A project with no server layer gets one
-first: the front is answered over http. `agnos front-purge` removes the layer
-again, leaving `assets/front/` alone.
+`add-route` writes `sandbox/internal/routes/[<--dir>/]<name>/route.yaml` (the declaration, `priority`
+and `response-type` always included — `100` for a route, `10` for a `--middleware`) and a stub
+`handler.go` (yours), then
+generates `generated.new.go` — the `api.Route` that lands in `Server.Routes`, a 1:1 image of the
+yaml — and `generated.input.go` — the `Input` the handler is handed.
+One editor per place the declaration holds something, so every key of
+[RouteYaml](../RouteYaml/doc.md) is reachable from the command line and `route.yaml` is never
+edited by hand. `add-body-field` takes a dotted path (`address.city`) and creates the objects
+it passes through — into the `json-schema` of a json body, or the flat `form-schema` of a form
+one; `set-body` covers the envelope around the schema — how the body is read, whether it is
+required, its size limit and its content-type.
 
-## Add the database layer
+Each `add-` has a `set-` beside it, so a key that was forgotten is added to the declaration
+that is there instead of removing it and declaring it again: the keys given are written over
+the ones already declared, `--clear <key>` takes one off, and the result goes through the same
+constructor the `add-` side calls. `import-body` is `add-body-field` run once per key of an
+example payload — a document pasted with `--json` or read with `--file`, inferring a type per
+key, the objects and lists around them and, with `--infer-format`, the four formats a string
+may spell; it never writes over a property already declared, and `--replace` starts the schema
+over. `show-route` prints the whole declaration as a tree, `list-routes` the chain, and
+`explain-route` which routes one request reaches and why the others are skipped — the three
+write nothing, and `explain-route` is the first step when a route does not run.
+
+Then write `handler.go` — the whole hand-written half of a route:
+
+```go
+func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
+	response.SetStatus(api.StatusCreated)
+	response.Write(payload(sandbox, create(sandbox, props.User, input.Tenant, input.Body)))
+	return nil
+}
+```
+
+`entries` arrives bound and converted — one field per path and per parameter, named by its id,
+and the body on `Body` — so a bad request was already answered `400` before the handler ran.
+
+Setting a status or writing a byte is what answers the request. Several routes may match one
+request; they run in `priority` order and stop at the first one that answers, so a handler that
+does neither has declined and the next one runs — that is the whole of what a middleware is, and
+`props` — the request's `routeprops.RouteProps`, typed in `sandbox/internal/routeprops/project.go` — carries what it
+learned to the routes after it. A handler refuses a request by returning `sandbox.Deps.OpinionatedAgnosServer.Fail`. What no route answers is answered
+by the eight `sandbox/internal/server/errors/handle_*.go`, which `build` writes once and no build
+rewrites: they are where a 404, a 405, a 401 or a 500 is worded.
+[Routes](../Routes/doc.md) documents the route on the next build, and
+[ServerUsage](../ServerUsage/doc.md) is the whole recipe.
+
+
+## Change the page surface
 
 ```bash
-agnos database-init                     # the store contract, the OpinionatedAgnosDatabase lib, the mechanic on
-agnos add-database app-database         # the first database
+agnos add-page <name> --title "One Line"   # assets/front/<name>.html, answered on /<name>
+agnos remove-page <name>                   # deletes the html
+```
+
+A page is a file of `assets/front/`, served as it is by the `front` route: write it by
+hand, scaffold it with `add-page`, or point a bundler's output there. Data comes from api
+routes the page's js calls. [FrontUsage](../FrontUsage/doc.md) is the whole recipe.
+
+## Change the database surface
+
+```bash
+agnos add-database app-database --key-prefix app
 agnos add-table url --database app-database
+agnos add-table-field alias --database app-database --table url --type key --required
+agnos add-table-field visits --database app-database --table url --type object
+agnos add-table-field agent --database app-database --table url --parent visits
+agnos show-database app-database                  # read the declaration back
 ```
 
-From there `add-table-field` declares what a table holds and every method it generates is
-written for you. `agnos database-purge` removes the layer again.
+`set-table-field` and the `remove-` half of each pair are the inverses. Every command rewrites
+`sandbox/internal/databases/<db>/database.yaml` and runs `build`, which regenerates `generated.api.go`,
+`generated.new.go` and `generated.methods.go` from it — the records, the insert structs, the filter and the body
+of every method.
 
-## Add the backoffice
+Then call it from wherever needs it:
+
+```go
+db := app_database.New(sandbox)
+url, err := db.AddUrl(app_database.UrlNew{Alias: "gh", Link: "https://github.com"})
+found, ok := db.FindUrlByAlias("gh")
+```
+
+A query the declaration cannot describe goes in `methods_custom.go` beside them, hand-written
+and rewritten by no build. [Databases](../Databases/doc.md) is the whole recipe.
+
+## Run the backoffice
 
 ```bash
-agnos backoffice-init   # /admin pages, /api/admin, users, API tokens, backoffice-db
+export EMISSARIO_BACKOFFICE_SECRET=$(openssl rand -hex 32)   # optional: unset, one is generated per run
+emissario add-backoffice-user --username admin --email admin@example.com --role root
+emissario start-server --insecure-http   # then /admin/login
 ```
 
-It installs the server, front and database layers it is missing, and writes every file once.
-`start-server` then reads the session secret from `EMISSARIO_BACKOFFICE_SECRET`, or generates one per run when
-it is unset. `agnos backoffice-purge` removes it again.
+Every page, route and package of it is the project's, written once: change it by hand.
+[Backoffice](../Backoffice/doc.md) is the whole map.
 ## Add reusable logic
 
 `sandbox/internal/<pkg>/`, one directory per concern, imported by whatever needs it. No
@@ -139,8 +243,6 @@ from anywhere inside `sandbox/`.
 
 One contract may have several adapters — see [Adapters](../Adapters/doc.md).
 
-This project has no `sandbox/deps/` yet: `agnos deps-init` creates it (`deps-purge` removes it).
-
 ## Add a doc
 
 ```bash
@@ -156,23 +258,30 @@ file is what renders [Structure](../Structure/doc.md).
 ## Add an example
 
 ```bash
+agnos add-cli-example <name>       # examples/cli/<name>/example.sh
 agnos add-lib-example <name>       # examples/lib/<name>/example.go
 agnos run-examples                    # run them all, check each against its golden
 agnos run-examples --only <name>      # one example, both sides
 agnos update-example <name>           # rewrite that one golden with what it produces now
 agnos run-examples --update           # rewrite every golden at once
+agnos remove-cli-example <name>
 agnos remove-lib-example <name>
 ```
 
 Write the example itself, ending with the copy out of `test-dir` into `assert-dir` that says what
 it asserts: `result.yaml` records `assert-dir`, and an example that copies nothing out fails.
 The golden is written by the first `run-examples` and refreshed with `update-example <name>`, which
-prints what it changes before writing. Details in [LibExamples](../LibExamples/doc.md).
+prints what it changes before writing. Details in [LibExamples](../LibExamples/doc.md) and
+[CliExamples](../CliExamples/doc.md).
 
 ## Hand-written code
 
 | File | Written when |
 | --- | --- |
+| `sandbox/internal/commands/<name>/handler.go` | a command does something |
+| `sandbox/internal/routes/<name>/handler.go` | a route answers something |
+| `assets/front/**` | the site looks like something |
+| `sandbox/internal/server/backoffice/**`, `assets/backoffice/*.html` | the backoffice behaves or looks otherwise |
 | `sandbox/internal/<pkg>/*.go` (never named `generated.*`) | logic worth reusing |
 | `sandbox/api/<x>.go` + `sandbox/internal/<x>/new.go` | a new api surface |
 | `sandbox/constructors/<x>/constructor.go` | how a field of the `Sandbox` is built |
@@ -198,6 +307,12 @@ drops the old name beside it, moves `sandbox/internal/generated/{cli,server,conf
 
 ## Ship
 
-This project has no `cmd/main` to compile: it ships as the Go module other programs import
-(see [LibUsage](../LibUsage/doc.md)). Bump `version` in `AgnosConfig/project.yaml` and tag
-the repository; `agnos cli-init` adds a binary if you want one.
+```bash
+agnos compile --target all   # cross-compile ./cmd/main into release/
+agnos publish                # build, compile, then a gh release
+```
+
+`go build -o release/emissario ./cmd/main` is the plain local binary.
+`publish` names the release after `version` in `AgnosConfig/project.yaml`; bump it there
+first. `compile` targets: `linux86`, `linuxarm64`, `linuxi32`, `mac86`, `macarm64`,
+`windows86`, `windowsi32`, or `all`.

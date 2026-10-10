@@ -1,0 +1,204 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "emissario",
+    "description": "Every address emissario answers: what to send and what comes back.",
+    "version": "unversioned"
+  },
+  "servers": [
+    {
+      "url": "{scheme}://{host}",
+      "variables": {
+        "scheme": {
+          "default": "http",
+          "enum": [
+            "http",
+            "https"
+          ]
+        },
+        "host": {
+          "default": "localhost:3000",
+          "description": "the host and port the server listens on"
+        }
+      }
+    }
+  ],
+  "tags": [
+    {
+      "name": "Server"
+    },
+    {
+      "name": "Assets"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "tags": [
+          "Server"
+        ],
+        "summary": "Reports that the server is up",
+        "parameters": [
+          {
+            "name": "x-request-method",
+            "in": "header",
+            "description": "the method of the request, set by the server and never by the client\n\nRead by `backoffice-maintenance`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-request-method"
+          },
+          {
+            "name": "x-client-ip",
+            "in": "header",
+            "description": "the ip of the connection, set by the server and never by the client\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-client-ip"
+          },
+          {
+            "name": "x-forwarded-for",
+            "in": "header",
+            "description": "the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-forwarded-for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "It worked. The answer comes as `application/json`.",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "operationId": "openapi",
+        "tags": [
+          "Server"
+        ],
+        "summary": "Answers the OpenAPI document of every route, to import into Postman or open in Swagger UI",
+        "parameters": [
+          {
+            "name": "x-request-method",
+            "in": "header",
+            "description": "the method of the request, set by the server and never by the client\n\nRead by `backoffice-maintenance`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-request-method"
+          },
+          {
+            "name": "x-client-ip",
+            "in": "header",
+            "description": "the ip of the connection, set by the server and never by the client\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-client-ip"
+          },
+          {
+            "name": "x-forwarded-for",
+            "in": "header",
+            "description": "the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-forwarded-for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "It worked. The answer comes as `application/json`.",
+            "content": {
+              "application/json": {}
+            }
+          }
+        }
+      }
+    },
+    "/{Rest}": {
+      "get": {
+        "operationId": "front",
+        "tags": [
+          "Assets"
+        ],
+        "summary": "Serves any file of the embedded assets/front tree",
+        "parameters": [
+          {
+            "name": "Rest",
+            "in": "path",
+            "description": "the file under assets/front; none is its index.html\n\nThe rest of the address — one part or more, like `a/b.png`.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-rest"
+          },
+          {
+            "name": "x-request-method",
+            "in": "header",
+            "description": "the method of the request, set by the server and never by the client\n\nRead by `backoffice-maintenance`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-request-method"
+          },
+          {
+            "name": "x-client-ip",
+            "in": "header",
+            "description": "the ip of the connection, set by the server and never by the client\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-client-ip"
+          },
+          {
+            "name": "x-forwarded-for",
+            "in": "header",
+            "description": "the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-forwarded-for"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "It worked. The answer comes as `text/html; charset=utf-8`.",
+            "content": {
+              "text/html; charset=utf-8": {}
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "what went wrong"
+          },
+          "field": {
+            "type": "string",
+            "description": "the value that was wrong, when it is one"
+          }
+        },
+        "required": [
+          "error"
+        ]
+      }
+    }
+  }
+}

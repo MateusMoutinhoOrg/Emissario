@@ -1,0 +1,5 @@
+description: "Index of every runnable example of the emissario cli"
+name: "CliExamples"
+order: 4
+themes:
+  - cli-usage

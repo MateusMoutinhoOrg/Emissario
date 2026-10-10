@@ -48,8 +48,8 @@ touch it. Deleting those files is what an `<x>-purge` is for — and that is the
 that writes the `false`:
 
 ```bash
-agnos deps-init                        # deps: true
-agnos deps-purge                       # removes the files and writes deps: false
+agnos cli-init                         # cli: true, plus the deps the layer needs
+agnos cli-purge                        # removes the files and writes cli: false
 ```
 
 A mechanic that needs another one gets it: `server-init` runs `cli-init` first when the

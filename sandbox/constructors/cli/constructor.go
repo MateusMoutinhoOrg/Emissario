@@ -1,0 +1,18 @@
+package cli
+
+import (
+	api "github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
+	cli "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/cli"
+)
+
+// Constructor fills Sandbox.Cli, building it with the
+// NewCli of sandbox/internal/cli. sandbox/generated.new.go calls it
+// once, along with the Constructor of every other package under
+// sandbox/constructors/.
+//
+// Written once by `agnos build` and then yours: wrap the
+// implementation, decorate the contract, or build a different one entirely.
+// No build rewrites this file once it is there.
+func Constructor(sandbox *api.Sandbox) {
+	sandbox.Cli = cli.NewCli(sandbox)
+}

@@ -1,0 +1,19 @@
+category: Backoffice API Tokens
+methods:
+    - POST
+paths:
+    - end: 1
+      id: AdminRevokeBackofficeApiToken
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/revoke-backoffice-api-token
+    - end: 2
+      id: Id
+      start: 2
+      type: integer
+priority: 100
+private: true
+response-type: text/html
+segments: 3
+summary: 'Revokes an API token: your own, or anyone''s for a root'

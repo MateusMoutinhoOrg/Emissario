@@ -1,0 +1,404 @@
+# RouteYaml
+
+`sandbox/internal/routes/[<folder>/]<name>/route.yaml` declares one http route — the file is
+what makes its directory a route, at any depth. `agnos build`
+generates two files beside it: `generated.new.go`, the `api.Route` that lands in `Server.Routes` — a 1:1
+image of the yaml, built on `Deps.OpinionatedAgnosServer.NewRoute` — and
+`generated.input.go`, the `Input` struct the route's `Handle` is handed, plus the
+`ReadBody` its body calls for. The dispatch is the `OpinionatedAgnosServer` lib's `Main`:
+it reads every request against those declarations, and nothing about a route is spelled
+in Go anywhere else.
+
+| File | Owner |
+|---|---|
+| `route.yaml` | the editors below |
+| `generated.new.go`, `generated.input.go` | every build |
+| `handler.go` | written once by `agnos add-route`, then the project's |
+
+Grow the file with the editors of [Workflow](../Workflow/doc.md#change-the-route-surface) — one
+per place it holds something — not by hand: they re-render it with keys in alphabetical order
+and drop comments.
+
+| Section | Editors |
+|---|---|
+| route-level keys | `set-route` (`--before` / `--after` place it one rung from another route) |
+| `paths` | `add-path` / `set-path` / `remove-path` |
+| `parameters` | `add-parameter` / `set-parameter` / `remove-parameter` |
+| `body` | `set-body` (`--type json` ↔ `--type form` carries a flat schema along) |
+| `body.json-schema`, `body.form-schema` | `add-body-field` / `set-body-field` / `remove-body-field` / `import-body` |
+
+`agnos show-route <route>` prints the whole of it as a tree, with its place in the
+chain. Three more readers write nothing: `list-routes` (every route in run order),
+`explain-route <METHOD> <path> [--header k=v] [--cookie k=v]` (which routes one request reaches,
+and why each other one is skipped — no server needed). `rename-route` and `rebalance-routes`
+(every route `--step` rungs apart, in the order they run now) are the two whole-route editors.
+
+`add-route --pattern` declares the paths from one url shape instead of `--trigger`:
+
+| Pattern piece | Becomes |
+|---|---|
+| literal segments in a row | one path with an `equal` trigger, named after them (`/get-article` -> `GetArticle`) |
+| `{name}` | one segment, `Input.Name string` |
+| `{name:integer\|number\|uuid}` | one segment of that type |
+| `{*rest}`, last only | the rest of the path, `start: i, end: -1` |
+| no `{*…}` | `segments: <n>` on the route: the segment count is fixed |
+
+```
+agnos add-route get-article --pattern '/get-article/{article:integer}'
+GET /get-article/42      Input.Article = 42
+GET /get-article/abc     not this route (the type is part of the match)
+GET /get-article/42/x    not this route (segments: 2)
+```
+
+`add-route --middleware` writes `methods: [ANY]`, a `prefix` trigger on `/` unless `--trigger`
+says otherwise, `priority: 10` and a stub that answers nothing.
+
+```yaml
+methods: [POST]
+priority: 100
+response-type: application/json
+paths:
+  - id: Users
+    start: 0
+    end: -1
+    trigger: { type: prefix, value: /users/ }
+  - id: Tenant
+    start: 1
+    end: 1
+parameters:
+  - id: Page
+    key: page
+    type: number
+    sources: [query]
+    default: "1"
+category: Users
+summary: Create a user under a tenant
+body:
+  type: json
+  required: true
+  max-bytes: 1048576
+  content-type: application/json
+  json-schema:
+    type: object
+    required: [email]
+    properties:
+      email: { type: string, format: email, maxLength: 254 }
+```
+
+## Route keys
+
+| Key | Effect |
+|---|---|
+| `methods` | Required, never empty: `GET`/`POST`/`PUT`/`PATCH`/`DELETE`/`HEAD`/`OPTIONS`, or `ANY` alone (`*` on the command line) |
+| `priority` | **Required.** The rung this route runs on when several match one request: lowest first, never negative. `add-route` writes `100`, `10` for a `--middleware` |
+| `response-type` | **Required.** The `Content-Type` set on the response before the handler runs; the handler may set another |
+| `segments` | The segment count the request path has to have, `≥ 1`. Absent: any count |
+| `paths` | The slices of the request path it reads. Required and never empty |
+| `parameters` | The values it reads from the query string and the headers |
+| `category`, `summary`, `description`, `examples`, `hidden` | As in [CommandYaml](../CommandYaml/doc.md#command-keys); feeds [Routes](../Routes/doc.md) |
+| `private` | `true` leaves the route out of `/openapi.json`, still in [Routes](../Routes/doc.md) and dispatched. `agnos set-route <name> --private` / `--public`. The backoffice's routes carry it |
+| `body` | The request body, one object rather than a sequence |
+
+`method`, `headers`, `params` and the `identifier` / `name` spelling of `paths` are the older
+declaration; `verify` names each one it finds.
+
+## Path keys
+
+A path reads the request segments from `start` to `end` — both inclusive, `-1` the last one — as
+`/` followed by them joined by `/`, and binds that text to `Input.<id>`. The root path, with no
+segment at all, reads as `/` for a path of `start: 0, end: -1`.
+
+| Key | Effect |
+|---|---|
+| `id` | The `Input` field the slice binds to: an exported Go name, unique across `paths` and `parameters`, never `FullRoute` or `Body` |
+| `start` | Index of the first segment. Default `0` |
+| `end` | Index of the last segment, `-1` the last one. Default `-1` |
+| `type` | `string` (default, omitted), `integer` (`int`), `number` (`float64`), `uuid` (`string`). Anything but `string` needs `start == end`; a segment that does not convert is a **non-match**, never a `400` |
+| `trigger` | `{type, value, negate, ignore-case}` (`values` for `one-of`): the slice has to match it for the route to run at all |
+| `description` | One-line help text |
+
+A request with no such slice — fewer segments than `start` — is not for the route. Every path
+has to find its slice, convert to its type and match its trigger, in any order. A path of one
+segment (`start == end`) binds the segment itself (`"42"`); a range binds the slice with its
+leading slash (`"/a/b.png"`). Triggers always compare the slice with its leading slash.
+
+| `trigger.type` | On a path slice, matches one that | On a parameter value |
+|---|---|---|
+| `equal` | is exactly `value` | same |
+| `prefix` | is `value` or continues it with a new segment: `/admin` matches `/admin`, `/admin/users`, never `/administrator`; `/` matches all | begins with `value` |
+| `text-prefix` | begins with `value`, whatever follows | begins with `value` |
+| `suffix` | ends with `value` | same |
+| `regex` | `value`, a regular expression, matches | same |
+| `one-of` | is exactly one of `values` | same |
+
+`negate: true` inverts the result; `ignore-case: true` compares without regard to case. The
+command line also takes `starts-with`, `ends-with`, `exact`/`equals`, `matches` and `any-of`, and
+writes the canonical name; a `one-of` is typed as one comma-separated `--trigger` (`a,b`). Two paths over the same slice are an AND — "`/admin` but not `/admin/login`":
+
+```yaml
+paths:
+  - { id: Route, start: 0, end: -1, trigger: { type: prefix, value: /admin } }
+  - { id: NotLogin, start: 0, end: -1, trigger: { type: equal, value: /admin/login, negate: true } }
+```
+
+```yaml
+paths:
+  - { id: Route, start: 0, end: 0, trigger: { type: equal, value: /static } }
+  - { id: Item, start: 1, end: -1 }
+```
+
+```
+GET /static          404, no segment 1
+GET /static/a        Input.Item = "/a"
+GET /static/a/b.png  Input.Item = "/a/b.png"
+```
+
+## Parameter keys
+
+| Key | Effect |
+|---|---|
+| `id` | The `Input` field the value binds to, as for a path |
+| `key` | The query key or header name it is read under; a header is matched without regard to case. Default `id` |
+| `type` | `string` (default, `string`), `integer` (`int`), `number` (`float64`), `boolean` (`bool`, `true`/`1`/`false`/`0`), `datetime` (`string`, RFC 3339), `string-array` (`[]string`: every occurrence of a query key, a header's comma-separated values), `integer-array` (`[]int`, read the same way) |
+| `sources` | Where it is read from, in order: `query`, `header`, `cookie`. The first that brings a value wins |
+| `required` | No source brings it: `400` through `HandleBadRequest`. Never on a `boolean`, never with `default` |
+| `default` | The literal bound when no source brings it |
+| `trigger` | As on a path: the value has to match for the route to run at all |
+| `description`, `examples` | One-line help text, whole requests |
+
+A parameter that fails its `trigger` does not fail the route — this route is not the one for the
+request, so the chain moves on and, if nothing else answers, `HandleNotFound` does. That is the
+difference from `required`, which says the route **is** the one and the request is malformed.
+
+```yaml
+methods: [GET]
+priority: 100
+response-type: application/json
+paths:
+  - { id: Route, start: 0, end: -1, trigger: { type: prefix, value: /admin } }
+parameters:
+  - { id: Authorization, key: authorization, type: string, sources: [header], trigger: { type: prefix, value: Bearer } }
+```
+
+```
+GET /admin                                  404, this route never ran
+GET /admin  Authorization: Basic abc        404, this route never ran
+GET /admin  Authorization: Bearer abc       this route
+```
+
+## Input and `Handle`
+
+`generated.input.go` declares one struct, every field tagged with the id `Run` fills it by:
+
+```go
+type Input struct {
+	FullRoute string `id:"FullRoute"` // the whole request path, always
+	Route     string `id:"Route"`     // one per path, in its type
+	Tenant    string `id:"Tenant"`
+	Page      int    `id:"Page"`      // one per parameter, in its type
+	Body      Body   `id:"Body"`      // a route declaring a body: what ReadBody returned
+}
+```
+
+The hand-written half is one function, which `verify` holds to this signature:
+
+```go
+func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error
+```
+
+`props` is the request's `routeprops.RouteProps` (see [The chain](#the-chain)); `entries` is everything
+the request brought that `route.yaml` declares — the handler is handed no request, so a value it
+needs is a declared path, parameter or body. The `OpinionatedAgnosServer` lib builds `Input` and
+calls the handler by reflection, since every route's `Input` is a type of its own.
+
+## Body keys
+
+| Key | Effect |
+|---|---|
+| `type` | `none` (default, no `ReadBody` at all), `raw` (`[]byte`), `text` (`string`), `json`, `form` (`map[string][]string`, `application/x-www-form-urlencoded`) |
+| `required` | An absent or empty body is `400` |
+| `max-bytes` | A longer body is `413`. Default `1048576` |
+| `content-type` | A divergent one is `415`, compared without its parameters (`; charset=...`) and regardless of case; a body sent with no `Content-Type` is `415` too. Default `application/json` for `json`, `application/x-www-form-urlencoded` for `form` |
+| `json-schema` | A subset of JSON Schema, only with `type: json` |
+| `form-schema` | The same subset held flat, only with `type: form` — see [Form schema](#form-schema) |
+
+Supported schema keywords: `type` (`object`/`array`/`string`/`integer`/`number`/`boolean`/
+`null`), `properties`, `required`, `additionalProperties`, `items`, `enum`, `const`, `minimum`,
+`maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `minLength`, `maxLength`, `pattern`,
+`minItems`, `maxItems`, `uniqueItems`, `format` (`email`, `uuid`, `date-time`, `uri`),
+`nullable`. Anything else (`$ref`, `oneOf`, `allOf`, `anyOf`, `patternProperties`) fails the
+build rather than being ignored.
+
+## Form schema
+
+A `form` body is what an html `<form method="POST">` sends — no script needed. Its `form-schema`
+reads a `key=value` list, so it is flat: the root is `type: object`, each property a `string`,
+`integer`, `number` or `boolean`, or an `array` of one (the key repeated: `tag=a&tag=b`). No
+nested object, no `nullable`, no dotted path; `verify` and every editor refuse one.
+
+```yaml
+body:
+  type: form
+  required: true
+  form-schema:
+    type: object
+    required: [password, username]
+    properties:
+      username: { type: string, maxLength: 254 }
+      password: { type: string, minLength: 8 }
+      remember: { type: boolean }
+```
+
+| Form value | Reads as |
+|---|---|
+| `integer`, `number` | parsed; text that will not parse is `400` `must be of type …` |
+| `boolean` | `true`/`1`/`on` (a checked checkbox), `false`/`0`/`off` |
+| `array` | every occurrence of the key; any other type its first one |
+| empty (`username=`) | absent: a blank input fails `required` |
+| undeclared key | text, so `additionalProperties: false` refuses it |
+
+`multipart/form-data` (an `enctype` for file uploads) is not read: the form keeps the default
+`application/x-www-form-urlencoded`. `set-body <route> --type form` turns a json body with a flat
+`json-schema` into this one, and `Input.Body` keeps its fields.
+
+## Generated `ReadBody`
+
+`ReadBody(sandbox *api.Sandbox, route *api.Route)` is generated into the route's own
+`generated.input.go`, and `generated.new.go` hands it to `Route.ReadBody`: the dispatch calls it before the handler
+runs and binds what it returns onto `Input.Body`, in what its `body.type` declares:
+
+| `body.type` | Returns |
+|---|---|
+| `none` | none is generated |
+| `raw` | `([]byte, error)` |
+| `text` | `(string, error)` |
+| `form` without a `form-schema` | `(map[string][]string, error)`; a body that does not parse is `400` |
+| `form` with one | `(Body, error)` |
+| `json` with an object `json-schema` | `(Body, error)` |
+| `json` without one | `(*serializabledeps.SerializableObject, error)` |
+
+Every variant does, in order: `Request.ReadBody(MaxBodyBytes)` (`413`), the `required` check
+(`400`) and — for `json` — `OpinionatedAgnosServer.ValidateSchema` against `BodySchema`, or — for a `form` with a
+schema — `OpinionatedAgnosServer.ValidateForm` (`400` on the first violation, its field path in the response's
+`field`). A nested object becomes `Body<Path>`; an
+object inside an array becomes `Body<Path>Item`.
+
+A failing body has already been answered, by whichever `Handle*` file of
+`sandbox/internal/server/errors/` the failure belongs to, and the handler never runs. A
+middleware in front of the route still refuses a request before a byte of it is read.
+
+## The chain
+
+`Main` hands every request to one dispatch, which walks `Server.Routes` in `priority`
+order — lowest rung first, by name within one — and runs every route whose
+`Matches` says the request is for it: the method is one of `methods` (or they are `ANY`),
+the path has `segments` segments when the route declares a count, and every path and parameter
+trigger matches.
+
+A route **answers** the request by setting a status or by writing a byte, which sends a `200`.
+A route that does neither has declined, and the next one runs; that is the whole of what makes a
+route a middleware. `SetHeader` alone answers nothing, which is how a middleware adds a header to
+whatever answers after it.
+
+```go
+func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
+	if input.Authorization == "" {
+		return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusUnauthorized, "authorization", "")
+	}
+	props.User = input.Authorization // the routes after it read props.User
+	return nil                         // nothing answered: the next route runs
+}
+```
+
+```bash
+agnos add-route admin-guard --middleware --trigger /admin --before admin
+agnos add-parameter authorization --route admin-guard --source header
+```
+
+Every route of one request is handed the same `props`: the dispatch builds one empty
+`routeprops.RouteProps` per request, and each field is declared by the project in
+`sandbox/internal/routeprops/project.go` — written once by `agnos build`, then the project's.
+`routeprops.go` beside it is generated: it embeds every struct of the package.
+
+When no route answers:
+
+| Situation | Answer |
+|---|---|
+| a `HEAD` nothing declares `HEAD` for | the chain runs again as a `GET`; the body is dropped |
+| a route with explicit `methods` matched the path under another method, and no route with explicit `methods` ran | `405` — an `ANY` route running does not hide it |
+| anything else | `404` |
+
+`OpinionatedAgnosServer.WriteJSON` (handed `sandbox.Deps.SerializableDeps`), `WriteText` and `Redirect` answer in one call; the
+`Response` also carries `AddHeader` (a second `Set-Cookie`) and `GetHeader`.
+
+## Failures
+
+Nothing the dispatch does writes a response. Every way a request can end without a route
+answering it is handed to one of eight files of `sandbox/internal/server/errors/`, each written
+once by `agnos build` and never regenerated:
+
+| Situation | File | Status |
+|---|---|---|
+| no route matched, or every matching route declined | `handle_not_found.go` | 404 |
+| the path matched under another method | `handle_method_not_allowed.go` | 405 |
+| a parameter that will not convert, a missing `required` one, a body the schema rejected | `handle_bad_request.go` | 400 |
+| a route raised `api.StatusUnauthorized` — a guard, most often | `handle_unauthorized.go` | 401 |
+| a route raised `api.StatusForbidden` | `handle_forbidden.go` | 403 |
+| `Content-Length` or the body itself above `max-bytes` | `handle_payload_too_large.go` | 413 |
+| `content-type` differs | `handle_unsupported_media_type.go` | 415 |
+| a handler returned an error without answering, or panicked | `handle_internal_server_error.go` | 500 |
+
+Each holds one function, writes the response itself and returns what it could not answer:
+
+```go
+func HandleNotFound(sandbox *api.Sandbox, route *api.Route, response serverdeps.Response) error {
+	failure := sandbox.Deps.OpinionatedAgnosServer.FailureOf(route, api.StatusNotFound, "route not found")
+
+	sandbox.Deps.StdDeps.Logf("route error %d %s %s \n", failure.Status, failure.Field, failure.Message)
+	return sandbox.Deps.OpinionatedAgnosServer.WriteError(sandbox.Deps.SerializableDeps, response, failure.Status, failure.Field, failure.Message)
+}
+```
+
+`FailureOf` is what the failure says, falling back to what the file says: the two the
+dispatch raises with nothing to add — nothing matched, method not allowed — carry no message, so
+the wording is the one spelled in that file and changing it there changes what the server says.
+The failures that know something the file could not — which field would not bind, and why —
+carry their own.
+
+A handler refuses a request by returning `sandbox.Deps.OpinionatedAgnosServer.Fail`, a `*api.RouteFailure`:
+
+```go
+return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusForbidden, "", "not authorized")
+```
+
+The lib's dispatch raises what it returns on the bound route — it is the one part of the server
+layer that raises — and reaches the right file through `sandbox.Server.Fail`, the switch the
+generated registry fills. `WriteError` is the writer underneath, and the default body every one
+of them produces is `{"error": "...", "field": "..."}`, logged on `deps.StdDeps.Logf` by the file
+before it is written.
+
+A `Handle*` file answers a failure and never raises one: a failure raised from inside one comes
+back to it.
+
+## OpenAPI
+
+`agnos build` renders every visible `route.yaml` into one OpenAPI 3.0.3 document,
+`docs/Routes/openapi.json`, and bakes the same bytes into the generated `openapi` route, which
+answers `GET /openapi.json` with `Access-Control-Allow-Origin: *`. Neither is edited: a
+declaration changes them.
+
+| `route.yaml` | OpenAPI |
+|---|---|
+| a visible route, `methods` not `ANY` | one operation per method, in run order; `operationId` the route's name (`-<method>` with several), `tags` its `category` |
+| `methods: [ANY]` | no operation — a middleware. The `parameters` of one that always runs in front of a route join that route's operation |
+| two routes drawing one path and method | the one running last |
+| `equal` / `prefix` path | literal segments; a prefix is listed at the prefix, and its description says the addresses under it are answered too |
+| capture, `one-of`, `text-prefix`, `suffix`, `regex` path | `{<id>}` path parameter: typed (`uuid` a `string` of format `uuid`), `enum` for `one-of`, `pattern` for `regex`, the rule in words otherwise |
+| a negated trigger, a slot no path reaches | a sentence of the description; `{segment<N>}` |
+| parameter | `in` its first source; `required` when `required` or triggered; `default`; `example` the value the route page sends; `enum` / `pattern` from an `equal`, `one-of` or `regex` trigger |
+| header `authorization` | an `apiKey` security scheme named after the route reading it, required when the parameter is |
+| header `accept`, `content-type` | left out — OpenAPI ignores them |
+| `body` | `requestBody` under its `content-type`, or `application/json`, `application/x-www-form-urlencoded`, `text/plain`, `application/octet-stream` by type; the json sample of the route page as `example` |
+| `json-schema`, `form-schema` | the same keywords; `const` as a one-value `enum`, a numeric `exclusiveMinimum` / `exclusiveMaximum` as the boolean over `minimum` / `maximum`, `type: null` as `nullable` |
+| statuses | the ones the route page lists; `200` in `response-type`, every failure the `Error` schema `{error, field}` |
+| `project.yaml` | `info.title` the project name, `info.version` its version (`unversioned` with none) |

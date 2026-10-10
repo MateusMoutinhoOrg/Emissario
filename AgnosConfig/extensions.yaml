@@ -1,10 +1,10 @@
-backoffice: false
-cli: false
-database: false
-deps: false
+backoffice: true
+cli: true
+database: true
+deps: true
 doc: true
 example: true
-front: false
+front: true
 readme: true
 sandbox: true
-server: false
+server: true

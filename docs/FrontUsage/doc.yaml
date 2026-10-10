@@ -1,0 +1,5 @@
+description: "Serve a website from emissario: bring the front layer up, drop files in assets/front, add pages"
+name: "FrontUsage"
+order: 2
+themes:
+  - server-usage

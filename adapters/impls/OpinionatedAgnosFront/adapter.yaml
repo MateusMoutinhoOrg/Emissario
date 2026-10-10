@@ -1,0 +1,5 @@
+dep: OpinionatedAgnosFront
+help: The agnos front file layer over strings
+module: ""
+name: OpinionatedAgnosFront
+origin: catalog

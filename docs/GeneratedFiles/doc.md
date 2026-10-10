@@ -23,13 +23,69 @@
 | `docs/**/Index.md` | `build` | always, for every doc that has sub-docs |
 | `docs/PublicApi/<contract>.md` | `build` | always. One page per file of `sandbox/api/` and per contract of `sandbox/deps/`; `docs/PublicApi/doc.md` indexes them by the symbols each declares |
 | `docs/LibExamples/` | `build` | always. Both `doc.md` and `doc.yaml` |
+| `sandbox/deps/generated.deps.go` | `build` | always. One `<Field> <dir>.Contract` per dir of `sandbox/deps/` (`<dir>.Sandbox` for a remote dep, which keeps the name of the api it copies) |
+| `adapters/bindings/<name>/generated.new.go` | `build` | always. One `<adapter>.Bind(&deps)` per entry of that binding's `binding.yaml`; a binding with no `binding.yaml` is hand-written and left alone |
 | `adapters/bindings/<name>/binding.yaml` | `deps-init` | once, then rewritten by `add-dep` / `remove-dep` — never by hand |
 | `sandbox/deps/<dep>/*.go`, `adapters/impls/<adapter>/*.go` | `add-dep` | once |
 | `adapters/impls/<adapter>/adapter.yaml` | `add-dep` | once |
 | `sandbox/deps/<dep>/generated.*.go` of a remote dep | `add-dep <module>` | rewritten by `set-dep`; a copy of that module's `sandbox/api/` |
 | `adapters/impls/<dep>/generated.<dep>.go` of a remote dep | `add-dep <module>` | rewritten by `set-dep`; the generated shim |
 | `assets/asset.go` | `add-dep embeddeps` | once |
+| `cmd/main/generated.main.go` | `build` | always |
+| `docs/{CliInstall,Commands}/` | `build` | always. Both `doc.md` and `doc.yaml` |
+| `docs/Commands/<command>.md` | `build` | always. One page per visible command; `docs/Commands/doc.md` indexes them |
+| `docs/CliExamples/` | `build` | always. Both `doc.md` and `doc.yaml` |
+| `sandbox/api/generated.{cli,command,trigger}.go` | `build` | always. Aliases of the `OpinionatedAgnosCli` contract's types |
+| `sandbox/api/generated.clisandbox.go` | `build` | always. `api.CliSandbox`, the part of `api.Sandbox` holding `Cli` |
+| `sandbox/internal/cli/generated.new.go` | `build` | always. `NewCli` builds `Cli.Commands` from every command's `NewCommand`, and `Cli.Main`, which hands the line to `OpinionatedAgnosCli.Main` |
+| `sandbox/deps/OpinionatedAgnosCli/`, `adapters/impls/OpinionatedAgnosCli/` | `cli-init` | once, like any dep. The dispatch, the binder, the matcher and the failures every command runs through |
+| `sandbox/internal/commands/{info/help,info/version,middleware/help_flag}/{command.yaml,generated.handler.go}` | `build` | always |
+| `sandbox/internal/commands/<name>/generated.new.go` | `build` | always. `NewCommand`, that command's `api.Command`, a 1:1 image of `command.yaml` |
+| `sandbox/internal/commands/<name>/generated.input.go` | `build` | always. `Input`, one field per arg and flag |
+| `sandbox/internal/commands/<name>/command.yaml` | `add-command` | once, then rewritten by `add-flag` / `add-arg` / `set-command`, their `set-` editors and their inverses — never by hand |
+| `sandbox/internal/commands/<name>/handler.go` | `add-command` | once. A stub; the command's whole hand-written half |
+| `sandbox/internal/cli/errors/handle_*.go` | `build` | once. Five files, one per failure — what this project answers when no command does |
+| `sandbox/internal/commandprops/generated.commandprops.go` | `build` | always. `commandprops.CommandProps`, what one command line's chain of commands shares: every struct of the package embedded |
+| `sandbox/internal/commandprops/project.go` | `build` | once, while the package has no other part. `Project`, the project's own fields of `CommandProps` |
+| `sandbox/api/generated.{server,route}.go` | `build` | always. Aliases of the `OpinionatedAgnosServer` contract's types |
+| `sandbox/api/generated.serversandbox.go` | `build` | always. `api.ServerSandbox`, the part of `api.Sandbox` holding `Server` |
+| `sandbox/internal/server/generated.new.go` | `build` | always. `NewServer` builds `Server.Routes` from every route's `NewRoute`, and `Server.Serve`, which hands the server to `OpinionatedAgnosServer.Main` |
+| `sandbox/deps/OpinionatedAgnosServer/`, `adapters/impls/OpinionatedAgnosServer/` | `server-init` | once, like any dep. The request chain, the binder, the json-schema validator and the writers every route runs through |
+| `sandbox/internal/routes/health/{route.yaml,generated.handler.go}` | `build` | always |
+| `sandbox/internal/routes/openapi/{route.yaml,generated.handler.go}` | `build` | always. `generated.handler.go` holds the OpenAPI document `docs/Routes/openapi.json` holds |
+| `sandbox/internal/routes/<name>/generated.new.go` | `build` | always. `NewRoute`, that route's `api.Route`, a 1:1 image of `route.yaml` |
+| `sandbox/internal/routes/<name>/generated.input.go` | `build` | always. `Input`, and the `ReadBody` a body calls for |
+| `docs/{RouteYaml,Routes,ServerUsage}/` | `build` | always. Both `doc.md` and `doc.yaml` |
+| `docs/Routes/<route>.md` | `build` | always. One page per visible route; `docs/Routes/doc.md` indexes them |
+| `docs/Routes/openapi.json` | `build` | always. The OpenAPI 3.0.3 document of every visible route, the one `GET /openapi.json` answers |
+| `sandbox/internal/routes/<name>/route.yaml` | `add-route` | once, then rewritten by `set-route` / `add-path` / `add-parameter` / `set-body` / `add-body-field` / `import-body`, their `set-` editors and their inverses — never by hand |
+| `sandbox/internal/routes/<name>/handler.go` | `add-route` | once. A stub; the route's whole hand-written half |
+| `sandbox/internal/commands/server/start_server/{command.yaml,handler.go}` | `server-init` | once |
+| `sandbox/internal/server/errors/handle_*.go` | `build` | once. Eight files, one per failure — what this project answers when no route does |
+| `sandbox/internal/routeprops/generated.routeprops.go` | `build` | always. `routeprops.RouteProps`, what one request's chain of routes shares: every struct of the package embedded |
+| `sandbox/internal/routeprops/project.go` | `build` | once, while the package has no other part. `Project`, the project's own fields of `RouteProps` — declare them there |
+| `sandbox/deps/OpinionatedAgnosDatabase/`, `adapters/impls/OpinionatedAgnosDatabase/` | `database-init` | once, like any dep. The readers and filters every `generated.methods.go` shares |
+| `sandbox/internal/databases/<db>/generated.{api,new,methods}.go` | `build` | always. The records, the `databasedeps.Props` and the body of every method, all from `database.yaml` |
+| `docs/Databases/` | `build` | always. Both `doc.md` and `doc.yaml` |
+| `docs/Databases/<db>.md` | `build` | always. One page per declared database; `docs/Databases/doc.md` indexes them |
+| `sandbox/internal/databases/<db>/database.yaml` | `add-database` | once, then rewritten by `add-table` / `add-table-field` / `set-table-field` and their inverses — never by hand |
+| `sandbox/internal/databases/<db>/methods_custom.go` | you | never. The one file of the package no build reads and no build rewrites |
+| `sandbox/api/generated.databaseconfig.go` | `build` | always. The database layer's part of `api.Config`: `DatabaseDir`, and `DefaultDatabaseDir` (`data`) |
+| `sandbox/internal/commands/middleware/database_dir/{command.yaml,generated.handler.go}` | `build` | always. The middleware reading `--database` in front of every command line |
+| `docs/Backoffice/`, `docs/Backups/` | `build` | always. Both `doc.md` and `doc.yaml` of each |
+| `sandbox/internal/server/backoffice/**`, `sandbox/internal/snapshots/**`, `sandbox/internal/databases/{backoffice_db,backup}/{database.yaml,methods_custom.go}` | `backoffice-init` | once. Then the project's; `backoffice-purge` removes them |
+| the backoffice's `route.yaml` + `handler.go` under `sandbox/internal/routes/{backoffice,api/backoffice}/**` | `backoffice-init` | once. Then edited like any route |
+| `sandbox/internal/commands/{backoffice/add_backoffice_user,middleware/backoffice_start_server}/{command.yaml,handler.go}` | `backoffice-init` | once. Then edited like any command |
+| `sandbox/internal/routeprops/backoffice.go`, `sandbox/api/backofficeconfig.go` | `backoffice-init` | once. The backoffice's part of `RouteProps` and of `api.Config` |
+| `assets/backoffice/*.html`, `assets/front/backoffice/backoffice.js` | `backoffice-init` | once. Copied verbatim: the pages are the project's runtime templates |
+| `sandbox/deps/OpinionatedAgnosFront/`, `adapters/impls/OpinionatedAgnosFront/` | `front-init` | once, like any dep. `Resolve`, `SafePath`, `ContentTypeOf` |
+| `docs/FrontUsage/` | `build` | always. Both `doc.md` and `doc.yaml` |
+| `sandbox/internal/routes/front/{route.yaml,handler.go}` | `front-init` | once. `spaFallback` is yours to turn on |
+| `assets/front/index.html` | `front-init` | once. Kept if already there |
+| `assets/front/404.html` | `front-init` | once. Kept if already there |
+| `assets/front/<page>.html` | `add-page` | once. Refused if already there |
 | `docs/<Name>/{doc.yaml,doc.md}` | `add-doc` | once |
+| `examples/cli/<name>/example.sh` | `add-cli-example` | once. A stub that already runs |
 | `examples/lib/<name>/example.go` | `add-lib-example` | once. A stub that already runs |
 | `examples/<side>/<name>/result.yaml` | `run-examples` | on `update-example <name>`, on `--update` or when absent — never by hand |
 

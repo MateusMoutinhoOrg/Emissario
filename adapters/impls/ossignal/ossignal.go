@@ -1,0 +1,28 @@
+package ossignal
+
+import (
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps"
+)
+
+// Bind fills deps.Deps.SignalDeps with the standard library's os/signal.
+func Bind(deps *deps.Deps) {
+	deps.SignalDeps.OnInterrupt = onInterrupt
+}
+
+// onInterrupt waits for the first interrupt or termination signal on a
+// goroutine of its own and runs handler once. Once it has heard one it stops
+// listening, so the next signal reaches the process with its default effect.
+func onInterrupt(handler func()) {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-signals
+		signal.Stop(signals)
+		handler()
+	}()
+}

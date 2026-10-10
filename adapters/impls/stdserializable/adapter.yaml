@@ -1,0 +1,5 @@
+dep: serializabledeps
+help: JSON/YAML values over encoding/json and a bundled YAML codec
+module: ""
+name: stdserializable
+origin: catalog

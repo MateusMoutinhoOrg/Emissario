@@ -4,7 +4,10 @@ package sandbox
 
 import (
 	api "github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
+	cli "github.com/MateusMoutinhoOrg/Emissario/sandbox/constructors/cli"
 	config "github.com/MateusMoutinhoOrg/Emissario/sandbox/constructors/config"
+	server "github.com/MateusMoutinhoOrg/Emissario/sandbox/constructors/server"
+	deps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps"
 )
 
 // New builds the whole library: one call per package under
@@ -12,10 +15,12 @@ import (
 // list is the directories themselves, so a constructor written by hand is
 // called exactly like a generated one — this file is rendered around what is
 // there, never the other way round.
-func New() *api.Sandbox {
-	self := api.Sandbox{}
+func New(deps *deps.Deps) *api.Sandbox {
+	self := api.Sandbox{Deps: deps}
 
+	cli.Constructor(&self)
 	config.Constructor(&self)
+	server.Constructor(&self)
 
 	return &self
 }

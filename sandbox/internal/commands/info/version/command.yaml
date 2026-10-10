@@ -1,0 +1,12 @@
+priority: 100
+args:
+  - id: Verb
+    start: 0
+    end: 0
+    trigger: { type: equal, value: version }
+category: Info
+summary: Print the installed version
+description: |
+  Prints the current version of the installed binary and exits.
+examples:
+  - "version"

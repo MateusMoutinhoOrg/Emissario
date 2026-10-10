@@ -6,6 +6,8 @@ Config is what the project knows about itself: the values of AgnosConfig/project
 
 | Field | Type | Description |
 | --- | --- | --- |
+| `BackofficeConfig` | `BackofficeConfig` | BackofficeConfig is a part of the Config, declared in sandbox/api/backofficeconfig.go. Embedded, so each of its fields is read as sandbox.Config.<Field>. Every struct of a sandbox/api/<x>config.go file is one, so a mechanic adds its own part beside the project's rather than editing it. |
+| `DatabaseConfig` | `DatabaseConfig` | DatabaseConfig is a part of the Config, declared in sandbox/api/generated.databaseconfig.go. Embedded, so each of its fields is read as sandbox.Config.<Field>. Every struct of a sandbox/api/<x>config.go file is one, so a mechanic adds its own part beside the project's rather than editing it. |
 | `ProjectConfig` | `ProjectConfig` | ProjectConfig is a part of the Config, declared in sandbox/api/projectconfig.go. Embedded, so each of its fields is read as sandbox.Config.<Field>. Every struct of a sandbox/api/<x>config.go file is one, so a mechanic adds its own part beside the project's rather than editing it. |
 | `ProjectName` | `string` | ProjectName is the project's name, the `project-name` key of AgnosConfig/project.yaml; lower-cased it is the name the cli answers to. |
 | `Version` | `string` | Version is the release the project is at, the `version` key of AgnosConfig/project.yaml. |

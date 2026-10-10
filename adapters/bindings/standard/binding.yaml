@@ -1,0 +1,23 @@
+adapters:
+    - OpinionatedAgnosCli
+    - OpinionatedAgnosDatabase
+    - OpinionatedAgnosFront
+    - OpinionatedAgnosServer
+    - cryptorand
+    - databasedeps
+    - goembed
+    - golangjwt
+    - memoryratelimit
+    - nethttpserver
+    - osenv
+    - osio
+    - ossignal
+    - osstd
+    - pbkdf2password
+    - sha256hash
+    - stdargv
+    - stdserializable
+    - stdsort
+    - stdstrings
+    - stdtime
+    - ziparchive

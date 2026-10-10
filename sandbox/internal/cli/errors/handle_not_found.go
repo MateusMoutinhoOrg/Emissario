@@ -1,0 +1,42 @@
+package errors
+
+import (
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/info/help"
+)
+
+// HandleNotFound answers every command line no command of the chain answered —
+// one that matched nothing at all, and one every matching command declined.
+// An empty command line prints the general help, and exits 0.
+//
+// It is a command handler like any other — it prints through the response and
+// sets the exit status itself — and it is **yours**: written once by
+// `agnos build` and never regenerated, so whatever you put here is
+// what your cli says.
+//
+// What went wrong is on `command.Failure`, read through Deps.OpinionatedAgnosCli.FailureOf so a
+// command carrying none still answers something. The command is bound when a
+// declared command raised the failure and bare when none did; command.Argv is
+// the command line either way.
+//
+// Answer a failure here; never raise one: a failure raised from here comes back to this file.
+func HandleNotFound(sandbox *api.Sandbox, command *api.Command, response *api.CommandResponse) error {
+	// An empty command line asks for nothing but the help, so it is
+	// answered like `help`: with the screen and exit 0.
+	if len(command.Argv) == 0 {
+		response.SetStatus(api.ExitOk)
+		help.PrintGeneralHelp(sandbox, response)
+		return nil
+	}
+
+	failure := sandbox.Deps.OpinionatedAgnosCli.FailureOf(command, api.ExitUsage, "")
+	response.SetStatus(failure.Status)
+	if failure.Message != "" {
+		response.Eprintf("%s\n", failure.Message)
+		return nil
+	}
+
+	name := sandbox.Deps.StringsDeps.ToLower(sandbox.Config.ProjectName)
+	response.Eprintf("unknown command %q — run '%s help' to see the available commands\n", command.Argv[0], name)
+	return nil
+}

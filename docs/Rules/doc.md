@@ -129,6 +129,210 @@ makes each kind of change is in [Workflow](../Workflow/doc.md).
   backs it (`sortdeps`, adapters `stdsort` and `reflectsort`). The two are separate names because one dep may have several adapters.
 - Reusable logic goes in `sandbox/internal/<pkg>/`, one directory per concern.
 
+## Handlers
+
+- A command is a directory under the folder of its category in `sandbox/internal/commands/`, holding
+  `command.yaml` (the declaration), `generated.new.go` and `generated.input.go` and
+  `handler.go` (hand-written), snake_case for a kebab-case name. The `command.yaml` is
+  what makes it one: a directory without it is a folder grouping commands
+  (`add-command <name> --dir <folder>`, `rename-command <name> <name> --dir <folder>`). A name is
+  unique across every folder, and a directory holding the go files without a `command.yaml` is
+  a violation. An `entries.yaml` is an old declaration. **(verify)**
+- Only `Handle(sandbox *api.Sandbox, props *commandprops.CommandProps, input *Input, response *api.CommandResponse) error`
+  is exported. Every flag and arg of `command.yaml` is a field of `Input` (`input.Name`),
+  already typed, defaulted and range-checked.
+- Import nothing outside `sandbox/`, the stdlib included. Every effect and every helper goes
+  through `sandbox.Deps.<Contract>` — see [PublicApi](../PublicApi/doc.md).
+- `response.Printf` (stdout) answers the command line with `api.ExitOk`; `response.Eprintf` and
+  `response.Logf` (stderr) answer nothing. Refuse a command line by returning
+  `sandbox.Deps.OpinionatedAgnosCli.Fail` — a
+  returned error fails it even after a print. A strict command that returns `nil` without
+  printing has run and exits `0`; only a middleware declines.
+- Reusable logic goes in `sandbox/internal/<pkg>/`, not in the handler.
+- A command's `command.yaml` is written by `add-flag` / `add-arg` / `set-command`, never by
+  hand: they re-render it with keys in alphabetical order and drop comments.
+- `Cli.Commands` is the whole command surface, one `api.Command` per declared command, built by
+  `sandbox/internal/cli/generated.new.go` from each package's generated `NewCommand`. The dispatch and
+  both help screens read it; nothing about the command set is generated per command anywhere
+  else. The dispatch itself is `OpinionatedAgnosCli.Main`, handed `Cli.Commands` by the
+  registry. Each run binds to its own copy of the declaration, made by `BindCommand`, so what
+  the slice holds is never written to.
+
+## Routes
+
+- A route is a directory under `sandbox/internal/routes/`, at any depth, holding `route.yaml`
+  (the declaration), `generated.new.go` and `generated.input.go` and `handler.go`
+  (hand-written) — the server layer's mirror of a command package, snake_case for a kebab-case
+  name. The `route.yaml` is what makes it one: a directory without it is a folder grouping routes
+  (`add-route <name> --dir <folder>`, `rename-route <name> <name> --dir <folder>`). A name is
+  unique across every folder. **(verify)**
+- Only `Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error`
+  is exported from a route's hand-written half. **(verify)**
+- `generated.new.go` is a 1:1 image of `route.yaml`, built on `OpinionatedAgnosServer.NewRoute`; `generated.input.go`
+  is the `Input` struct — `FullRoute`, one field per path, one per parameter and `Body` when a
+  body is declared, each tagged `id:"<id>"` — plus the `ReadBody` a body calls for. The lib's
+  dispatch reads the body before the handler runs and fills `Input` by those tags. A handler
+  is handed no request: what it reads is declared.
+- Setting a status or writing a byte on the response is what answers a request and ends the
+  chain — a write sends a `200` ahead of it. A handler that does neither has declined, and the
+  next route matching that request runs; a handler that returns a non-nil error without
+  answering has failed, and `handle_internal_server_error.go` answers for it. What a handler returns is
+  never the status. `SetHeader` alone answers nothing.
+- Every route of one request is handed the same `props *routeprops.RouteProps`, built empty per
+  request; a middleware hands what it learned to the routes after it by setting a field of it.
+  `routeprops.go` is generated: it embeds every exported struct of every other file of
+  `sandbox/internal/routeprops/` — `project.go`, written once and the project's, plus one file per
+  mechanic that hands something on (`backoffice.go`). A field is declared in one of those parts,
+  never in `routeprops.go`; two parts may not declare the same field (`verify`). It sits under
+  `sandbox/internal`, never `sandbox/api`, so a field may name any type of the project — a
+  database record — as long as that package imports no route; `api.Route.Props` holds it as
+  `any`. `build` moves a hand-written `routeprops.go` (or an old `sandbox/api/routeprops.go`) to
+  `project.go`, its struct renamed `Project`; the same holds for `commandprops.CommandProps` in
+  `sandbox/internal/commandprops/`.
+- `api.Config` and `api.Sandbox` are generated the same way: each embeds every struct of
+  `sandbox/api/<x>config.go` / `sandbox/api/<x>sandbox.go`. `projectconfig.go` and
+  `projectsandbox.go` are the project's; each mechanic writes its own part beside them
+  (`clisandbox.go`, `serversandbox.go`, `backofficeconfig.go`), never edits another's. The
+  `Sandbox` declares only `Deps` and `Config` itself: a contract's field is declared by the part
+  of whoever owns it, so a contract the project writes is a field of `ProjectSandbox`. **(verify)**
+  `build` renames an old `usersandbox_<x>.go` / `userconfig_<x>.go` to `<x>sandbox.go` /
+  `<x>config.go`.
+- A route's `route.yaml` is written by `add-route` and rewritten by `set-route`,
+  `add-path` / `set-path` / `remove-path`, `add-parameter` / `set-parameter` /
+  `remove-parameter`, `set-body` and `add-body-field` / `set-body-field` / `remove-body-field` /
+  `import-body` — one editor per place the file holds something and one `set-` per `add-`, and
+  never by hand: they re-render it with keys in alphabetical order and drop comments.
+  `rename-route` and `rebalance-routes` rewrite whole routes; `show-route`, `list-routes` and
+  `explain-route` read them and write nothing.
+- `methods`, `priority` and `response-type` are required on every route; `priority` is never
+  negative, and `methods` holds known methods only — or `ANY`, alone. `segments`, when
+  declared, is at least `1`; a `phase` key is an old declaration. **(verify)**
+- `health` and `openapi` are routes `build` renders itself, rung `100`: `add-route`,
+  `remove-route` and `rename-route` refuse their names and `rebalance-routes` leaves their rung.
+  `openapi` answers `docs/Routes/openapi.json`, rendered from every visible `route.yaml`; an `ANY`
+  route is no operation there, only parameters of the routes it always runs in front of
+  ([RouteYaml](../RouteYaml/doc.md#openapi)).
+- `add-route` lands a route on rung `100` and a `--middleware` on `10`, so a guard goes in front
+  of the routes it guards without renumbering them; `--before` / `--after` place one next to
+  another, and `rebalance-routes` makes room again.
+- A route declares at least one path. A path's `start` is never negative and its `end` is `-1`
+  or not before `start`; its `type` is `string`, `integer`, `number` or `uuid`, and anything but
+  `string` reads one segment (`start == end`); a `trigger` has a known type (`equal`, `prefix`,
+  `text-prefix`, `suffix`, `regex`, `one-of`), a value — `values` for a `one-of` — and — for a
+  regex — one that compiles. **(verify)**
+- On a path a `prefix` holds on a segment boundary — `/admin` is `/admin` or `/admin/…`, never
+  `/administrator`; `text-prefix` is the plain one. On a parameter value the two are the same.
+- Every `id` of `paths` and `parameters` is an exported Go name, unique across both and never
+  `FullRoute` or `Body`: each one names one field of `Input`. **(verify)**
+- A parameter declares a known type and at least one known source; it is never both `required`
+  and defaulted, and a `boolean` is never `required`. **(verify)**
+- A trigger — and a path's type — decides whether the route runs at all. A request that fails
+  one is not a bad request: that route is simply not the one for it.
+- A `405` is answered when a route with explicit `methods` matched the path under another method
+  and no route with explicit `methods` ran; an `ANY` route running does not hide it. A `HEAD`
+  nothing declares runs the chain again as a `GET`.
+- No two routes declare the same method and path pattern *on the same rung*.
+  Sharing a pattern across rungs is what a middleware in front of a route is; sharing a rung as
+  well would leave the order between them undeclared. **(verify)**
+- A `json-schema` is declared on a `type: json` body alone and a `form-schema` on a `type: form`
+  one alone, each only with the keywords of the subset — `$ref`, `oneOf`, `allOf`, `anyOf` and
+  `patternProperties` fail the build. A `form-schema` is flat: scalar properties or arrays of
+  them, never an object or `nullable`. **(verify)**
+- `Server.Routes` is the whole http surface, one `*api.Route` per declared route, built by
+  `sandbox/internal/server/generated.new.go` from each package's generated `NewRoute`. The dispatch
+  reads it and nothing about the route set is generated per route anywhere else. The dispatch
+  itself is `OpinionatedAgnosServer.Main`, handed `Server.Routes` by the registry through
+  `Server.Serve`; each request runs on its copy of the declaration, made by `BindRoute`, so
+  nothing bound is ever shared.
+- Run order is the collector's, not the directory's: lowest `priority` first, then by name.
+- Nothing in the dispatch writes a response. Every way a request ends without a route answering
+  it is handed to one of the eight `sandbox/internal/server/errors/handle_*.go` — one per status.
+  They are written **once**, by the first `build` that finds the server layer, and no build
+  rewrites them: what a project answers when nothing matches is the project's. **(verify)**
+- A handler — or a generated `ReadBody` — refuses a request by returning
+  `sandbox.Deps.OpinionatedAgnosServer.Fail`, a `*api.RouteFailure`; the dispatch raises it. Only
+  the dispatch raises, and it reaches the right file through the `Fail` field of `api.Server`,
+  which the registry fills. A `Handle*` file answers a failure and never raises one.
+- A failure the dispatch raises with nothing to add — nothing matched, method not allowed —
+  carries no message, so the wording is the one its `Handle*` file spells. One that knows
+  something that file could not — which parameter would not bind, and why — carries its own.
+  `OpinionatedAgnosServer.FailureOf` is the one reading of that rule.
+- A response body for a failure is written by `OpinionatedAgnosServer.WriteError` alone, so every
+  route answers one JSON shape.
+
+Every key of a declaration is in [RouteYaml](../RouteYaml/doc.md).
+
+## Front
+
+- A page is a file of `assets/front/` and nothing else. The `front` route serves the
+  whole tree, so a file dropped there by hand or by a bundler is as much a page as one
+  `add-page` wrote; `add-page` / `remove-page` only write and delete the html.
+- Everything under `assets/front/` is the project's content: no build writes there,
+  `add-page` refuses an existing file, and `front-purge` leaves the tree whole.
+- The `front` route is written once and then the project's. The file layer is the
+  `OpinionatedAgnosFront` lib, and its `SafePath`, which `Resolve` runs first, is what keeps a
+  caller's path inside `assets/front/`: the handler resolves every path through it.
+- The `front` route runs at priority `1000`, after every api route, and answers a path that
+  names no file with `assets/front/404.html` under a `404`; only with that file gone does it
+  decline, so the `404` falls to `handle_not_found.go`.
+
+How a path is resolved, and a bundler's build, is in [FrontUsage](../FrontUsage/doc.md).
+
+## Backoffice
+
+- Every file `backoffice-init` wrote is the project's: no build rewrites it, and a second
+  `backoffice-init` keeps each one already there. `backoffice-purge` removes them all.
+- The backoffice edits nothing the project wrote. What it hands a route is
+  `sandbox/internal/routeprops/backoffice.go`, what it reads at startup
+  `sandbox/api/backofficeconfig.go`, both embedded by the generated aggregates, and the
+  secret is read by the `backoffice-start-server` middleware in front of `start-server`.
+- The session secret is the `EMISSARIO_BACKOFFICE_SECRET` environment variable, at least 32 characters, never
+  a flag or a file; shorter, `start-server` refuses to start. Unset, `start-server` generates one
+  for the run and warns: every session ends at a restart.
+- Its records live in `backoffice-db`, a database of its own; the project's databases are never
+  touched. `./data/backofficedb` is gitignored and survives a purge.
+- Its backups live in `backup`, a database of its own, `./data/backup`, gitignored and kept by a
+  purge: a snapshot holds every other folder of the `--database` folder, and a restore replaces
+  them, never `backup` itself. Every backup route is root only, and one backup job runs at a time.
+
+Routes, roles and the API are in [Backoffice](../Backoffice/doc.md); backups in
+[Backups](../Backups/doc.md).
+
+## Databases
+
+- A database is `sandbox/internal/databases/<db>/`, declared by `database.yaml` and generated
+  whole from it. `add-database`, `add-table`, `add-table-field`, their `set-` editors and
+  their inverses are its only editors — never by hand. **(verify)**
+- `generated.api.go`, `generated.new.go` and `generated.methods.go` are rewritten by every build; what every `generated.methods.go`
+  shares — resolving a table, reading a stored value, the filter filters — is the
+  `OpinionatedAgnosDatabase` lib. `methods_custom.go` is the one escape: hand-written, in the same
+  package, read and rewritten by nothing. A name it shares with a generated one is a violation.
+  **(verify)**
+- A database is **not** a surface of `sandbox/api/`: its methods are typed by table, so there
+  is no `[]Database` standing where `Cli.Commands` stands. Whoever needs one builds it with
+  `<db>.New(sandbox)`, which touches no key — building one is free and creates nothing until
+  the first record is written.
+- A `Find<T>By<Field>` is generated for a `key` field and for no other: it is the only field
+  the storage indexes. Every other plain field is reached through `List<T>` and its
+  `<T>Filter`, so a scan is never sold with the face of an indexed lookup.
+- A search answers `(<T>Record, bool)` and a write answers `error`: what failed is an error,
+  what is absent is a `false`, and no single `nil` ever stands for both.
+- No stored value is asserted into a type without `ok`. A value of the wrong type is an error;
+  a field a record never carried reads as the zero value of its type.
+- Every `link` names a `target` that is a table of the same database, and every `object`
+  field carries `fields` of its own and nests no further — one level is what is generated.
+  **(verify)**
+- No table declares a field named `id`: every record already carries its permanent one.
+  **(verify)**
+- No `object` field is named `position` or `values`, and no `key-prefix` holds a `.` or `..`
+  segment: the store refuses either, and every method of that database would fail. **(verify)**
+- Every database lives in the `--database` folder (`data` by default), relative to where the
+  program runs; a `key-prefix` is a folder inside it, so none starts with `data/`. **(verify)**
+  `--database` is read by a generated middleware in front of every command line: no command
+  declares a flag of that name.
+
+Every key of a declaration is in [Databases](../Databases/doc.md).
+
 ## Output channels
 
 | Channel | Stream | Carries | Silenced |
@@ -161,20 +365,26 @@ Never `fmt.Printf`. A generated cli declares no `--quiet`: add it as a
   family, and only its literal head has to exist. Drop the entry when the path goes. **(verify)**
 - A generated page is changed at its source, never on the page:
   [PublicApi](../PublicApi/doc.md) from the doc comments of `sandbox/api/` and `sandbox/deps/`,
+  [Commands](../Commands/doc.md) from each `command.yaml`,
   [Structure](../Structure/doc.md) from
   `AgnosConfig/structure.yaml`, `README.md` from
   `AgnosConfig/docs/ReadmeHeader.md` and every `doc.yaml`.
 - Docs are short, objective and dense: tables, commands, file paths and rules — no prose, no
   narrative, no tutorials, no motivation sections. One page per topic; no sub-doc unless the
   content is a real list of independent items.
+- [Routes](../Routes/doc.md) is the exception: it is read by whoever calls the server, a person,
+  so it speaks plain words and every page carries requests that run as they are. It is
+  generated from each `route.yaml`, `openapi.json` beside it included: a `summary`, a
+  `description` or an `examples` entry is what changes a page.
 - Say a rule once, in this page, and link to it. Links are relative to the file that carries
   them: `../X/doc.md` inside `docs/`, `docs/X/doc.md` in `README.md` and `ReadmeHeader.md`.
 
 
 ## Examples
 
-- An example is `examples/<side>/<name>/`, holding exactly one `example.go` under `lib/`. Create and delete them with `add-lib-example` /
-  `remove-lib-example`,
+- An example is `examples/<side>/<name>/`, holding exactly one `example.go` under `lib/`
+  or one `example.sh` under `cli/`. Create and delete them with `add-lib-example` /
+  `remove-lib-example` and `add-cli-example` / `remove-cli-example`,
   never by hand — the same rule as `add-doc` / `remove-doc`.
 - An example runs with its own directory as the working directory and writes only inside its own
   `test-dir`, which `run-examples` removes before every run.
@@ -187,6 +397,12 @@ Never `fmt.Printf`. A generated cli declares no `--quiet`: add it as a
   whole suite with `run-examples --update`, or delete it; never edit one.
 - An example's output carries no absolute path other than its own directory, no timestamp and no
   resolved version: those are normalized away or make the golden machine-specific.
+- An `example.sh` types the project's `name` exactly as `AgnosConfig/project.yaml` spells it —
+  that name is the alias `run-examples` puts on the PATH, and a case mismatch passes on macOS and
+  fails on Linux.
+- A `<name>` declared on both sides leaves the same `tree` and exits the same way — so the two
+  sides copy the same set into `assert-dir`; `cli-output` is compared per side only.
 
-Details: [LibExamples](../LibExamples/doc.md).
+Details: [LibExamples](../LibExamples/doc.md) and
+[CliExamples](../CliExamples/doc.md).
 

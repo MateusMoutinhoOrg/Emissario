@@ -1,0 +1,46 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            date:
+                type: string
+            expiration:
+                enum:
+                    - "7"
+                    - "30"
+                    - "60"
+                    - "90"
+                    - "365"
+                    - custom
+                    - never
+                type: string
+            ips:
+                type: string
+            name:
+                type: string
+            password:
+                maxLength: 1024
+                type: string
+        required:
+            - expiration
+            - name
+            - password
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Backoffice API Tokens
+methods:
+    - POST
+paths:
+    - end: 1
+      id: AdminCreateBackofficeApiToken
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/add-backoffice-api-token
+priority: 100
+private: true
+response-type: text/html
+segments: 2
+summary: Creates an API token and shows it once
