@@ -1,0 +1,5 @@
+dep: sleepdeps
+help: Pause a goroutine over time.Sleep
+module: ""
+name: stdsleep
+origin: project

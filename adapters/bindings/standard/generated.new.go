@@ -14,6 +14,7 @@ import (
 	memoryratelimit "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/memoryratelimit"
 	nethttpserver "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/nethttpserver"
 	osenv "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/osenv"
+	osexecrun "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/osexecrun"
 	osio "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/osio"
 	ossignal "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/ossignal"
 	osstd "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/osstd"
@@ -21,6 +22,7 @@ import (
 	sha256hash "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/sha256hash"
 	stdargv "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdargv"
 	stdserializable "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdserializable"
+	stdsleep "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdsleep"
 	stdsort "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdsort"
 	stdstrings "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdstrings"
 	stdtime "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdtime"
@@ -41,6 +43,7 @@ func New() deps.Deps {
 	memoryratelimit.Bind(&deps)
 	nethttpserver.Bind(&deps)
 	osenv.Bind(&deps)
+	osexecrun.Bind(&deps)
 	osio.Bind(&deps)
 	ossignal.Bind(&deps)
 	osstd.Bind(&deps)
@@ -48,6 +51,7 @@ func New() deps.Deps {
 	sha256hash.Bind(&deps)
 	stdargv.Bind(&deps)
 	stdserializable.Bind(&deps)
+	stdsleep.Bind(&deps)
 	stdsort.Bind(&deps)
 	stdstrings.Bind(&deps)
 	stdtime.Bind(&deps)

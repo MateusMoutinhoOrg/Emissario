@@ -1,0 +1,15 @@
+key-prefix: emissariodb
+name: emissario-db
+tables:
+    - fields:
+        - name: name
+          required: true
+          type: string
+        - name: repourl
+          required: true
+          type: string
+        - name: branch
+          type: string
+        - name: sync-time
+          type: string
+      name: source

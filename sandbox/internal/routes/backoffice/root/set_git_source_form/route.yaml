@@ -1,0 +1,35 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            branch:
+                maxLength: 255
+                type: string
+            repo-url:
+                maxLength: 2048
+                type: string
+            sync-time:
+                maxLength: 32
+                type: string
+        required:
+            - branch
+            - repo-url
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Git Source
+description: The repository is cloned into <fonts>/frontend and its branch pulled every sync time by the goroutine start-server runs; a blank sync time stops the syncing. Saving also asks for a sync on the next tick, so the site follows a new repository or branch at once.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSetGitSource
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-git-source
+priority: 100
+private: true
+response-type: text/html
+summary: Sets the git repository, branch and sync time the public website is served from

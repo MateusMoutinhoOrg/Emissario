@@ -71,6 +71,7 @@ or `403`, for example — or let it through to this route.
 | [`download-backup`](download_backup.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backups-page`](list_backups_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-backoffice-user-page`](set_backoffice_user_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-git-source-page`](set_git_source_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`health`](health.md) | depends on the address — `explain-route` gives the exact answer |
 | [`openapi`](openapi.md) | depends on the address — `explain-route` gives the exact answer |
 

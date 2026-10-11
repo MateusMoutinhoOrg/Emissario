@@ -277,6 +277,7 @@
         <a href="/admin/list-backoffice-users">Users</a>
         <a href="/admin/list-backoffice-api-tokens">API tokens</a>
         {{if .IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
+        {{if .IsRoot}}<a href="/admin/root/set-git-source">Git source</a>{{end}}
       </nav>
     </div>
     <div class="who">
@@ -348,6 +349,16 @@
         </p>
         <div class="links">
           <a class="btn btn-primary" href="/admin/root/list-backups">View backups</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Git source</h2>
+        <p class="muted">
+          Pick the git repository and branch the public website is served from, and how often it is pulled.
+        </p>
+        <div class="links">
+          <a class="btn btn-primary" href="/admin/root/set-git-source">Set git source</a>
         </div>
       </article>
       {{end}}

@@ -55,6 +55,8 @@ import (
 	routes_restore_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/restore_backup_form"
 	routes_set_backoffice_user_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_backoffice_user_form"
 	routes_set_backoffice_user_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_backoffice_user_page"
+	routes_set_git_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_git_source_form"
+	routes_set_git_source_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_git_source_page"
 	routes_upload_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/upload_backup"
 	routes_front "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/front"
 	routes_health "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/health"
@@ -125,6 +127,8 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_revoke_backoffice_api_token_form.NewRoute(sandbox),
 		routes_set_backoffice_user_form.NewRoute(sandbox),
 		routes_set_backoffice_user_page.NewRoute(sandbox),
+		routes_set_git_source_form.NewRoute(sandbox),
+		routes_set_git_source_page.NewRoute(sandbox),
 		routes_upload_backup.NewRoute(sandbox),
 		routes_front.NewRoute(sandbox),
 	}

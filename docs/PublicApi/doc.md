@@ -34,7 +34,7 @@ struct of function fields, filled by a binder.
 | [`sandbox/api/generated.server.go`](api.server.md) | `StatusOK`, `StatusCreated`, `StatusNoContent`, `StatusMovedPermanently`, `StatusFound`, `StatusSeeOther`, `StatusNotModified`, `StatusTemporaryRedirect`, `StatusPermanentRedirect`, `StatusBadRequest`, `StatusUnauthorized`, `StatusForbidden`, `StatusNotFound`, `StatusMethodNotAllowed`, `StatusConflict`, `StatusPayloadTooLarge`, `StatusUnsupportedMediaType`, `StatusUnprocessableEntity`, `StatusTooManyRequests`, `StatusInternalServerError`, `StatusServiceUnavailable`, `Server`, `ServeProps` |
 | [`sandbox/api/generated.serversandbox.go`](api.serversandbox.md) | `ServerSandbox` |
 | [`sandbox/api/generated.trigger.go`](api.trigger.md) | `TriggerEqual`, `TriggerPrefix`, `TriggerTextPrefix`, `TriggerSuffix`, `TriggerRegex`, `TriggerOneOf`, `TriggerType`, `Trigger` |
-| [`sandbox/api/projectconfig.go`](api.projectconfig.md) | `ProjectConfig` |
+| [`sandbox/api/projectconfig.go`](api.projectconfig.md) | `DefaultFontsDir`, `ProjectConfig` |
 | [`sandbox/api/projectsandbox.go`](api.projectsandbox.md) | `ProjectSandbox` |
 
 ## Dependency contracts
@@ -59,9 +59,11 @@ field is that package's `Sandbox` struct, filled by `adapters/impls/<name>.Bind(
 | [`deps.PasswordDeps`](deps.passworddeps.md) | `Contract` |
 | [`deps.RandDeps`](deps.randdeps.md) | `Contract` |
 | [`deps.RatelimitDeps`](deps.ratelimitdeps.md) | `Contract` |
+| [`deps.RunDeps`](deps.rundeps.md) | `Contract`, `RunProps`, `Result` |
 | [`deps.SerializableDeps`](deps.serializabledeps.md) | `SerializableObject`, `Contract` |
 | [`deps.ServerDeps`](deps.serverdeps.md) | `Contract`, `ServerProps`, `Server`, `Request`, `Response` |
 | [`deps.SignalDeps`](deps.signaldeps.md) | `Contract` |
+| [`deps.SleepDeps`](deps.sleepdeps.md) | `Contract` |
 | [`deps.SortDeps`](deps.sortdeps.md) | `Contract` |
 | [`deps.StdDeps`](deps.stddeps.md) | `Contract` |
 | [`deps.StringsDeps`](deps.stringsdeps.md) | `Contract` |

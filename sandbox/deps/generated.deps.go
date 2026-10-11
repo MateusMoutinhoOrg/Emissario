@@ -18,9 +18,11 @@ import (
 	passworddeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/passworddeps"
 	randdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/randdeps"
 	ratelimitdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/ratelimitdeps"
+	rundeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/rundeps"
 	serializabledeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serializabledeps"
 	serverdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	signaldeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/signaldeps"
+	sleepdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/sleepdeps"
 	sortdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/sortdeps"
 	stddeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/stddeps"
 	stringsdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/stringsdeps"
@@ -46,9 +48,11 @@ type Deps struct {
 	PasswordDeps             passworddeps.Contract
 	RandDeps                 randdeps.Contract
 	RatelimitDeps            ratelimitdeps.Contract
+	RunDeps                  rundeps.Contract
 	SerializableDeps         serializabledeps.Contract
 	ServerDeps               serverdeps.Contract
 	SignalDeps               signaldeps.Contract
+	SleepDeps                sleepdeps.Contract
 	SortDeps                 sortdeps.Contract
 	StdDeps                  stddeps.Contract
 	StringsDeps              stringsdeps.Contract

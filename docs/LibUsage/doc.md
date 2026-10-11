@@ -94,9 +94,11 @@ The contracts available to patch:
 | `deps.PasswordDeps` | `sandbox/deps/passworddeps` |
 | `deps.RandDeps` | `sandbox/deps/randdeps` |
 | `deps.RatelimitDeps` | `sandbox/deps/ratelimitdeps` |
+| `deps.RunDeps` | `sandbox/deps/rundeps` |
 | `deps.SerializableDeps` | `sandbox/deps/serializabledeps` |
 | `deps.ServerDeps` | `sandbox/deps/serverdeps` |
 | `deps.SignalDeps` | `sandbox/deps/signaldeps` |
+| `deps.SleepDeps` | `sandbox/deps/sleepdeps` |
 | `deps.SortDeps` | `sandbox/deps/sortdeps` |
 | `deps.StdDeps` | `sandbox/deps/stddeps` |
 | `deps.StringsDeps` | `sandbox/deps/stringsdeps` |
@@ -118,6 +120,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/memoryratelimit` | `memoryratelimit.Bind(&deps)` |
 | `adapters/impls/nethttpserver` | `nethttpserver.Bind(&deps)` |
 | `adapters/impls/osenv` | `osenv.Bind(&deps)` |
+| `adapters/impls/osexecrun` | `osexecrun.Bind(&deps)` |
 | `adapters/impls/osio` | `osio.Bind(&deps)` |
 | `adapters/impls/ossignal` | `ossignal.Bind(&deps)` |
 | `adapters/impls/osstd` | `osstd.Bind(&deps)` |
@@ -125,6 +128,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/sha256hash` | `sha256hash.Bind(&deps)` |
 | `adapters/impls/stdargv` | `stdargv.Bind(&deps)` |
 | `adapters/impls/stdserializable` | `stdserializable.Bind(&deps)` |
+| `adapters/impls/stdsleep` | `stdsleep.Bind(&deps)` |
 | `adapters/impls/stdsort` | `stdsort.Bind(&deps)` |
 | `adapters/impls/stdstrings` | `stdstrings.Bind(&deps)` |
 | `adapters/impls/stdtime` | `stdtime.Bind(&deps)` |

@@ -15,4 +15,15 @@ package api
 // Written once by `agnos start` and then yours: no build rewrites
 // this file.
 type ProjectConfig struct {
+	// FontsDir is the folder every git source is cloned into, one folder per
+	// source named after it — the frontend source in <FontsDir>/frontend —
+	// relative to the directory the program runs from, or absolute. The
+	// git-source-start-server middleware sets it from `--fonts` in front of
+	// start-server; the config constructor starts it at DefaultFontsDir.
+	FontsDir string
 }
+
+// DefaultFontsDir is the folder the git sources are cloned into when no
+// command line says otherwise: `--fonts` defaults to it, and a project used
+// as a lib keeps it.
+const DefaultFontsDir = "EmissarioFonts"

@@ -108,6 +108,13 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /admin/root/restore-backup/{Id:integer}`](restore_backup_form.md) | Starts putting a snapshot back over every database, after a pre-restore snapshot of them, and answers at once |
 | [`POST /admin/root/upload-backup`](upload_backup.md) | Stores a zip archive a download built as a new snapshot |
 
+## Git Source
+
+| Route | What it does |
+| --- | --- |
+| [`POST /admin/root/set-git-source`](set_git_source_form.md) | Sets the git repository, branch and sync time the public website is served from |
+| [`GET /admin/root/set-git-source`](set_git_source_page.md) | Shows the form that sets the git repository the public website is served from |
+
 ## Assets
 
 | Route | What it does |
