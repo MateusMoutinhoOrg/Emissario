@@ -66,6 +66,12 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /api/admin/root/restore-backup`](api_restore_backup.md) | Starts putting a snapshot back over every database, after a pre-restore snapshot of them, and answers 202 at once |
 | [`POST /api/admin/root/upload-backup`](api_upload_backup.md) | Stores a zip archive a download built as a new snapshot |
 
+## Website Source API
+
+| Route | What it does |
+| --- | --- |
+| [`POST /api/admin/root/sync-website-source`](api_sync_website_source.md) | Syncs the website source now, even when it is up to date, and answers 202 at once: the sync runs in the background |
+
 ## Backoffice API Tokens
 
 | Route | What it does |
@@ -108,12 +114,13 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /admin/root/restore-backup/{Id:integer}`](restore_backup_form.md) | Starts putting a snapshot back over every database, after a pre-restore snapshot of them, and answers at once |
 | [`POST /admin/root/upload-backup`](upload_backup.md) | Stores a zip archive a download built as a new snapshot |
 
-## Git Source
+## Website Source
 
 | Route | What it does |
 | --- | --- |
-| [`POST /admin/root/set-git-source`](set_git_source_form.md) | Sets the git repository, branch and sync time the public website is served from |
-| [`GET /admin/root/set-git-source`](set_git_source_page.md) | Shows the form that sets the git repository the public website is served from |
+| [`POST /admin/root/set-website-source`](set_website_source_form.md) | Sets the git repository, branch and sync time the public website is served from |
+| [`GET /admin/root/set-website-source`](set_website_source_page.md) | Shows the form that sets the git repository the public website is served from, and what the last sync did |
+| [`POST /admin/root/sync-website-source`](sync_website_source_form.md) | Syncs the website source now, even when it is up to date, and answers at once: the sync runs in the background |
 
 ## Assets
 

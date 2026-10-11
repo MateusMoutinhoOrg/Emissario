@@ -10,7 +10,7 @@ package sleepdeps
 // hands an instant over as a plain integer.
 
 // Contract is the waiting half of a clock, injected whole as the
-// Deps.SleepDeps field. The git source sync loop is what reaches for it, to
+// Deps.SleepDeps field. The website source sync loop is what reaches for it, to
 // wait between two looks at the sources it keeps pulled.
 type Contract struct {
 	// Sleep pauses the calling goroutine for at least milliseconds. Zero or

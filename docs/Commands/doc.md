@@ -37,7 +37,7 @@ Run in front of the commands they match, lowest `priority` first; typed by nobod
 | --- | --- | --- | --- |
 | [`backoffice-start-server`](backoffice-start-server.md) | `start-server` | 50 | `--addr`, `--allow-x-forwarded-for`, `--insecure-http` |
 | [`database-dir`](database-dir.md) | `*` | 6 | `--database` |
-| [`git-source-start-server`](git-source-start-server.md) | `start-server` | 51 | `--fonts` |
 | [`help-flag`](help-flag.md) | `*` | 5 | `--help`, `-h` |
+| [`website-source-start-server`](website-source-start-server.md) | `start-server` | 51 | `--fonts` |
 
 Output channels and exit codes are in [Rules](../Rules/doc.md#output-channels).

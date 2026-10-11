@@ -27,6 +27,7 @@ import (
 	routes_api_remove_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_backup"
 	routes_api_restore_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_restore_backup"
 	routes_api_set_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_backoffice_user"
+	routes_api_sync_website_source "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_sync_website_source"
 	routes_api_upload_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_upload_backup"
 	routes_add_backoffice_api_token_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/add_backoffice_api_token_form"
 	routes_add_backoffice_api_token_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/add_backoffice_api_token_page"
@@ -55,8 +56,9 @@ import (
 	routes_restore_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/restore_backup_form"
 	routes_set_backoffice_user_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_backoffice_user_form"
 	routes_set_backoffice_user_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_backoffice_user_page"
-	routes_set_git_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_git_source_form"
-	routes_set_git_source_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_git_source_page"
+	routes_set_website_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_website_source_form"
+	routes_set_website_source_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_website_source_page"
+	routes_sync_website_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/sync_website_source_form"
 	routes_upload_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/upload_backup"
 	routes_front "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/front"
 	routes_health "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/health"
@@ -107,6 +109,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_remove_backup.NewRoute(sandbox),
 		routes_api_restore_backup.NewRoute(sandbox),
 		routes_api_set_backoffice_user.NewRoute(sandbox),
+		routes_api_sync_website_source.NewRoute(sandbox),
 		routes_api_upload_backup.NewRoute(sandbox),
 		routes_backoffice_home.NewRoute(sandbox),
 		routes_backoffice_index.NewRoute(sandbox),
@@ -127,8 +130,9 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_revoke_backoffice_api_token_form.NewRoute(sandbox),
 		routes_set_backoffice_user_form.NewRoute(sandbox),
 		routes_set_backoffice_user_page.NewRoute(sandbox),
-		routes_set_git_source_form.NewRoute(sandbox),
-		routes_set_git_source_page.NewRoute(sandbox),
+		routes_set_website_source_form.NewRoute(sandbox),
+		routes_set_website_source_page.NewRoute(sandbox),
+		routes_sync_website_source_form.NewRoute(sandbox),
 		routes_upload_backup.NewRoute(sandbox),
 		routes_front.NewRoute(sandbox),
 	}

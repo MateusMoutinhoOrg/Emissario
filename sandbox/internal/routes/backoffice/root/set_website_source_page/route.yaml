@@ -1,0 +1,21 @@
+category: Website Source
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last save
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootSetWebsiteSource
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-website-source
+priority: 100
+private: true
+response-type: text/html
+summary: Shows the form that sets the git repository the public website is served from, and what the last sync did

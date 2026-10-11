@@ -1,0 +1,14 @@
+category: Website Source
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSyncWebsiteSource
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/sync-website-source
+priority: 100
+private: true
+response-type: text/html
+summary: 'Syncs the website source now, even when it is up to date, and answers at once: the sync runs in the background'

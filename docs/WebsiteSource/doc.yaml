@@ -1,0 +1,4 @@
+description: 'Serve the public website from a git repository: the root sets the repository, branch and sync time in the backoffice, start-server keeps it pulled, and Sync or its API syncs it on demand'
+name: Website Source
+themes:
+    - server-usage

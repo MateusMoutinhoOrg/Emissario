@@ -1,4 +1,0 @@
-description: 'Serve the public website from a git repository: the root sets the repository, branch and sync time in the backoffice, start-server keeps it pulled'
-name: Git Source
-themes:
-    - server-usage

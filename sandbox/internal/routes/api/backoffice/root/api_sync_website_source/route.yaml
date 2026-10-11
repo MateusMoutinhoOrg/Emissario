@@ -1,0 +1,17 @@
+category: Website Source API
+description: Answers 409 when no website source was saved yet, and 503 when the sync loop does not run in this process (it runs in the one start-server started). The page /admin/root/set-website-source shows when the sync ends, the commit it left the site at, and why it failed.
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/sync-website-source -H "Authorization: Bearer $TOKEN"'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootSyncWebsiteSource
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/sync-website-source
+priority: 100
+private: true
+response-type: application/json
+summary: 'Syncs the website source now, even when it is up to date, and answers 202 at once: the sync runs in the background'
