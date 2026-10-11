@@ -30,9 +30,8 @@ type WebsiteSourceFormPage struct {
 	SyncTime      string
 	// Saved is true once a website source was saved: Sync needs one.
 	Saved bool
-	// RepoDir is the folder the repository is cloned into, and the website
-	// served from.
-	RepoDir string
+	// SiteDir is the folder of the checkout the website is served from.
+	SiteDir string
 	// Running is true when the sync loop runs in this process.
 	Running bool
 	// Busy is true from the moment a sync is asked for until it ends: the page
@@ -85,7 +84,7 @@ func RenderWebsiteSourcePage(sandbox *api.Sandbox, response *serverdeps.Response
 		Branch:     settings.Branch,
 		SyncTime:   settings.SyncTime,
 		Saved:      saved,
-		RepoDir:    websitesource.RepoDir(sandbox),
+		SiteDir:    websitesource.SiteDir(sandbox),
 		Running:    last.Running,
 		Busy:       last.Pending || last.Syncing,
 		Attempted:  last.AttemptedAt > 0,

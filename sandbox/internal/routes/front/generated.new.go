@@ -26,7 +26,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Segments = 0
 	self.Pattern = "/{*Rest}"
 	self.Category = "Assets"
-	self.Summary = "Serves any file of the embedded assets/front tree"
+	self.Summary = "Serves the public website: the frontend/ folder of the website source"
 	self.Description = ""
 	self.Examples = []string{}
 	self.Hidden = false
@@ -37,7 +37,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 			Start:       0,
 			End:         -1,
 			Type:        api.PathString,
-			Description: "the file under assets/front; none is its index.html",
+			Description: "the file under the frontend/ folder of the website source, else that path plus .html; none is its index.html",
 			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
 		},
 	}

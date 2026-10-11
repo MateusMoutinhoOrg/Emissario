@@ -130,12 +130,12 @@
         "tags": [
           "Assets"
         ],
-        "summary": "Serves any file of the embedded assets/front tree",
+        "summary": "Serves the public website: the frontend/ folder of the website source",
         "parameters": [
           {
             "name": "Rest",
             "in": "path",
-            "description": "the file under assets/front; none is its index.html\n\nThe rest of the address — one part or more, like `a/b.png`.",
+            "description": "the file under the frontend/ folder of the website source, else that path plus .html; none is its index.html\n\nThe rest of the address — one part or more, like `a/b.png`.",
             "required": true,
             "schema": {
               "type": "string"

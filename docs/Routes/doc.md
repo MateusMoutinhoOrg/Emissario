@@ -126,7 +126,7 @@ it prints the address it took. Change it to wherever your server runs.
 
 | Route | What it does |
 | --- | --- |
-| [`GET /{*Rest}`](front.md) | Serves any file of the embedded assets/front tree |
+| [`GET /{*Rest}`](front.md) | Serves the public website: the frontend/ folder of the website source |
 
 ## Server
 

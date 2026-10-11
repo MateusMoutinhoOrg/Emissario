@@ -1,6 +1,6 @@
 # `GET /{*Rest}`
 
-Serves any file of the embedded assets/front tree
+Serves the public website: the frontend/ folder of the website source
 
 ## Try it
 
@@ -23,7 +23,7 @@ curl localhost:3000/my-rest \
 
 | Part | What goes there | Example | Description |
 | --- | --- | --- | --- |
-| `{*Rest}` | the rest of the address — one part or more, like `a/b.png` | `my-rest` | the file under assets/front; none is its index.html |
+| `{*Rest}` | the rest of the address — one part or more, like `a/b.png` | `my-rest` | the file under the frontend/ folder of the website source, else that path plus .html; none is its index.html |
 
 ## Query string, headers and cookies
 

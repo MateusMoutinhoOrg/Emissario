@@ -9,8 +9,8 @@ import (
 // sets its url, branch and sync time in the backoffice; they are kept as the
 // frontend record of the source table of emissario-db. The goroutine Start
 // runs clones the repository into <FontsDir>/frontend and pulls the branch
-// every sync time (sync.go), and the site is that checkout itself (site.go):
-// / answers the index.html at the root of the repository. git runs with whatever credentials the user running the
+// every sync time (sync.go), and the site is the SiteFolder of that checkout
+// (site.go): / answers the frontend/index.html of the repository. git runs with whatever credentials the user running the
 // server has set up — an ssh key, a credential helper — and none is ever
 // asked for, stored or put on a command line here.
 
@@ -19,6 +19,9 @@ const (
 	// served from, and of the folder under FontsDir its repository is cloned
 	// into.
 	FrontendName = "frontend"
+	// SiteFolder is the folder of the repository the public website is served
+	// from: / answers its index.html.
+	SiteFolder = "frontend"
 	// PagePath is the backoffice page that sets the website source.
 	PagePath = "/admin/root/set-website-source"
 	// DefaultBranch fills the branch of a form no root saved yet.
@@ -77,10 +80,15 @@ func Defaults(sandbox *api.Sandbox) Settings {
 	return Settings{Branch: DefaultBranch, SyncTime: DefaultSyncTime}
 }
 
-// RepoDir is the folder the frontend repository is cloned into, and the one
-// the public website is served from.
+// RepoDir is the folder the frontend repository is cloned into.
 func RepoDir(sandbox *api.Sandbox) string {
 	return sandbox.Deps.IoDeps.Join(fontsDir(sandbox), FrontendName)
+}
+
+// SiteDir is the folder the public website is served from: the SiteFolder of
+// the checkout at RepoDir.
+func SiteDir(sandbox *api.Sandbox) string {
+	return sandbox.Deps.IoDeps.Join(RepoDir(sandbox), SiteFolder)
 }
 
 // fontsDir is sandbox.Config.FontsDir, api.DefaultFontsDir when it was left

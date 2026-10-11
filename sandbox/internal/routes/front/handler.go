@@ -8,11 +8,12 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 )
 
-// Handle answers GET /<rest...> with the public website: the checkout of the
-// website source a root set in the backoffice, cloned into <--fonts>/frontend,
-// read through websitesource.Resolve. A path ending in / is answered with the
-// index.html of that folder, any other with the file it names; one naming no
-// file with the checkout's not-found.html under a 404, else
+// Handle answers GET /<rest...> with the public website: the frontend/ folder
+// of the website source a root set in the backoffice, cloned into
+// <--fonts>/frontend, read through websitesource.Resolve. A path ending in / is
+// answered with the index.html of that folder, any other with the file it
+// names, else with that file plus .html (/pagina -> pagina.html); one naming no
+// file with the site's not-found.html under a 404, else
 // with the default assets/front/not-found.html embedded in the binary. Only
 // when that one is gone too is the path declined — nil without answering — so
 // the chain goes on and HandleNotFound answers it.

@@ -1,6 +1,6 @@
 # WebsiteSource
 
-The public website is a git repository, served from its root. A root sets the repository,
+The public website is a git repository, served from its `frontend/` folder. A root sets the repository,
 branch and sync time in the backoffice; `start-server` clones it into `<fonts>/frontend` and keeps
 pulling the branch. **Sync** — a button and its JSON twin — pulls it on demand.
 
@@ -66,14 +66,15 @@ sync: when, the commit, and the tail of git's output when it failed; stderr carr
 
 ## How a path is answered
 
-The `front` route (`GET /{*Rest}`, priority `1000`) reads the checkout, `<fonts>/frontend/`:
+The `front` route (`GET /{*Rest}`, priority `1000`) reads the `frontend/` folder of the checkout,
+`<fonts>/frontend/frontend/` — `repo/frontend/` below:
 
 | Request | Answered with |
 |---|---|
-| `/` | `<fonts>/frontend/index.html` |
-| path ending in `/` (`/blog/`) | `<fonts>/frontend/<path>/index.html` |
-| any other path (`/blog/app.css`) | `<fonts>/frontend/<path>` — a folder without its `/` is not found |
-| not found | `404` with `<fonts>/frontend/not-found.html`, else the embedded `assets/front/not-found.html` |
+| `/` | `repo/frontend/index.html` |
+| path ending in `/` (`/pagina/`) | `repo/frontend/<path>/index.html` |
+| any other path (`/style/app.css`, `/pagina`) | `repo/frontend/<path>` when it is a file, else `repo/frontend/<path>.html` (`/pagina` → `pagina.html`) |
+| not found | `404` with `repo/frontend/not-found.html`, else the embedded `assets/front/not-found.html` |
 
 Every path goes through `OpinionatedAgnosFront.SafePath` first: no `..`, no empty segment, no
 dotfile (`.git`) but `.well-known`. `/backoffice/*` files embedded under `assets/front/backoffice/`
