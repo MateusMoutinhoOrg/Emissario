@@ -3,7 +3,7 @@
   "info": {
     "title": "emissario",
     "description": "Every address emissario answers: what to send and what comes back.",
-    "version": "unversioned"
+    "version": "v0.0.1"
   },
   "servers": [
     {
