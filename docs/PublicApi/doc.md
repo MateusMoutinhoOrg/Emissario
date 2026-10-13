@@ -36,6 +36,7 @@ struct of function fields, filled by a binder.
 | [`sandbox/api/generated.trigger.go`](api.trigger.md) | `TriggerEqual`, `TriggerPrefix`, `TriggerTextPrefix`, `TriggerSuffix`, `TriggerRegex`, `TriggerOneOf`, `TriggerType`, `Trigger` |
 | [`sandbox/api/projectconfig.go`](api.projectconfig.md) | `DefaultFontsDir`, `ProjectConfig` |
 | [`sandbox/api/projectsandbox.go`](api.projectsandbox.md) | `ProjectSandbox` |
+| [`sandbox/api/visualizationconfig.go`](api.visualizationconfig.md) | `VisualizationConfig` |
 
 ## Dependency contracts
 
@@ -53,9 +54,11 @@ field is that package's `Sandbox` struct, filled by `adapters/impls/<name>.Bind(
 | [`deps.DatabaseDeps`](deps.databasedeps.md) | `Config`, `Key`, `Int`, `Nested`, `Float`, `String`, `Link`, `Bytes`, `KeyConflict`, `NoValue`, `MissingField`, `InvalidField`, `Internal`, `Removed`, `InvalidSchema`, `InvalidArgument`, `Field`, `Schema`, `Props`, `Error`, `Record`, `Collection`, `Database`, `Databases`, `Info`, `ProjectConfig`, `ProjectSandbox`, `Sandbox` |
 | [`deps.EmbedDeps`](deps.embeddeps.md) | `Contract` |
 | [`deps.EnvDeps`](deps.envdeps.md) | `Contract` |
+| [`deps.GeoipDeps`](deps.geoipdeps.md) | `Contract`, `Database` |
 | [`deps.HashDeps`](deps.hashdeps.md) | `Contract` |
 | [`deps.IoDeps`](deps.iodeps.md) | `Contract` |
 | [`deps.JwtDeps`](deps.jwtdeps.md) | `Contract`, `Claims` |
+| [`deps.LocaltimeDeps`](deps.localtimedeps.md) | `Contract` |
 | [`deps.PasswordDeps`](deps.passworddeps.md) | `Contract` |
 | [`deps.RandDeps`](deps.randdeps.md) | `Contract` |
 | [`deps.RatelimitDeps`](deps.ratelimitdeps.md) | `Contract` |

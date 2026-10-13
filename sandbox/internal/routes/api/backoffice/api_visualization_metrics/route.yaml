@@ -1,0 +1,56 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            bots:
+                type: boolean
+            browser:
+                type: string
+            bucket:
+                enum:
+                    - hour
+                    - day
+                    - month
+                type: string
+            country:
+                type: string
+            device:
+                type: string
+            from:
+                type: string
+            ip:
+                type: string
+            os:
+                type: string
+            path:
+                type: string
+            prefix:
+                type: string
+            status:
+                type: integer
+            to:
+                type: string
+            top:
+                maximum: 100
+                minimum: 1
+                type: integer
+        type: object
+    max-bytes: 1048576
+    type: json
+category: Visualization API
+description: 'Open to every backoffice user. Every field is optional: the period defaults to the last 7 days, bucket to hour up to 2 days, day up to 90 and month above, top to 10. Answers {summary, timeline, top}; unique visitors are counted on the whole ip, and the ips of top.visitors are masked to a viewer. A bad filter is answered 400, an ip sent by a viewer 403.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/visualization-metrics -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"from":"2026-10-07","to":"2026-10-13","country":"BR","bucket":"day","top":10}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminVisualizationMetrics
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/visualization-metrics
+priority: 100
+private: true
+response-type: application/json
+summary: 'Answers the metrics of the page views of a period: the totals, the views over time and the top pages, countries, devices, browsers, operating systems, referrers, not-found paths and visitors'

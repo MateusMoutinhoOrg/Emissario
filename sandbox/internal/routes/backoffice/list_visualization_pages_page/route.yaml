@@ -1,0 +1,104 @@
+category: Visualization
+description: Open to every backoffice user, with the filters of the dashboard; prefix searches the pages, sort orders them by views, unique, last or page, and page and limit paginate them, 20 a page.
+examples:
+    - curl -b "backoffice_session=$SESSION" 'localhost:3000/admin/list-visualization-pages?prefix=/blog/&sort=unique'
+methods:
+    - GET
+parameters:
+    - description: the first day of the period, YYYY-MM-DD, included; 6 days before to when absent
+      id: From
+      key: from
+      sources:
+        - query
+      type: string
+    - description: the last day of the period, YYYY-MM-DD, included; today when absent; a period covers 366 days at most
+      id: To
+      key: to
+      sources:
+        - query
+      type: string
+    - description: one canonical page, exactly (/blog/)
+      id: Path
+      key: path
+      sources:
+        - query
+      type: string
+    - description: keeps the pages starting with it (/blog/)
+      id: Prefix
+      key: prefix
+      sources:
+        - query
+      type: string
+    - description: 'one ip or one CIDR range (203.0.113.0/24): a root only, a viewer is answered 403'
+      id: Ip
+      key: ip
+      sources:
+        - query
+      type: string
+    - description: one ISO 3166-1 alpha-2 code (BR), XX for an unknown country
+      id: Country
+      key: country
+      sources:
+        - query
+      type: string
+    - description: desktop, mobile, tablet, bot or other
+      id: Device
+      key: device
+      sources:
+        - query
+      type: string
+    - description: Chrome, Firefox, Safari, Edge, Opera, Samsung Internet or Other
+      id: Browser
+      key: browser
+      sources:
+        - query
+      type: string
+    - description: Windows, macOS, Linux, Android, iOS, ChromeOS or Other
+      id: Os
+      key: os
+      sources:
+        - query
+      type: string
+    - description: 200, or 404 for the not-found views
+      id: Status
+      key: status
+      sources:
+        - query
+      type: string
+    - description: 1 includes the views of bots, left out of everything otherwise
+      id: Bots
+      key: bots
+      sources:
+        - query
+      type: string
+    - description: views (the default), unique, last or page
+      id: Sort
+      key: sort
+      sources:
+        - query
+      type: string
+    - default: "1"
+      description: the page to show, counted from 1
+      id: Page
+      key: page
+      sources:
+        - query
+      type: integer
+    - default: "20"
+      description: how many rows a page shows, from 1 to 100
+      id: Limit
+      key: limit
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminListVisualizationPages
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/list-visualization-pages
+priority: 100
+private: true
+response-type: text/html
+summary: 'Lists every canonical page of the public website viewed in a period: its views, unique visitors and last view'

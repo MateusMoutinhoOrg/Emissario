@@ -1,0 +1,54 @@
+package list_visualization_views_page
+
+import (
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeauth"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficerender"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
+)
+
+// Handle answers GET /admin/list-visualization-views, open to every backoffice
+// user, with backoffice/visualization_views.html: one page of the views the
+// filters of the query string keep, newest first, each ip masked to a viewer.
+// Filtered by one exact ip — a root alone filters by ip — the page opens with
+// the summary of that visitor. A filter that does not read answers the page
+// under a 400, the reason above the filter bar; an ip sent by a viewer answers
+// the forbidden page.
+func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
+	if props.User == nil {
+		return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusUnauthorized, "", "no authenticated user")
+	}
+	raw := visualization.RawFilter{
+		From:    input.From,
+		To:      input.To,
+		Path:    input.Path,
+		Prefix:  input.Prefix,
+		Ip:      input.Ip,
+		Country: input.Country,
+		Device:  input.Device,
+		Browser: input.Browser,
+		Os:      input.Os,
+		Status:  input.Status,
+		Bots:    input.Bots,
+	}
+	root := backofficeauth.Role(props.User.Role) == backofficeauth.RoleRoot
+	filter, refusal := visualization.ParseFilter(sandbox, raw, root)
+	if refusal != nil && refusal.Status == api.StatusForbidden {
+		return backofficerender.RenderForbiddenPage(sandbox, response, props.User)
+	}
+	if refusal != nil {
+		return backofficerender.RenderVisualizationViewsPage(sandbox, response, api.StatusBadRequest, props.User, raw, filter, refusal.Message, nil, visualization.Paging{Limit: input.Limit}, nil)
+	}
+	selection, err := visualization.Select(sandbox, filter)
+	if err != nil {
+		return err
+	}
+	views, paging := visualization.ListViews(sandbox, selection, input.Page, input.Limit, root)
+	var visitor *visualization.VisitorSummary
+	if summary, ok := visualization.SummarizeVisitor(sandbox, selection); ok {
+		visitor = &summary
+	}
+	return backofficerender.RenderVisualizationViewsPage(sandbox, response, api.StatusOK, props.User, raw, filter, "", views, paging, visitor)
+}

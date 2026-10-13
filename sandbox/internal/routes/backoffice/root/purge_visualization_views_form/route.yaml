@@ -1,0 +1,31 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            all:
+                maxLength: 8
+                type: string
+            before:
+                maxLength: 16
+                type: string
+        type: object
+    max-bytes: 1024
+    required: true
+    type: form
+category: Visualization
+description: Root only. before=YYYY-MM-DD removes every view before that day, all=1 every view; answers 303 to the settings page with ?notice=purged and how many views were removed.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/purge-visualization-views -H ''Origin: http://localhost:3000'' --data ''before=2026-07-01'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootPurgeVisualizationViews
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/purge-visualization-views
+priority: 100
+private: true
+response-type: text/html
+summary: Deletes every page view before a date, or every one

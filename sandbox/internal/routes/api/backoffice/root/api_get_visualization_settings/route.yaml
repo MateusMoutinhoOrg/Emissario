@@ -1,0 +1,17 @@
+category: Visualization API
+description: 'Root only. Answers {settings, geoip, stored, oldest_at, dropped}: geoip is {source, built_at}, source embedded or the --visualization-geoip file; dropped counts the views the full queue dropped since the server started.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/get-visualization-settings -H "Authorization: Bearer $TOKEN"'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootGetVisualizationSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/get-visualization-settings
+priority: 100
+private: true
+response-type: application/json
+summary: Answers the settings of the visualization, the country database in use, how many views are stored, the oldest one and how many were dropped

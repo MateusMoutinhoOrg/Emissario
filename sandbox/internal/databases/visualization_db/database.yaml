@@ -1,0 +1,40 @@
+key-prefix: visualizationdb
+name: visualization-db
+tables:
+    - fields:
+        - name: at
+          required: true
+          type: integer
+        - name: path
+          required: true
+          type: string
+        - name: page
+          required: true
+          type: string
+        - name: status
+          required: true
+          type: integer
+        - name: ip
+          required: true
+          type: string
+        - name: country
+          type: string
+        - name: device
+          type: string
+        - name: browser
+          type: string
+        - name: os
+          type: string
+        - name: user-agent
+          type: string
+        - name: referrer
+          type: string
+      name: visualization-view
+    - fields:
+        - name: enabled
+          type: integer
+        - name: retention-days
+          type: integer
+        - name: ignored-ips
+          type: string
+      name: visualization-setting

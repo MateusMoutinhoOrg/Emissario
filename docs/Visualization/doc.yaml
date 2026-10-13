@@ -1,0 +1,4 @@
+description: 'Page views of the public website, recorded on the server: which page, when, from which ip, country, device, browser and os, searched and counted in the backoffice at /admin/visualization and its JSON api'
+name: Visualization
+themes:
+    - server-usage

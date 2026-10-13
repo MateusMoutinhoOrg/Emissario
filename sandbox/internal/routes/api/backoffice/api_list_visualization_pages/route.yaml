@@ -1,0 +1,57 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            bots:
+                type: boolean
+            browser:
+                type: string
+            country:
+                type: string
+            device:
+                type: string
+            from:
+                type: string
+            ip:
+                type: string
+            limit:
+                type: integer
+            os:
+                type: string
+            page:
+                type: integer
+            path:
+                type: string
+            prefix:
+                type: string
+            sort:
+                enum:
+                    - views
+                    - unique
+                    - last
+                    - page
+                type: string
+            status:
+                type: integer
+            to:
+                type: string
+        type: object
+    max-bytes: 1048576
+    type: json
+category: Visualization API
+description: Open to every backoffice user. Answers {website_pages, total, page, pages, limit}, each page {page, views, unique, not_found, last_at}.
+examples:
+    - 'curl -X POST localhost:3000/api/admin/list-visualization-pages -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"prefix":"/blog/","sort":"views","page":1,"limit":20}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminListVisualizationPages
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/list-visualization-pages
+priority: 100
+private: true
+response-type: application/json
+summary: Lists every canonical page of the public website viewed in a period, paginated

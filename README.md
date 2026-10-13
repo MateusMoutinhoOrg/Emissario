@@ -5,6 +5,7 @@
 
 Place your description in AgnosConfig/docs/ReadmeHeader.md
 
+The country of every page view of the public website ([Visualization](docs/Visualization/doc.md)) is looked up in the DB-IP *IP to Country Lite* database embedded in the binary, licensed CC BY 4.0: [IP Geolocation by DB-IP](https://db-ip.com).
 
 
 ## Documentation
@@ -30,6 +31,7 @@ Serving http - bring the server up, declare routes, read a body
 | [Routes](docs/Routes/doc.md) | Every address emissario answers: what to send, a request to run, what comes back, and the OpenAPI document for Postman or Swagger |
 | [Backoffice](docs/Backoffice/doc.md) | The admin backoffice of emissario: secret, users, roles, sessions, API tokens and the /api/admin JSON api |
 | [Backups](docs/Backups/doc.md) | Backups of every database of emissario from the backoffice: take a snapshot in the background, download, upload and restore one, or build one by hand file by file |
+| [Visualization](docs/Visualization/doc.md) | Page views of the public website, recorded on the server: which page, when, from which ip, country, device, browser and os, searched and counted in the backoffice at /admin/visualization and its JSON api |
 | [Website Source](docs/WebsiteSource/doc.md) | Serve the public website from a git repository: the root sets the repository, branch and sync time in the backoffice, start-server keeps it pulled, and Sync or its API syncs it on demand |
 
 ### LibUsage

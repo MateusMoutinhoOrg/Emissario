@@ -1,0 +1,31 @@
+category: Visualization
+description: Root only. Beside the form, the country database in use and its build date, how many views are stored, the oldest one, how many were dropped since the server started (the queue was full) and the ip of the request, with a button that adds it to the ignored ips.
+examples:
+    - curl -b "backoffice_session=$SESSION" localhost:3000/admin/root/set-visualization-settings
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last save or delete
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many views the last delete removed
+      id: Removed
+      key: removed
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminRootSetVisualizationSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-visualization-settings
+priority: 100
+private: true
+response-type: text/html
+summary: 'Shows the settings of the visualization: tracking, retention, ignored ips, the country database in use and the Delete views form'

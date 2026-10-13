@@ -1,0 +1,84 @@
+category: Visualization
+description: Open to every backoffice user. Every filter is optional and the period defaults to the last 7 days, today included, counted in the server's time zone; the bots are left out unless bots=1. Each row of a table is a link that adds its filter, so ?path=/blog/ is the detail of one page and ?country=BR of one country. A bad filter is answered 400 with the reason above the filter bar, and an ip sent by a viewer 403.
+examples:
+    - curl -b "backoffice_session=$SESSION" 'localhost:3000/admin/visualization?from=2026-10-07&to=2026-10-13&country=BR'
+methods:
+    - GET
+parameters:
+    - description: the first day of the period, YYYY-MM-DD, included; 6 days before to when absent
+      id: From
+      key: from
+      sources:
+        - query
+      type: string
+    - description: the last day of the period, YYYY-MM-DD, included; today when absent; a period covers 366 days at most
+      id: To
+      key: to
+      sources:
+        - query
+      type: string
+    - description: one canonical page, exactly (/blog/)
+      id: Path
+      key: path
+      sources:
+        - query
+      type: string
+    - description: keeps the pages starting with it (/blog/)
+      id: Prefix
+      key: prefix
+      sources:
+        - query
+      type: string
+    - description: 'one ip or one CIDR range (203.0.113.0/24): a root only, a viewer is answered 403'
+      id: Ip
+      key: ip
+      sources:
+        - query
+      type: string
+    - description: one ISO 3166-1 alpha-2 code (BR), XX for an unknown country
+      id: Country
+      key: country
+      sources:
+        - query
+      type: string
+    - description: desktop, mobile, tablet, bot or other
+      id: Device
+      key: device
+      sources:
+        - query
+      type: string
+    - description: Chrome, Firefox, Safari, Edge, Opera, Samsung Internet or Other
+      id: Browser
+      key: browser
+      sources:
+        - query
+      type: string
+    - description: Windows, macOS, Linux, Android, iOS, ChromeOS or Other
+      id: Os
+      key: os
+      sources:
+        - query
+      type: string
+    - description: 200, or 404 for the not-found views
+      id: Status
+      key: status
+      sources:
+        - query
+      type: string
+    - description: 1 includes the views of bots, left out of everything otherwise
+      id: Bots
+      key: bots
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminVisualization
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/visualization
+priority: 100
+private: true
+response-type: text/html
+summary: 'Shows the dashboard of the page views of the public website: cards, views over time and the top pages, countries, devices, browsers, operating systems, referrers, not-found paths and visitors'

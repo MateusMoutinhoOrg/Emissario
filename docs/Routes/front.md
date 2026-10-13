@@ -14,6 +14,10 @@ With every value it reads:
 
 ```bash
 curl localhost:3000/my-rest \
+  -H 'x-request-method: my-x-request-method' \
+  -H 'user-agent: my-user-agent' \
+  -H 'referer: my-referer' \
+  -H 'host: my-host' \
   -H 'x-client-ip: my-x-client-ip' \
   -H 'x-forwarded-for: my-x-forwarded-for' \
   -H 'x-request-method: my-x-request-method'
@@ -29,6 +33,10 @@ curl localhost:3000/my-rest \
 
 | Name | Sent in | What goes there | Required | Example | Description |
 | --- | --- | --- | --- | --- | --- |
+| `x-request-method` | header | text | no | `my-x-request-method` | the method of the request, set by the server and never by the client: a HEAD is no page view |
+| `user-agent` | header | text | no | `my-user-agent` | the device, browser and operating system a page view is recorded with |
+| `referer` | header | text | no | `my-referer` | the site a page view came from, recorded when it is another one |
+| `host` | header | text | no | `my-host` | the host the request was sent to: a Referer naming it is a link inside the site |
 | `x-client-ip` | header | text | no | `my-x-client-ip` | the ip of the connection, set by the server and never by the client — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
 | `x-forwarded-for` | header | text | no | `my-x-forwarded-for` | the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
 | `x-request-method` | header | text | no | `my-x-request-method` | the method of the request, set by the server and never by the client — read by [`backoffice-maintenance`](backoffice_maintenance.md), which runs first |
@@ -61,6 +69,9 @@ or `403`, for example — or let it through to this route.
 | [`backoffice-login-page`](backoffice_login_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backoffice-api-tokens-page`](list_backoffice_api_tokens_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backoffice-users-page`](list_backoffice_users_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`list-visualization-pages-page`](list_visualization_pages_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`list-visualization-views-page`](list_visualization_views_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`list-visualization-visitors-page`](list_visualization_visitors_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-client-ip`](backoffice_client_ip.md) | always |
 | [`backoffice-maintenance`](backoffice_maintenance.md) | always |
 | [`backoffice-root-guard`](backoffice_root_guard.md) | depends on the address — `explain-route` gives the exact answer |
@@ -69,9 +80,12 @@ or `403`, for example — or let it through to this route.
 | [`backoffice-session-auth`](backoffice_session_auth.md) | depends on the address — `explain-route` gives the exact answer |
 | [`add-backoffice-user-page`](add_backoffice_user_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`download-backup`](download_backup.md) | depends on the address — `explain-route` gives the exact answer |
+| [`export-visualization-views`](export_visualization_views.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backups-page`](list_backups_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-backoffice-user-page`](set_backoffice_user_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-visualization-settings-page`](set_visualization_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-website-source-page`](set_website_source_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`visualization-dashboard-page`](visualization_dashboard_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`health`](health.md) | depends on the address — `explain-route` gives the exact answer |
 | [`openapi`](openapi.md) | depends on the address — `explain-route` gives the exact answer |
 

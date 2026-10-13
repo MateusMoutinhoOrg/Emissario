@@ -39,6 +39,21 @@
     });
   }
 
+  // The visualization settings form: add the browser's own ip to the ignored
+  // ones, one per line.
+  var ignore = document.getElementById('visualization-add-my-ip');
+  if (ignore) {
+    ignore.addEventListener('click', function () {
+      var field = document.getElementById('ignored-ips');
+      var ip = ignore.dataset.ip;
+      var listed = field.value.split('\n').map(function (entry) { return entry.trim(); }).filter(Boolean);
+      if (listed.indexOf(ip) === -1) {
+        listed.push(ip);
+      }
+      field.value = listed.join('\n');
+    });
+  }
+
   // The snapshot upload form: the server reads no multipart body, so the
   // file is sent as the whole body of the request, and the list is reloaded
   // with the outcome — or the reason it was refused is shown.

@@ -1,0 +1,34 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            enabled:
+                maxLength: 8
+                type: string
+            ignored-ips:
+                maxLength: 8192
+                type: string
+            retention-days:
+                maxLength: 16
+                type: string
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Visualization
+description: Root only. enabled=1 turns tracking on, its absence off; a blank retention keeps the views forever, else 1 to 3650 days; the ignored ips are one ip or CIDR range per line, 100 at most. A refused value answers the form again under a 400; a save answers 303 back to the page with ?notice=saved.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/set-visualization-settings -H ''Origin: http://localhost:3000'' --data ''enabled=1&retention-days=90&ignored-ips=203.0.113.7'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSetVisualizationSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-visualization-settings
+priority: 100
+private: true
+response-type: text/html
+summary: 'Saves the settings of the visualization: tracking on or off, the retention in days and the ignored ips'

@@ -38,6 +38,7 @@ Run in front of the commands they match, lowest `priority` first; typed by nobod
 | [`backoffice-start-server`](backoffice-start-server.md) | `start-server` | 50 | `--addr`, `--allow-x-forwarded-for`, `--insecure-http` |
 | [`database-dir`](database-dir.md) | `*` | 6 | `--database` |
 | [`help-flag`](help-flag.md) | `*` | 5 | `--help`, `-h` |
+| [`visualization-start-server`](visualization-start-server.md) | `start-server` | 52 | `--visualization-geoip` |
 | [`website-source-start-server`](website-source-start-server.md) | `start-server` | 51 | `--fonts` |
 
 Output channels and exit codes are in [Rules](../Rules/doc.md#output-channels).

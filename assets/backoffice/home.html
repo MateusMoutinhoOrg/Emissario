@@ -276,6 +276,7 @@
         <a href="/admin/home" class="active">Home</a>
         <a href="/admin/list-backoffice-users">Users</a>
         <a href="/admin/list-backoffice-api-tokens">API tokens</a>
+        <a href="/admin/visualization">Visualization</a>
         {{if .IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
         {{if .IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
       </nav>
@@ -338,6 +339,23 @@
         <div class="links">
           <a class="btn btn-primary" href="/admin/list-backoffice-api-tokens">View tokens</a>
           <a class="btn" href="/admin/add-backoffice-api-token">New token</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Visualization</h2>
+        <dl>
+          <dt>Views today</dt>
+          <dd>{{.VisualizationToday}}</dd>
+          <dt>Last 7 days</dt>
+          <dd>{{.VisualizationWeek}}</dd>
+        </dl>
+        <p class="muted" style="margin-top: 1rem;">
+          Every page of the public website viewed, bots left out: which page, when and from where.
+        </p>
+        <div class="links">
+          <a class="btn btn-primary" href="/admin/visualization">Open dashboard</a>
+          {{if .IsRoot}}<a class="btn" href="/admin/root/set-visualization-settings">Settings</a>{{end}}
         </div>
       </article>
 

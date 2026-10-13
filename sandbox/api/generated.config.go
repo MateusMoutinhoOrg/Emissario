@@ -26,6 +26,12 @@ type Config struct {
 	// mechanic adds its own part beside the project's rather than editing it.
 	ProjectConfig
 
+	// VisualizationConfig is a part of the Config, declared in sandbox/api/visualizationconfig.go.
+	// Embedded, so each of its fields is read as sandbox.Config.<Field>.
+	// Every struct of a sandbox/api/<x>config.go file is one, so a
+	// mechanic adds its own part beside the project's rather than editing it.
+	VisualizationConfig
+
 	// ProjectName is the project's name, the `project-name` key of
 	// AgnosConfig/project.yaml; lower-cased it is the name the cli answers
 	// to.

@@ -88,9 +88,11 @@ The contracts available to patch:
 | `deps.DatabaseDeps` | `sandbox/deps/databasedeps` |
 | `deps.EmbedDeps` | `sandbox/deps/embeddeps` |
 | `deps.EnvDeps` | `sandbox/deps/envdeps` |
+| `deps.GeoipDeps` | `sandbox/deps/geoipdeps` |
 | `deps.HashDeps` | `sandbox/deps/hashdeps` |
 | `deps.IoDeps` | `sandbox/deps/iodeps` |
 | `deps.JwtDeps` | `sandbox/deps/jwtdeps` |
+| `deps.LocaltimeDeps` | `sandbox/deps/localtimedeps` |
 | `deps.PasswordDeps` | `sandbox/deps/passworddeps` |
 | `deps.RandDeps` | `sandbox/deps/randdeps` |
 | `deps.RatelimitDeps` | `sandbox/deps/ratelimitdeps` |
@@ -117,6 +119,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/databasedeps` | `databasedeps.Bind(&deps)` |
 | `adapters/impls/goembed` | `goembed.Bind(&deps)` |
 | `adapters/impls/golangjwt` | `golangjwt.Bind(&deps)` |
+| `adapters/impls/maxmindgeoip` | `maxmindgeoip.Bind(&deps)` |
 | `adapters/impls/memoryratelimit` | `memoryratelimit.Bind(&deps)` |
 | `adapters/impls/nethttpserver` | `nethttpserver.Bind(&deps)` |
 | `adapters/impls/osenv` | `osenv.Bind(&deps)` |
@@ -127,6 +130,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/pbkdf2password` | `pbkdf2password.Bind(&deps)` |
 | `adapters/impls/sha256hash` | `sha256hash.Bind(&deps)` |
 | `adapters/impls/stdargv` | `stdargv.Bind(&deps)` |
+| `adapters/impls/stdlocaltime` | `stdlocaltime.Bind(&deps)` |
 | `adapters/impls/stdserializable` | `stdserializable.Bind(&deps)` |
 | `adapters/impls/stdsleep` | `stdsleep.Bind(&deps)` |
 | `adapters/impls/stdsort` | `stdsort.Bind(&deps)` |

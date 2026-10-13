@@ -1,6 +1,31 @@
 category: Assets
 methods:
     - GET
+parameters:
+    - description: 'the method of the request, set by the server and never by the client: a HEAD is no page view'
+      id: XRequestMethod
+      key: x-request-method
+      sources:
+        - header
+      type: string
+    - description: the device, browser and operating system a page view is recorded with
+      id: UserAgent
+      key: user-agent
+      sources:
+        - header
+      type: string
+    - description: the site a page view came from, recorded when it is another one
+      id: Referer
+      key: referer
+      sources:
+        - header
+      type: string
+    - description: 'the host the request was sent to: a Referer naming it is a link inside the site'
+      id: Host
+      key: host
+      sources:
+        - header
+      type: string
 paths:
     - description: the file under the frontend/ folder of the website source, else that path plus .html; none is its index.html
       end: -1

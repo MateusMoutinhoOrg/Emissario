@@ -42,7 +42,52 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 		},
 	}
 
-	self.Parameters = []api.Parameter{}
+	self.Parameters = []api.Parameter{
+		{
+			Id:          "XRequestMethod",
+			Key:         "x-request-method",
+			Sources:     []api.ParameterSource{api.SourceHeader},
+			Required:    false,
+			Type:        api.ParameterString,
+			Default:     "",
+			HasDefault:  false,
+			Description: "the method of the request, set by the server and never by the client: a HEAD is no page view",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
+		{
+			Id:          "UserAgent",
+			Key:         "user-agent",
+			Sources:     []api.ParameterSource{api.SourceHeader},
+			Required:    false,
+			Type:        api.ParameterString,
+			Default:     "",
+			HasDefault:  false,
+			Description: "the device, browser and operating system a page view is recorded with",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
+		{
+			Id:          "Referer",
+			Key:         "referer",
+			Sources:     []api.ParameterSource{api.SourceHeader},
+			Required:    false,
+			Type:        api.ParameterString,
+			Default:     "",
+			HasDefault:  false,
+			Description: "the site a page view came from, recorded when it is another one",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
+		{
+			Id:          "Host",
+			Key:         "host",
+			Sources:     []api.ParameterSource{api.SourceHeader},
+			Required:    false,
+			Type:        api.ParameterString,
+			Default:     "",
+			HasDefault:  false,
+			Description: "the host the request was sent to: a Referer naming it is a link inside the site",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
+	}
 
 	self.Body = api.RouteBody{
 		Type:        "none",

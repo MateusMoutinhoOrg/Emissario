@@ -12,9 +12,11 @@ import (
 	databasedeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/databasedeps"
 	embeddeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/embeddeps"
 	envdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/envdeps"
+	geoipdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/geoipdeps"
 	hashdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/hashdeps"
 	iodeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/iodeps"
 	jwtdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/jwtdeps"
+	localtimedeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/localtimedeps"
 	passworddeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/passworddeps"
 	randdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/randdeps"
 	ratelimitdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/ratelimitdeps"
@@ -42,9 +44,11 @@ type Deps struct {
 	DatabaseDeps             databasedeps.Sandbox
 	EmbedDeps                embeddeps.Contract
 	EnvDeps                  envdeps.Contract
+	GeoipDeps                geoipdeps.Contract
 	HashDeps                 hashdeps.Contract
 	IoDeps                   iodeps.Contract
 	JwtDeps                  jwtdeps.Contract
+	LocaltimeDeps            localtimedeps.Contract
 	PasswordDeps             passworddeps.Contract
 	RandDeps                 randdeps.Contract
 	RatelimitDeps            ratelimitdeps.Contract

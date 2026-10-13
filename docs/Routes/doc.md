@@ -34,6 +34,18 @@ it prints the address it took. Change it to wherever your server runs.
 | --- | --- |
 | [`GET /api/admin/me`](api_get_current_backoffice_user.md) | Answers the backoffice user of the Bearer token |
 
+## Visualization API
+
+| Route | What it does |
+| --- | --- |
+| [`POST /api/admin/list-visualization-pages`](api_list_visualization_pages.md) | Lists every canonical page of the public website viewed in a period, paginated |
+| [`POST /api/admin/list-visualization-views`](api_list_visualization_views.md) | Lists the page views of the public website, newest first, paginated, the ip masked to a viewer |
+| [`POST /api/admin/list-visualization-visitors`](api_list_visualization_visitors.md) | Lists every ip that viewed the public website in a period, paginated, masked to a viewer |
+| [`POST /api/admin/visualization-metrics`](api_visualization_metrics.md) | Answers the metrics of the page views of a period: the totals, the views over time and the top pages, countries, devices, browsers, operating systems, referrers, not-found paths and visitors |
+| [`POST /api/admin/root/get-visualization-settings`](api_get_visualization_settings.md) | Answers the settings of the visualization, the country database in use, how many views are stored, the oldest one and how many were dropped |
+| [`POST /api/admin/root/purge-visualization-views`](api_purge_visualization_views.md) | Deletes every page view before a date, or every one, and answers how many were removed |
+| [`POST /api/admin/root/set-visualization-settings`](api_set_visualization_settings.md) | Sets the settings of the visualization: tracking on or off, the retention in days and the ignored ips |
+
 ## Middleware
 
 | Route | What it does |
@@ -101,6 +113,19 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /admin/root/remove-backoffice-user/{Id:integer}`](remove_backoffice_user_form.md) | Removes a backoffice user and every session of it |
 | [`POST /admin/root/set-backoffice-user/{Id:integer}`](set_backoffice_user_form.md) | Edits a backoffice user; a blank password keeps the current one |
 | [`GET /admin/root/set-backoffice-user/{Id:integer}`](set_backoffice_user_page.md) | Shows the form that edits a backoffice user |
+
+## Visualization
+
+| Route | What it does |
+| --- | --- |
+| [`GET /admin/list-visualization-pages`](list_visualization_pages_page.md) | Lists every canonical page of the public website viewed in a period: its views, unique visitors and last view |
+| [`GET /admin/list-visualization-views`](list_visualization_views_page.md) | Lists the page views of the public website, newest first, and the summary of one visitor when filtered by one ip |
+| [`GET /admin/list-visualization-visitors`](list_visualization_visitors_page.md) | Lists every ip that viewed the public website in a period: its country, device, browser, os, views and pages, masked to a viewer |
+| [`GET /admin/root/export-visualization-views`](export_visualization_views.md) | Downloads the page views of a period as CSV, newest first, 100 000 at most |
+| [`POST /admin/root/purge-visualization-views`](purge_visualization_views_form.md) | Deletes every page view before a date, or every one |
+| [`POST /admin/root/set-visualization-settings`](set_visualization_settings_form.md) | Saves the settings of the visualization: tracking on or off, the retention in days and the ignored ips |
+| [`GET /admin/root/set-visualization-settings`](set_visualization_settings_page.md) | Shows the settings of the visualization: tracking, retention, ignored ips, the country database in use and the Delete views form |
+| [`GET /admin/visualization`](visualization_dashboard_page.md) | Shows the dashboard of the page views of the public website: cards, views over time and the top pages, countries, devices, browsers, operating systems, referrers, not-found paths and visitors |
 
 ## Backoffice Backups
 

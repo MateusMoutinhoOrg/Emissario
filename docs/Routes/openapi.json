@@ -145,11 +145,38 @@
           {
             "name": "x-request-method",
             "in": "header",
-            "description": "the method of the request, set by the server and never by the client\n\nRead by `backoffice-maintenance`, which runs in front of this route.",
+            "description": "the method of the request, set by the server and never by the client: a HEAD is no page view",
             "schema": {
               "type": "string"
             },
             "example": "my-x-request-method"
+          },
+          {
+            "name": "user-agent",
+            "in": "header",
+            "description": "the device, browser and operating system a page view is recorded with",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-user-agent"
+          },
+          {
+            "name": "referer",
+            "in": "header",
+            "description": "the site a page view came from, recorded when it is another one",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-referer"
+          },
+          {
+            "name": "host",
+            "in": "header",
+            "description": "the host the request was sent to: a Referer naming it is a link inside the site",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-host"
           },
           {
             "name": "x-client-ip",

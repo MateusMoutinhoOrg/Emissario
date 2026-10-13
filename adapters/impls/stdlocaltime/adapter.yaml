@@ -1,0 +1,5 @@
+dep: localtimedeps
+help: The offset and name of the local time zone over time.Local
+module: ""
+name: stdlocaltime
+origin: project

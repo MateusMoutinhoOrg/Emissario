@@ -11,6 +11,7 @@ import (
 	databasedeps "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/databasedeps"
 	goembed "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/goembed"
 	golangjwt "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/golangjwt"
+	maxmindgeoip "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/maxmindgeoip"
 	memoryratelimit "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/memoryratelimit"
 	nethttpserver "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/nethttpserver"
 	osenv "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/osenv"
@@ -21,6 +22,7 @@ import (
 	pbkdf2password "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/pbkdf2password"
 	sha256hash "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/sha256hash"
 	stdargv "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdargv"
+	stdlocaltime "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdlocaltime"
 	stdserializable "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdserializable"
 	stdsleep "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdsleep"
 	stdsort "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdsort"
@@ -40,6 +42,7 @@ func New() deps.Deps {
 	databasedeps.Bind(&deps)
 	goembed.Bind(&deps)
 	golangjwt.Bind(&deps)
+	maxmindgeoip.Bind(&deps)
 	memoryratelimit.Bind(&deps)
 	nethttpserver.Bind(&deps)
 	osenv.Bind(&deps)
@@ -50,6 +53,7 @@ func New() deps.Deps {
 	pbkdf2password.Bind(&deps)
 	sha256hash.Bind(&deps)
 	stdargv.Bind(&deps)
+	stdlocaltime.Bind(&deps)
 	stdserializable.Bind(&deps)
 	stdsleep.Bind(&deps)
 	stdsort.Bind(&deps)

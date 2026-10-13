@@ -1,0 +1,5 @@
+dep: geoipdeps
+help: IP-to-country lookups in a MaxMind DB over github.com/oschwald/maxminddb-golang
+module: github.com/oschwald/maxminddb-golang@v1.13.1
+name: maxmindgeoip
+origin: project

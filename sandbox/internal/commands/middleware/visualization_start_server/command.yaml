@@ -1,0 +1,17 @@
+args:
+    - end: 0
+      id: Verb
+      start: 0
+      trigger:
+        type: equal
+        value: start-server
+category: Middleware
+description: 'Runs in front of start-server and answers nothing. It opens the country database every page view of the public website is looked up in - the DB-IP Lite one embedded in the binary, or the .mmdb --visualization-geoip names - and starts the two goroutines of the visualization: the writer, which turns each view the front route queued into a record of visualization-db (holding them while a backup is taken or restored), and the retention cleanup, which removes every hour the views older than the retention a root set at /admin/root/set-visualization-settings (90 days by default). The ip of a view is looked up locally: it is never sent anywhere. Behind a reverse proxy, run with --allow-x-forwarded-for so the ip is the visitor''s.'
+examples:
+    - start-server --visualization-geoip GeoLite2-Country.mmdb
+flags:
+    - description: 'a country database (.mmdb) to look the ip of each page view up in instead of the embedded DB-IP Lite: a newer DB-IP Lite, MaxMind GeoLite2-Country, IPinfo Lite; a file that does not open stops the server at start'
+      id: VisualizationGeoip
+priority: 52
+strict: false
+summary: Open the country database and start recording the page views of the public website in front of start-server

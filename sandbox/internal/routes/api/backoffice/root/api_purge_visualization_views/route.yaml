@@ -1,0 +1,29 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            all:
+                type: boolean
+            before:
+                type: string
+        type: object
+    max-bytes: 1048576
+    required: true
+    type: json
+category: Visualization API
+description: 'Root only. {before: "YYYY-MM-DD"} removes every view before that day, {all: true} every view. Answers {removed}.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/purge-visualization-views -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"before":"2026-07-01"}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootPurgeVisualizationViews
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/purge-visualization-views
+priority: 100
+private: true
+response-type: application/json
+summary: Deletes every page view before a date, or every one, and answers how many were removed
