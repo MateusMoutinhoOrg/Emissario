@@ -1,0 +1,37 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            archived:
+                type: boolean
+            ids:
+                items:
+                    maxLength: 64
+                    type: string
+                maxItems: 100
+                minItems: 1
+                type: array
+        required:
+            - archived
+            - ids
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Contact Requests API
+description: 'Root only. Send ids — at most 100 — and archived: true archives them, false moves them back to the inbox. Answers {changed}, how many changed; ids no contact request holds are left out, and 404 when none is found.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/archive-contact-requests -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"ids":["3f9a0c1b2d4e5f60"],"archived":true}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootArchiveContactRequests
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/archive-contact-requests
+priority: 100
+private: true
+response-type: application/json
+summary: Archives contact requests, or moves them back to the inbox

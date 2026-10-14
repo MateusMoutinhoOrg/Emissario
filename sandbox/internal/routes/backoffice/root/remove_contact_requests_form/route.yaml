@@ -1,0 +1,37 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            back:
+                maxLength: 2048
+                type: string
+            before:
+                maxLength: 16
+                type: string
+            ids:
+                items:
+                    maxLength: 64
+                    type: string
+                maxItems: 100
+                type: array
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Contact Requests
+description: Root only. Send ids — the ids of the contact requests, at most 100 — or before — YYYY-MM-DD, every contact request before that day — not both; back is the page to answer 303 to, with ?notice=removed&count=<n> (the list, when back was one of the requests deleted). Anything else answers the list under a 400 or a 404.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/remove-contact-requests -H ''Origin: http://localhost:3000'' --data ''before=2026-07-01'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootRemoveContactRequests
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/remove-contact-requests
+priority: 100
+private: true
+response-type: text/html
+summary: Deletes the contact requests selected, or every one before a date

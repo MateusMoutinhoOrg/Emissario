@@ -11,6 +11,38 @@
     });
   });
 
+  // A submit button carrying data-confirm asks before it sends its form — one
+  // form whose buttons do different things, the riskiest one asking.
+  document.querySelectorAll('button[data-confirm]').forEach(function (button) {
+    button.addEventListener('click', function (event) {
+      if (!window.confirm(button.dataset.confirm)) {
+        event.preventDefault();
+      }
+    });
+  });
+
+  // The contact requests: a button of the selection does nothing until a row
+  // is selected, and the header checkbox selects every row shown.
+  var selection = document.getElementById('selection');
+  if (selection) {
+    var rows = function () {
+      return document.querySelectorAll('input[name="ids"][form="selection"]');
+    };
+    selection.addEventListener('submit', function (event) {
+      var picked = Array.prototype.some.call(rows(), function (box) { return box.checked; });
+      if (!picked) {
+        event.preventDefault();
+        window.alert('Select at least one contact request.');
+      }
+    });
+    var all = document.getElementById('select-all');
+    if (all) {
+      all.addEventListener('change', function () {
+        rows().forEach(function (box) { box.checked = all.checked; });
+      });
+    }
+  }
+
   // The create token form: the date field shows only for a custom expiration.
   var expiration = document.getElementById('expiration');
   var group = document.getElementById('date-group');

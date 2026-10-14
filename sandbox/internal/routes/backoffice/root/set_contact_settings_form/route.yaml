@@ -1,0 +1,37 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            enabled:
+                maxLength: 8
+                type: string
+            ip-daily-limit:
+                maxLength: 16
+                type: string
+            max-bytes:
+                maxLength: 16
+                type: string
+            rate-per-minute:
+                maxLength: 16
+                type: string
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Contact Requests
+description: Root only. enabled is 1 or on to take contact requests; max-bytes from 2 to 1048576 (blank 16384); rate-per-minute from 1 to 10000 (blank 5); ip-daily-limit up to 1000000 (blank no limit). Saving answers 303 to the settings with ?notice=saved; a refused value answers the form under a 400 with the reason.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/set-contact-settings -H ''Origin: http://localhost:3000'' --data ''enabled=1&max-bytes=8192&rate-per-minute=5&ip-daily-limit=50'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSetContactSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-contact-settings
+priority: 100
+private: true
+response-type: text/html
+summary: Saves the settings of the contact requests

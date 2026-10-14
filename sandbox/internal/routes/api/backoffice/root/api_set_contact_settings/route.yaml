@@ -1,0 +1,44 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            enabled:
+                type: boolean
+            ip_daily_limit:
+                maximum: 1000000
+                minimum: 0
+                type: integer
+            max_bytes:
+                maximum: 1048576
+                minimum: 2
+                type: integer
+            rate_per_minute:
+                maximum: 10000
+                minimum: 1
+                type: integer
+        required:
+            - enabled
+            - ip_daily_limit
+            - max_bytes
+            - rate_per_minute
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Contact Requests API
+description: 'Root only. Send every field: enabled; max_bytes, the largest body, 2 to 1048576; rate_per_minute, 1 to 10000; ip_daily_limit, requests a day per ip, 0 for no limit. Answers {settings}.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/set-contact-settings -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"enabled":true,"max_bytes":16384,"rate_per_minute":5,"ip_daily_limit":0}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootSetContactSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/set-contact-settings
+priority: 100
+private: true
+response-type: application/json
+summary: Saves the settings of the contact requests

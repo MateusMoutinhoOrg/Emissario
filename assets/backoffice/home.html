@@ -278,6 +278,7 @@
         <a href="/admin/list-backoffice-api-tokens">API tokens</a>
         <a href="/admin/visualization">Visualization</a>
         <a href="/admin/agent">Agent</a>
+        <a href="/admin/list-contact-requests">Contacts</a>
         {{if .IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
         {{if .IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
       </nav>
@@ -357,6 +358,23 @@
         <div class="links">
           <a class="btn btn-primary" href="/admin/visualization">Open dashboard</a>
           {{if .IsRoot}}<a class="btn" href="/admin/root/set-visualization-settings">Settings</a>{{end}}
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Contacts</h2>
+        <dl>
+          <dt>In the inbox</dt>
+          <dd>{{.ContactInbox}}</dd>
+          <dt>Received today</dt>
+          <dd>{{.ContactToday}}</dd>
+        </dl>
+        <p class="muted" style="margin-top: 1rem;">
+          What the website sent to /api/contact-requests: any JSON, with its time, ip and country.
+        </p>
+        <div class="links">
+          <a class="btn btn-primary" href="/admin/list-contact-requests">Open contacts</a>
+          {{if .IsRoot}}<a class="btn" href="/admin/root/set-contact-settings">Settings</a>{{end}}
         </div>
       </article>
 

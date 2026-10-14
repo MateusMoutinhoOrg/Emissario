@@ -1,0 +1,49 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            contains:
+                maxLength: 200
+                type: string
+            country:
+                maxLength: 8
+                type: string
+            from:
+                maxLength: 16
+                type: string
+            limit:
+                maximum: 100
+                minimum: 1
+                type: integer
+            page:
+                minimum: 1
+                type: integer
+            status:
+                enum:
+                    - inbox
+                    - archived
+                    - all
+                type: string
+            to:
+                maxLength: 16
+                type: string
+        type: object
+    max-bytes: 65536
+    type: json
+category: Contact Requests API
+description: 'Root and viewer. Answers {contact_requests: [{id, at, ip, country, archived, size, body, body_text}], total, page, pages, limit}; body is the JSON value sent, read back with its keys sorted and its numbers as doubles (an integer past 2^53 rounded), body_text the text exactly as sent. from and to are YYYY-MM-DD, both included, each optional; country an ISO code (XX unknown); contains a text the JSON holds, any case; status inbox (the default), archived or all. 400 for a bad filter.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/list-contact-requests -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"from":"2026-10-01","country":"BR","contains":"ana","status":"all","page":1,"limit":20}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminListContactRequests
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/list-contact-requests
+priority: 100
+private: true
+response-type: application/json
+summary: 'Answers one page of the contact requests, newest first: inbox, archived or all, filtered by period, country and a text of the JSON'

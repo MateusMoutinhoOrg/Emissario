@@ -1,0 +1,32 @@
+key-prefix: contactdb
+name: contact-db
+tables:
+    - fields:
+        - name: ref
+          required: true
+          type: key
+        - name: at
+          required: true
+          type: integer
+        - name: ip
+          required: true
+          type: string
+        - name: country
+          type: string
+        - name: body
+          type: string
+        - name: size
+          type: integer
+        - name: archived
+          type: integer
+      name: contact-request
+    - fields:
+        - name: enabled
+          type: integer
+        - name: max-bytes
+          type: integer
+        - name: rate-per-minute
+          type: integer
+        - name: ip-daily-limit
+          type: integer
+      name: contact-setting

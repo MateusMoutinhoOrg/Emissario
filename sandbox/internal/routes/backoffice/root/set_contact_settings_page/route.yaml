@@ -1,0 +1,31 @@
+category: Contact Requests
+description: 'Root only. Beside the form: how many contact requests are stored and in the inbox, whether the writer runs, and the danger zone that deletes every contact request before a date.'
+examples:
+    - curl -b "backoffice_session=$SESSION" localhost:3000/admin/root/set-contact-settings
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last save or removal
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many contact requests the last removal removed
+      id: Count
+      key: count
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminRootSetContactSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-contact-settings
+priority: 100
+private: true
+response-type: text/html
+summary: 'Shows the settings of the contact requests: on or off, the largest body and the limits per ip'

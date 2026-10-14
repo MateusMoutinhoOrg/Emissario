@@ -28,6 +28,9 @@
       "name": "Agent"
     },
     {
+      "name": "Contact Requests"
+    },
+    {
       "name": "Server"
     },
     {
@@ -319,6 +322,113 @@
           },
           "413": {
             "description": "The body is larger than 64 KB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body was not sent with `Content-Type: application/json`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contact-requests": {
+      "post": {
+        "operationId": "contact-requests",
+        "tags": [
+          "Contact Requests"
+        ],
+        "summary": "Receives one contact request of the website: any JSON value, stored as sent with its time, ip and country",
+        "description": "Public, no authentication, same origin only (no CORS). The body is any JSON value — an object, an array, a string, a number — at most the largest body set at /admin/root/set-contact-settings (16384 bytes by default, 1048576 at most); it is stored exactly as sent, with the time, the ip and its country. Answers 201 {\"id\"}. Errors {\"error\",\"field\"}: 400 invalid-json, 403 origin, 413 too-large, 415 a Content-Type other than application/json, 429 rate-limit or ip-daily-limit with Retry-After, 503 disabled, not-running, restoring or busy.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "description": "the origin of the page that sent the request, sent by the browser",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-origin"
+          },
+          {
+            "name": "Host",
+            "in": "header",
+            "description": "the host the request was sent to",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-host"
+          },
+          {
+            "name": "x-request-method",
+            "in": "header",
+            "description": "the method of the request, set by the server and never by the client\n\nRead by `backoffice-maintenance`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-request-method"
+          },
+          {
+            "name": "x-client-ip",
+            "in": "header",
+            "description": "the ip of the connection, set by the server and never by the client\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-client-ip"
+          },
+          {
+            "name": "x-forwarded-for",
+            "in": "header",
+            "description": "the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-forwarded-for"
+          }
+        ],
+        "requestBody": {
+          "description": "Up to 1 MB.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "It worked. The answer comes as `application/json`.",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "400": {
+            "description": "Something you sent is missing or has the wrong type or format. The answer's `field` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 1 MB.",
             "content": {
               "application/json": {
                 "schema": {

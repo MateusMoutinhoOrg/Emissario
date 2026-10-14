@@ -9,6 +9,7 @@ with the `generated.new.go` they render.
 | [`AgentDb`](agent_db.md) | `agent_db` | `agentdb` |
 | [`BackofficeDb`](backoffice_db.md) | `backoffice_db` | `backofficedb` |
 | [`Backup`](backup.md) | `backup` | `backup` |
+| [`ContactDb`](contact_db.md) | `contact_db` | `contactdb` |
 | [`EmissarioDb`](emissario_db.md) | `emissario_db` | `emissariodb` |
 | [`VisualizationDb`](visualization_db.md) | `visualization_db` | `visualizationdb` |
 

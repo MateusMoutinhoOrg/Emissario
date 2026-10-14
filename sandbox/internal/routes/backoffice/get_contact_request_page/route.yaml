@@ -1,0 +1,37 @@
+category: Contact Requests
+description: Root and viewer; a root also sees the buttons that archive, move back to the inbox and delete it. An id no contact request holds answers the list under a 404.
+examples:
+    - curl -b "backoffice_session=$SESSION" "localhost:3000/admin/get-contact-request?id=3f9a0c1b2d4e5f60"
+methods:
+    - GET
+parameters:
+    - description: the id of the contact request, as /api/contact-requests answered it
+      id: Id
+      key: id
+      sources:
+        - query
+      type: string
+    - description: the outcome code of the last archive
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many contact requests the last archive touched
+      id: Count
+      key: count
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminGetContactRequest
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/get-contact-request
+priority: 100
+private: true
+response-type: text/html
+summary: 'Shows one contact request whole: its JSON laid out as sent, its time, ip and country'

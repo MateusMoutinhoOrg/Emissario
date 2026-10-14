@@ -70,9 +70,11 @@ or `403`, for example — or let it through to this route.
 | [`backoffice-index`](backoffice_index.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-login-page`](backoffice_login_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`get-agent-summary-page`](get_agent_summary_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`get-contact-request-page`](get_contact_request_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-agent-summaries-page`](list_agent_summaries_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backoffice-api-tokens-page`](list_backoffice_api_tokens_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backoffice-users-page`](list_backoffice_users_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`list-contact-requests-page`](list_contact_requests_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-visualization-pages-page`](list_visualization_pages_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-visualization-views-page`](list_visualization_views_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-visualization-visitors-page`](list_visualization_visitors_page.md) | depends on the address — `explain-route` gives the exact answer |
@@ -92,6 +94,7 @@ or `403`, for example — or let it through to this route.
 | [`set-agent-source-page`](set_agent_source_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-agent-url-page`](set_agent_url_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-backoffice-user-page`](set_backoffice_user_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-contact-settings-page`](set_contact_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-visualization-settings-page`](set_visualization_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-website-source-page`](set_website_source_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`visualization-dashboard-page`](visualization_dashboard_page.md) | depends on the address — `explain-route` gives the exact answer |

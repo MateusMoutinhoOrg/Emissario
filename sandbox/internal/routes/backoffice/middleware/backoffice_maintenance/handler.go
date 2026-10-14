@@ -3,6 +3,7 @@ package backoffice_maintenance
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/snapshots"
 )
@@ -19,8 +20,9 @@ const RetryAfterSeconds = "5"
 // snapshot reads them file by file, a request that may write — any method but
 // GET, HEAD and OPTIONS — is refused the same way, so every file of the
 // snapshot is taken at one instant — but for the public agent, /api/agent/,
-// which writes nothing itself while a snapshot is taken: its usage and its
-// summaries wait in a queue until the snapshot ends (sandbox/internal/agent).
+// and the contact requests, /api/contact-requests, which write nothing
+// themselves while a snapshot is taken: their records wait in a queue until
+// the snapshot ends (sandbox/internal/agent, sandbox/internal/contact).
 // Anything else declines, so the route after it runs. A request already past
 // this rung when a job starts is not stopped, and neither is a write made
 // outside the server, by a command line.
@@ -41,8 +43,8 @@ func reads(sandbox *api.Sandbox, method string) bool {
 	return method == "GET" || method == "HEAD" || method == "OPTIONS"
 }
 
-// queued tells whether path is one of the public agent, whose writes wait in
-// a queue while a snapshot is taken.
+// queued tells whether path is one of the public agent or the contact
+// requests, whose writes wait in a queue while a snapshot is taken.
 func queued(sandbox *api.Sandbox, path string) bool {
-	return sandbox.Deps.StringsDeps.HasPrefix(path, "/api/agent/")
+	return sandbox.Deps.StringsDeps.HasPrefix(path, "/api/agent/") || path == contact.PublicPath
 }

@@ -1,0 +1,12 @@
+args:
+    - end: 0
+      id: Verb
+      start: 0
+      trigger:
+        type: equal
+        value: start-server
+category: Middleware
+description: Runs in front of start-server and answers nothing. It starts the writer of the contact requests, which turns what POST /api/contact-requests queues into records of contact-db, holding them while a backup is taken or restored, so the website keeps sending meanwhile. The route answers 503 not-running in a process that did not start it. The limits are set at /admin/root/set-contact-settings.
+priority: 54
+strict: false
+summary: Start the writer of the contact requests in front of start-server

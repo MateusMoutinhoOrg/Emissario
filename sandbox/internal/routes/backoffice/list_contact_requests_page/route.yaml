@@ -1,0 +1,75 @@
+category: Contact Requests
+description: Root and viewer. A bad date, from after to, a country that is not two letters or an unknown status answers the page under a 400 with the reason. A root also sees the checkboxes and the buttons that archive, move back to the inbox and delete the contact requests selected.
+examples:
+    - curl -b "backoffice_session=$SESSION" "localhost:3000/admin/list-contact-requests?from=2026-10-01&to=2026-10-14&country=BR&contains=ana"
+methods:
+    - GET
+parameters:
+    - description: the first day, YYYY-MM-DD; no bound by default
+      id: From
+      key: from
+      sources:
+        - query
+      type: string
+    - description: the last day, YYYY-MM-DD, included; no bound by default
+      id: To
+      key: to
+      sources:
+        - query
+      type: string
+    - description: an ISO 3166-1 alpha-2 code, such as BR, or XX for an unknown country
+      id: Country
+      key: country
+      sources:
+        - query
+      type: string
+    - description: a text the JSON holds, any case
+      id: Contains
+      key: contains
+      sources:
+        - query
+      type: string
+    - description: inbox (the default), archived or all
+      id: Status
+      key: status
+      sources:
+        - query
+      type: string
+    - default: "1"
+      description: the page, from 1
+      id: Page
+      key: page
+      sources:
+        - query
+      type: integer
+    - default: "20"
+      description: the contact requests per page, 1 to 100
+      id: Limit
+      key: limit
+      sources:
+        - query
+      type: integer
+    - description: the outcome code of the last archive or removal
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many contact requests the last archive or removal touched
+      id: Count
+      key: count
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminListContactRequests
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/list-contact-requests
+priority: 100
+private: true
+response-type: text/html
+summary: 'Lists the contact requests, newest first: inbox, archived or all, filtered by period, country and a text of the JSON'

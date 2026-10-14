@@ -68,6 +68,17 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /api/admin/root/remove-backoffice-user`](api_remove_backoffice_user.md) | Removes a backoffice user and every session of it |
 | [`POST /api/admin/root/set-backoffice-user`](api_set_backoffice_user.md) | Edits a backoffice user; a missing or blank password keeps the current one |
 
+## Contact Requests API
+
+| Route | What it does |
+| --- | --- |
+| [`POST /api/admin/get-contact-request`](api_get_contact_request.md) | Answers one contact request whole |
+| [`POST /api/admin/list-contact-requests`](api_list_contact_requests.md) | Answers one page of the contact requests, newest first: inbox, archived or all, filtered by period, country and a text of the JSON |
+| [`POST /api/admin/root/archive-contact-requests`](api_archive_contact_requests.md) | Archives contact requests, or moves them back to the inbox |
+| [`POST /api/admin/root/get-contact-settings`](api_get_contact_settings.md) | Answers the settings of the contact requests and their state |
+| [`POST /api/admin/root/remove-contact-requests`](api_remove_contact_requests.md) | Deletes contact requests, or every one before a date |
+| [`POST /api/admin/root/set-contact-settings`](api_set_contact_settings.md) | Saves the settings of the contact requests |
+
 ## Backoffice API
 
 | Route | What it does |
@@ -142,6 +153,18 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /admin/login`](backoffice_login.md) | Signs a backoffice user in and sets the session cookie |
 | [`GET /admin/login`](backoffice_login_page.md) | Shows the sign-in form |
 | [`POST /admin/logout`](backoffice_logout.md) | Ends the current session |
+
+## Contact Requests
+
+| Route | What it does |
+| --- | --- |
+| [`GET /admin/get-contact-request`](get_contact_request_page.md) | Shows one contact request whole: its JSON laid out as sent, its time, ip and country |
+| [`GET /admin/list-contact-requests`](list_contact_requests_page.md) | Lists the contact requests, newest first: inbox, archived or all, filtered by period, country and a text of the JSON |
+| [`POST /admin/root/archive-contact-requests`](archive_contact_requests_form.md) | Archives the contact requests selected, or moves them back to the inbox |
+| [`POST /admin/root/remove-contact-requests`](remove_contact_requests_form.md) | Deletes the contact requests selected, or every one before a date |
+| [`POST /admin/root/set-contact-settings`](set_contact_settings_form.md) | Saves the settings of the contact requests |
+| [`GET /admin/root/set-contact-settings`](set_contact_settings_page.md) | Shows the settings of the contact requests: on or off, the largest body and the limits per ip |
+| [`POST /api/contact-requests`](contact_requests.md) | Receives one contact request of the website: any JSON value, stored as sent with its time, ip and country |
 
 ## Backoffice Users
 

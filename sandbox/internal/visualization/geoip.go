@@ -114,6 +114,12 @@ func Country(sandbox *api.Sandbox, ip string) string {
 	return code
 }
 
+// IsCountryCode tells whether code is two letters A to Z: an ISO 3166-1
+// alpha-2 code, or UnknownCountry.
+func IsCountryCode(sandbox *api.Sandbox, code string) bool {
+	return isCountryCode(code)
+}
+
 // isCountryCode tells whether code is two letters A to Z.
 func isCountryCode(code string) bool {
 	return len(code) == 2 && code[0] >= 'A' && code[0] <= 'Z' && code[1] >= 'A' && code[1] <= 'Z'

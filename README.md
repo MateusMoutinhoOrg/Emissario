@@ -32,6 +32,7 @@ Serving http - bring the server up, declare routes, read a body
 | [Backoffice](docs/Backoffice/doc.md) | The admin backoffice of emissario: secret, users, roles, sessions, API tokens and the /api/admin JSON api |
 | [Backups](docs/Backups/doc.md) | Backups of every database of emissario from the backoffice: take a snapshot in the background, download, upload and restore one, or build one by hand file by file |
 | [Agent](docs/Agent/doc.md) | The public agent of the website: an anonymous visitor talks to a configurable model through /api/agent/messages, its instructions synced from a git repository, its urls, limits, signed history and anonymous summaries set and read in the backoffice at /admin/agent |
+| [Contact Requests](docs/ContactRequests/doc.md) | The contact form of the website: any JSON the website sends to /api/contact-requests, kept as sent with its time, ip and country, read, searched, archived and deleted in the backoffice at /admin/list-contact-requests |
 | [Visualization](docs/Visualization/doc.md) | Page views of the public website, recorded on the server: which page, when, from which ip, country, device, browser and os, searched and counted in the backoffice at /admin/visualization and its JSON api |
 | [Website Source](docs/WebsiteSource/doc.md) | Serve the public website from a git repository: the root sets the repository, branch and sync time in the backoffice, start-server keeps it pulled, and Sync or its API syncs it on demand |
 

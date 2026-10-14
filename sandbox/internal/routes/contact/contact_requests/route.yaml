@@ -1,0 +1,32 @@
+body:
+    content-type: application/json
+    max-bytes: 1048576
+    required: true
+    type: raw
+category: Contact Requests
+description: 'Public, no authentication, same origin only (no CORS). The body is any JSON value — an object, an array, a string, a number — at most the largest body set at /admin/root/set-contact-settings (16384 bytes by default, 1048576 at most); it is stored exactly as sent, with the time, the ip and its country. Answers 201 {"id"}. Errors {"error","field"}: 400 invalid-json, 403 origin, 413 too-large, 415 a Content-Type other than application/json, 429 rate-limit or ip-daily-limit with Retry-After, 503 disabled, not-running, restoring or busy.'
+examples:
+    - 'curl -X POST localhost:3000/api/contact-requests -H ''Content-Type: application/json'' -d ''{"name":"Ana","email":"ana@example.com","message":"Hello"}'''
+methods:
+    - POST
+parameters:
+    - description: the origin of the page that sent the request, sent by the browser
+      id: Origin
+      sources:
+        - header
+      type: string
+    - description: the host the request was sent to
+      id: Host
+      sources:
+        - header
+      type: string
+paths:
+    - end: -1
+      id: ApiContactRequests
+      start: 0
+      trigger:
+        type: equal
+        value: /api/contact-requests
+priority: 100
+response-type: application/json
+summary: 'Receives one contact request of the website: any JSON value, stored as sent with its time, ip and country'

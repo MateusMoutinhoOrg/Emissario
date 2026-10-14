@@ -37,6 +37,7 @@ Run in front of the commands they match, lowest `priority` first; typed by nobod
 | --- | --- | --- | --- |
 | [`agent-start-server`](agent-start-server.md) | `start-server` | 53 | — |
 | [`backoffice-start-server`](backoffice-start-server.md) | `start-server` | 50 | `--addr`, `--allow-x-forwarded-for`, `--insecure-http` |
+| [`contact-start-server`](contact-start-server.md) | `start-server` | 54 | — |
 | [`database-dir`](database-dir.md) | `*` | 6 | `--database` |
 | [`help-flag`](help-flag.md) | `*` | 5 | `--help`, `-h` |
 | [`visualization-start-server`](visualization-start-server.md) | `start-server` | 52 | `--visualization-geoip` |

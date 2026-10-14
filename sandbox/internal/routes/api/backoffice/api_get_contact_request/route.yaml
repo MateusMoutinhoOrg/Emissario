@@ -1,0 +1,30 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            id:
+                maxLength: 64
+                type: string
+        required:
+            - id
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Contact Requests API
+description: 'Root and viewer. Answers {contact_request: {id, at, ip, country, archived, size, body, body_text}}: body the JSON value sent, body_text the text exactly as sent; 404 for an id no contact request holds.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/get-contact-request -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"id":"3f9a0c1b2d4e5f60"}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminGetContactRequest
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/get-contact-request
+priority: 100
+private: true
+response-type: application/json
+summary: Answers one contact request whole

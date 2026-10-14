@@ -1,0 +1,4 @@
+description: 'The contact form of the website: any JSON the website sends to /api/contact-requests, kept as sent with its time, ip and country, read, searched, archived and deleted in the backoffice at /admin/list-contact-requests'
+name: Contact Requests
+themes:
+    - server-usage
