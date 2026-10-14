@@ -23,10 +23,9 @@ Every database is embedded and lives in one folder, `./data` by default.
 
 ## Quick start
 
-```bash
-# macOS (Apple Silicon); every other platform is in docs/CliInstall
-curl -sL https://github.com/MateusMoutinhoOrg/Emissario/releases/latest/download/macarm64.bin -o emissario && chmod +x emissario && sudo mv emissario /usr/local/bin/
+Install the binary for your platform ([CliInstall](docs/CliInstall/doc.md)), then:
 
+```bash
 emissario add-backoffice-user --username admin --email admin@example.com --role root   # prints the password once
 emissario start-server --insecure-http --addr 127.0.0.1:3000                            # plain http, local only
 ```
