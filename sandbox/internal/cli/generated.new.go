@@ -10,6 +10,7 @@ import (
 	add_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/backoffice/add_backoffice_user"
 	help "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/info/help"
 	version "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/info/version"
+	agent_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/agent_start_server"
 	backoffice_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/backoffice_start_server"
 	database_dir "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/database_dir"
 	help_flag "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/help_flag"
@@ -34,6 +35,7 @@ func NewCli(sandbox *api.Sandbox) api.Cli {
 		backoffice_start_server.NewCommand(sandbox),
 		website_source_start_server.NewCommand(sandbox),
 		visualization_start_server.NewCommand(sandbox),
+		agent_start_server.NewCommand(sandbox),
 		add_backoffice_user.NewCommand(sandbox),
 		help.NewCommand(sandbox),
 		start_server.NewCommand(sandbox),

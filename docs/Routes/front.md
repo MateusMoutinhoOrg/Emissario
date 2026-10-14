@@ -64,9 +64,13 @@ or `403`, for example — or let it through to this route.
 | [`api-list-backup-files`](api_list_backup_files.md) | depends on the address — `explain-route` gives the exact answer |
 | [`api-list-backups`](api_list_backups.md) | depends on the address — `explain-route` gives the exact answer |
 | [`add-backoffice-api-token-page`](add_backoffice_api_token_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`agent-dashboard-page`](agent_dashboard_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`agent-usage-page`](agent_usage_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-home`](backoffice_home.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-index`](backoffice_index.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-login-page`](backoffice_login_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`get-agent-summary-page`](get_agent_summary_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`list-agent-summaries-page`](list_agent_summaries_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backoffice-api-tokens-page`](list_backoffice_api_tokens_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backoffice-users-page`](list_backoffice_users_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-visualization-pages-page`](list_visualization_pages_page.md) | depends on the address — `explain-route` gives the exact answer |
@@ -78,10 +82,15 @@ or `403`, for example — or let it through to this route.
 | [`backoffice-same-origin`](backoffice_same_origin.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-security-headers`](backoffice_security_headers.md) | always |
 | [`backoffice-session-auth`](backoffice_session_auth.md) | depends on the address — `explain-route` gives the exact answer |
+| [`add-agent-url-page`](add_agent_url_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`add-backoffice-user-page`](add_backoffice_user_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`download-backup`](download_backup.md) | depends on the address — `explain-route` gives the exact answer |
 | [`export-visualization-views`](export_visualization_views.md) | depends on the address — `explain-route` gives the exact answer |
+| [`list-agent-urls-page`](list_agent_urls_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backups-page`](list_backups_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-agent-settings-page`](set_agent_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-agent-source-page`](set_agent_source_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-agent-url-page`](set_agent_url_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-backoffice-user-page`](set_backoffice_user_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-visualization-settings-page`](set_visualization_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-website-source-page`](set_website_source_page.md) | depends on the address — `explain-route` gives the exact answer |

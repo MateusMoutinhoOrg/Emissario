@@ -13,6 +13,7 @@ import (
 	golangjwt "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/golangjwt"
 	maxmindgeoip "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/maxmindgeoip"
 	memoryratelimit "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/memoryratelimit"
+	nethttprequest "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/nethttprequest"
 	nethttpserver "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/nethttpserver"
 	osenv "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/osenv"
 	osexecrun "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/osexecrun"
@@ -44,6 +45,7 @@ func New() deps.Deps {
 	golangjwt.Bind(&deps)
 	maxmindgeoip.Bind(&deps)
 	memoryratelimit.Bind(&deps)
+	nethttprequest.Bind(&deps)
 	nethttpserver.Bind(&deps)
 	osenv.Bind(&deps)
 	osexecrun.Bind(&deps)

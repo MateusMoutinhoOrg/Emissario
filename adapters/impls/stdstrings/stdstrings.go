@@ -81,6 +81,13 @@ func Bind(deps *deps.Deps) {
 		MatchPattern: func(pattern string, s string) (bool, error) {
 			return regexp.MatchString(pattern, s)
 		},
+		ReplacePattern: func(pattern string, s string, replacement string) (string, error) {
+			compiled, err := regexp.Compile(pattern)
+			if err != nil {
+				return "", err
+			}
+			return compiled.ReplaceAllString(s, replacement), nil
+		},
 		Atoi: func(s string) (int, error) {
 			return strconv.Atoi(s)
 		},

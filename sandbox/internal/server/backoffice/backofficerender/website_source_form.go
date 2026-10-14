@@ -10,9 +10,13 @@ import (
 // syncPath is where the Sync button of the website source page posts.
 const syncPath = "/admin/root/sync-website-source"
 
+// agentSyncPath is where the Sync button of the agent source page posts.
+const agentSyncPath = "/admin/root/sync-agent-source"
+
 // WebsiteSourceFormPage is what backoffice/website_source_form.html is
-// rendered with: the form that sets the website source of the public website,
-// the Sync button, and what the sync loop is doing and its last sync did.
+// rendered with: the form that sets a source — the website's — the Sync
+// button, and what its sync loop is doing and its last sync did.
+// AgentSourcePage embeds it for the agent source.
 type WebsiteSourceFormPage struct {
 	Viewer Viewer
 	// Action is where the form posts.
@@ -28,9 +32,10 @@ type WebsiteSourceFormPage struct {
 	RepoUrl       string
 	Branch        string
 	SyncTime      string
-	// Saved is true once a website source was saved: Sync needs one.
+	// Saved is true once the source was saved: Sync needs one.
 	Saved bool
-	// SiteDir is the folder of the checkout the website is served from.
+	// SiteDir is the folder of the checkout that is read: the website's
+	// frontend/ folder, or the agent's instructions/ folder.
 	SiteDir string
 	// Running is true when the sync loop runs in this process.
 	Running bool
@@ -70,21 +75,37 @@ func websiteSourceNotice(sandbox *api.Sandbox, notice string) (string, bool) {
 // sentence of notice — beside what the sync loop of this process is doing and
 // its last sync did.
 func RenderWebsiteSourcePage(sandbox *api.Sandbox, response *serverdeps.Response, status int, user *backoffice_db.BackofficeUserRecord, settings websitesource.Settings, notice string, message string) error {
-	_, saved, err := websitesource.Read(sandbox)
+	page, err := sourceFormPage(sandbox, user, websitesource.FrontendName, settings, notice, message)
 	if err != nil {
 		return err
 	}
-	last := websitesource.CurrentStatus(sandbox)
+	return RenderHTML(sandbox, response, status, "backoffice/website_source_form.html", page)
+}
+
+// sourceFormPage is the form of the source name filled with settings, with
+// message above it — or the sentence of notice — and what its sync loop is
+// doing and its last sync did.
+func sourceFormPage(sandbox *api.Sandbox, user *backoffice_db.BackofficeUserRecord, name string, settings websitesource.Settings, notice string, message string) (WebsiteSourceFormPage, error) {
+	_, saved, err := websitesource.Read(sandbox, name)
+	if err != nil {
+		return WebsiteSourceFormPage{}, err
+	}
+	last := websitesource.CurrentStatus(sandbox, name)
+	siteDir, sync := websitesource.SiteDir(sandbox), syncPath
+	if name == websitesource.AgentName {
+		siteDir = sandbox.Deps.IoDeps.Join(websitesource.RepoDir(sandbox, name), "instructions")
+		sync = agentSyncPath
+	}
 	page := WebsiteSourceFormPage{
 		Viewer:     viewerOf(sandbox, user),
-		Action:     websitesource.PagePath,
-		SyncAction: syncPath,
+		Action:     websitesource.PageOf(sandbox, name),
+		SyncAction: sync,
 		Error:      message,
 		RepoUrl:    settings.RepoUrl,
 		Branch:     settings.Branch,
 		SyncTime:   settings.SyncTime,
 		Saved:      saved,
-		SiteDir:    websitesource.SiteDir(sandbox),
+		SiteDir:    siteDir,
 		Running:    last.Running,
 		Busy:       last.Pending || last.Syncing,
 		Attempted:  last.AttemptedAt > 0,
@@ -96,5 +117,5 @@ func RenderWebsiteSourcePage(sandbox *api.Sandbox, response *serverdeps.Response
 	if page.Attempted {
 		page.AttemptedAt = sandbox.Deps.TimeDeps.FormatUnix(last.AttemptedAt, "2006-01-02 15:04:05 UTC")
 	}
-	return RenderHTML(sandbox, response, status, "backoffice/website_source_form.html", page)
+	return page, nil
 }

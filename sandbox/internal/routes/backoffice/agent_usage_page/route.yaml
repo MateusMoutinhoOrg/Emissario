@@ -1,0 +1,30 @@
+category: Agent
+description: Root and viewer; a viewer reads every ip masked (203.0.113.xxx). An IPv6 ip counts by its /64; summaries hold no ip and count in the days alone.
+examples:
+    - curl -b "backoffice_session=$SESSION" "localhost:3000/admin/agent-usage?from=2026-10-01&to=2026-10-14"
+methods:
+    - GET
+parameters:
+    - description: the first day, YYYY-MM-DD; the last 30 days by default
+      id: From
+      key: from
+      sources:
+        - query
+      type: string
+    - description: the last day, YYYY-MM-DD, included
+      id: To
+      key: to
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminAgentUsage
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/agent-usage
+priority: 100
+private: true
+response-type: text/html
+summary: 'Shows the tokens of the agent: today against the limits, by day, by ip and the ips at their limit'

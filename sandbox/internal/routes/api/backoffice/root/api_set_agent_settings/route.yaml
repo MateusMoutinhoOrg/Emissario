@@ -1,0 +1,60 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            api_key:
+                maxLength: 4096
+                type: string
+            base_url:
+                maxLength: 2048
+                type: string
+            clear_api_key:
+                type: boolean
+            daily_limit:
+                minimum: 0
+                type: integer
+            enabled:
+                type: boolean
+            ip_daily_limit:
+                minimum: 0
+                type: integer
+            max_tokens:
+                maximum: 1000000
+                minimum: 1
+                type: integer
+            model:
+                maxLength: 200
+                type: string
+            rate_per_minute:
+                maximum: 10000
+                minimum: 1
+                type: integer
+        required:
+            - base_url
+            - daily_limit
+            - enabled
+            - ip_daily_limit
+            - max_tokens
+            - model
+            - rate_per_minute
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Agent API
+description: Root only. A blank or absent api_key keeps the one saved, clear_api_key removes it; a limit of 0 is no limit. Answers {settings} as get-agent-settings does; 400 for a value refused, with the field.
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/set-agent-settings -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"enabled":true,"base_url":"https://api.openai.com/v1","api_key":"sk-...","model":"gpt-4o-mini","max_tokens":1024,"daily_limit":200000,"ip_daily_limit":20000,"rate_per_minute":10}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootSetAgentSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/set-agent-settings
+priority: 100
+private: true
+response-type: application/json
+summary: Saves the provider and the limits of the public agent

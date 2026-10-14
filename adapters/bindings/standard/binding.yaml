@@ -9,6 +9,7 @@ adapters:
     - golangjwt
     - maxmindgeoip
     - memoryratelimit
+    - nethttprequest
     - nethttpserver
     - osenv
     - osexecrun

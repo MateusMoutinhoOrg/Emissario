@@ -44,8 +44,10 @@ needs its key in `~/.ssh/known_hosts` first (`ssh-keyscan github.com >> ~/.ssh/k
 ## The sync loop
 
 `website-source-start-server`, a cli middleware (priority `51`) in front of `start-server`, reads
-`--fonts` into `sandbox.Config.FontsDir` and starts one goroutine, which lives as long as the
-process. Every 2 s it reads the `frontend` record of `source` and syncs:
+`--fonts` into `sandbox.Config.FontsDir` and starts one goroutine per record of `source` —
+`frontend`, the website, and `agent`, the instructions of the [agent](../Agent/doc.md), cloned into
+`<fonts>/agent` and set at `/admin/root/set-agent-source` — each living as long as the process, so a
+slow clone of one never holds the other. Every 2 s each reads its record and syncs:
 
 | When | Needs a sync time |
 |---|---|
@@ -85,8 +87,8 @@ dotfile (`.git`) but `.well-known`. `/backoffice/*` files embedded under `assets
 
 | Path | What |
 |---|---|
-| `sandbox/internal/websitesource/` | settings and validation (`websitesource.go`), the loop, Sync and git (`sync.go`), path resolution (`site.go`) |
-| `sandbox/internal/databases/emissario_db/` | table `source`: `name`, `repourl`, `branch`, `sync-time`; the store is `./data/emissariodb`, gitignored, in every backup |
+| `sandbox/internal/websitesource/` | settings and validation of every source (`websitesource.go`), one loop per source, Sync and git (`sync.go`), path resolution (`site.go`) |
+| `sandbox/internal/databases/emissario_db/` | table `source`: `name` (`frontend`, `agent`), `repourl`, `branch`, `sync-time`; the store is `./data/emissariodb`, gitignored, in every backup |
 | `sandbox/internal/commands/middleware/website_source_start_server/` | `--fonts`, starts the loop |
 | `sandbox/internal/routes/backoffice/root/set_website_source_{page,form}/` | `GET` / `POST /admin/root/set-website-source` |
 | `sandbox/internal/routes/backoffice/root/sync_website_source_form/` | `POST /admin/root/sync-website-source`, the Sync button |

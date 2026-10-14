@@ -1,0 +1,56 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            clear_headers:
+                type: boolean
+            description:
+                maxLength: 1000
+                type: string
+            headers:
+                items:
+                    maxLength: 4096
+                    type: string
+                maxItems: 20
+                type: array
+            id:
+                minimum: 1
+                type: integer
+            method:
+                enum:
+                    - GET
+                    - POST
+                type: string
+            name:
+                maxLength: 64
+                type: string
+            url:
+                maxLength: 2048
+                type: string
+        required:
+            - description
+            - id
+            - method
+            - name
+            - url
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Agent API
+description: Root only. An empty or absent headers keeps the ones saved, clear_headers removes them. Answers {url}; 404 for an id no url holds, 400 for a value refused.
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/set-agent-url -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"id":1,"name":"order-status","description":"The status of an order, by its number","method":"GET","url":"https://api.example.com/orders"}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootSetAgentUrl
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/set-agent-url
+priority: 100
+private: true
+response-type: application/json
+summary: Changes a url the public agent can call

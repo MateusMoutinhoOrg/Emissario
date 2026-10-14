@@ -1,0 +1,24 @@
+category: Agent
+description: Root only. Shows the names of the headers of each url, never their values. Anything the agent can call, any anonymous visitor can call, with these headers.
+examples:
+    - curl -b "backoffice_session=$SESSION" localhost:3000/admin/root/list-agent-urls
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last change
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootListAgentUrls
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/list-agent-urls
+priority: 100
+private: true
+response-type: text/html
+summary: Lists the urls the public agent can call, by name

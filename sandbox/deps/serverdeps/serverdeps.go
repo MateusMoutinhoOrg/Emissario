@@ -124,4 +124,9 @@ type Response struct {
 	SetStatus func(code int)
 	// Write appends bytes to the response body.
 	Write func(body []byte) error
+	// SetWriteDeadline moves the deadline the response must be written by to
+	// milliseconds from now, past the server's write timeout — what a route
+	// that waits on a slow upstream calls before it starts waiting. The error
+	// reports a connection that cannot take a deadline.
+	SetWriteDeadline func(milliseconds int64) error
 }

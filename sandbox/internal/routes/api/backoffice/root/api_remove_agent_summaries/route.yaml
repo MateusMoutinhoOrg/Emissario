@@ -1,0 +1,31 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            before:
+                maxLength: 16
+                type: string
+            id:
+                maxLength: 64
+                type: string
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Agent API
+description: Root only. Send id — the id of one summary — or before — YYYY-MM-DD, every summary before that day — not both. Answers {removed}; 404 for an id no summary holds, 400 otherwise refused.
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/remove-agent-summaries -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"before":"2026-07-01"}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootRemoveAgentSummaries
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/remove-agent-summaries
+priority: 100
+private: true
+response-type: application/json
+summary: Deletes one summary, or every summary before a date

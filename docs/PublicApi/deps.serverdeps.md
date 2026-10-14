@@ -62,5 +62,6 @@ Response is the one http response being written, through function fields only. H
 | `GetHeader` | `func(key string) string` | GetHeader returns the first value a response header carries so far, or "" when it has none. |
 | `SetStatus` | `func(code int)` | SetStatus writes the status line. It is called at most once, before any Write; without it the status is 200. |
 | `Write` | `func(body []byte) error` | Write appends bytes to the response body. |
+| `SetWriteDeadline` | `func(milliseconds int64) error` | SetWriteDeadline moves the deadline the response must be written by to milliseconds from now, past the server's write timeout — what a route that waits on a slow upstream calls before it starts waiting. The error reports a connection that cannot take a deadline. |
 
 [every contract](doc.md)

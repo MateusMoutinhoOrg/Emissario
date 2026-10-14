@@ -1,0 +1,30 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            id:
+                maxLength: 64
+                type: string
+        required:
+            - id
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Agent API
+description: 'Root and viewer. Answers {summary: {id, at, summary, messages, input_tokens, output_tokens}}; 404 for an id no summary holds.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/get-agent-summary -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"id":"3f9a0c1b2d4e5f60"}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminGetAgentSummary
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/get-agent-summary
+priority: 100
+private: true
+response-type: application/json
+summary: Answers one summary whole

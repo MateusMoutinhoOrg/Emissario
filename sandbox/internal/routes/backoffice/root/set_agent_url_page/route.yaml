@@ -1,0 +1,25 @@
+category: Agent
+description: 'Root only. The headers are not filled in: their names are shown beside. An id no url holds answers 404.'
+examples:
+    - curl -b "backoffice_session=$SESSION" "localhost:3000/admin/root/set-agent-url?id=1"
+methods:
+    - GET
+parameters:
+    - default: "0"
+      description: the id of the url
+      id: Id
+      key: id
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminRootSetAgentUrl
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-agent-url
+priority: 100
+private: true
+response-type: text/html
+summary: Shows the form that changes a url the public agent can call

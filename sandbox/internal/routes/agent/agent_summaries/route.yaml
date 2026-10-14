@@ -1,0 +1,60 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            messages:
+                items:
+                    additionalProperties: false
+                    properties:
+                        content:
+                            maxLength: 4000
+                            type: string
+                        role:
+                            enum:
+                                - user
+                                - assistant
+                            type: string
+                    required:
+                        - content
+                        - role
+                    type: object
+                maxItems: 50
+                minItems: 2
+                type: array
+            signature:
+                maxLength: 128
+                type: string
+        required:
+            - messages
+            - signature
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Agent
+description: No authentication, same origin. Send the whole conversation — every message, ending with the last answer of the agent — and the signature that answer carried. The configured model writes a summary under the mandatory instructions (remove names, dates, places, ids, CPF, phones, emails, addresses) and instructions/SUMMARY.md of the agent source, a regex pass then removes what still looks like a CPF, a CNPJ, an email, a phone or a card number, and the summary is kept with no ip; it is answered 201 {"id"} and its text is never returned. Its tokens count in the limits. Errors as /api/agent/messages.
+examples:
+    - 'curl -X POST localhost:3000/api/agent/summaries -H ''Content-Type: application/json'' -d ''{"messages":[{"role":"user","content":"Hello"},{"role":"assistant","content":"Hi! How can I help?"}],"signature":"<the signature of the last answer>"}'''
+methods:
+    - POST
+parameters:
+    - description: the origin of the page that sent the request, sent by the browser
+      id: Origin
+      sources:
+        - header
+      type: string
+    - description: the host the request was sent to
+      id: Host
+      sources:
+        - header
+      type: string
+paths:
+    - end: -1
+      id: ApiAgentSummaries
+      start: 0
+      trigger:
+        type: equal
+        value: /api/agent/summaries
+priority: 100
+response-type: application/json
+summary: Keeps an anonymous summary of a conversation the server signed, and answers its id

@@ -18,15 +18,18 @@ const RetryAfterSeconds = "5"
 // half-written database, nor writes into one about to be replaced. While a
 // snapshot reads them file by file, a request that may write — any method but
 // GET, HEAD and OPTIONS — is refused the same way, so every file of the
-// snapshot is taken at one instant. Anything else declines, so the route
-// after it runs. A request already past this rung when a job starts is not
-// stopped, and neither is a write made outside the server, by a command line.
+// snapshot is taken at one instant — but for the public agent, /api/agent/,
+// which writes nothing itself while a snapshot is taken: its usage and its
+// summaries wait in a queue until the snapshot ends (sandbox/internal/agent).
+// Anything else declines, so the route after it runs. A request already past
+// this rung when a job starts is not stopped, and neither is a write made
+// outside the server, by a command line.
 func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
 	if snapshots.Restoring(sandbox) {
 		response.SetHeader("Retry-After", RetryAfterSeconds)
 		return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusServiceUnavailable, "", "a backup is being restored: try again in a few seconds")
 	}
-	if snapshots.Creating(sandbox) && !reads(sandbox, input.XRequestMethod) {
+	if snapshots.Creating(sandbox) && !reads(sandbox, input.XRequestMethod) && !queued(sandbox, input.FullRoute) {
 		response.SetHeader("Retry-After", RetryAfterSeconds)
 		return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusServiceUnavailable, "", "a backup is being taken: try again in a few seconds")
 	}
@@ -36,4 +39,10 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 // reads tells whether method is one that only reads: GET, HEAD or OPTIONS.
 func reads(sandbox *api.Sandbox, method string) bool {
 	return method == "GET" || method == "HEAD" || method == "OPTIONS"
+}
+
+// queued tells whether path is one of the public agent, whose writes wait in
+// a queue while a snapshot is taken.
+func queued(sandbox *api.Sandbox, path string) bool {
+	return sandbox.Deps.StringsDeps.HasPrefix(path, "/api/agent/")
 }

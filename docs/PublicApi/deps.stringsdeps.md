@@ -30,6 +30,7 @@ Contract is the text library injected whole as the Deps.StringsDeps field. The f
 | `ToLower` | `func(s string) string` | ToLower returns s with every letter mapped to its lower case. |
 | `Quote` | `func(s string) string` | Quote returns s as a double-quoted Go string literal, escaping what the Go syntax requires. |
 | `MatchPattern` | `func(pattern string, s string) (bool, error)` | MatchPattern reports whether s is matched by the regular expression pattern, and errors when the pattern itself does not compile. It is the one matching primitive the sandbox has: `regexp` lives on the adapter side like every other standard package. |
+| `ReplacePattern` | `func(pattern string, s string, replacement string) (string, error)` | ReplacePattern returns s with every match of the regular expression pattern (RE2 syntax) replaced by replacement, where $1 or ${name} stand for a submatch. The error reports a pattern that does not compile. |
 | `Atoi` | `func(s string) (int, error)` | Atoi parses s as a decimal integer. The error reports a string that is not one. |
 | `ParseInt` | `func(s string, base int, bitSize int) (int64, error)` | ParseInt parses s as an integer in the given base with the given bit size. The error reports a string that is not one. |
 | `ParseFloat` | `func(s string, bitSize int) (float64, error)` | ParseFloat parses s as a floating-point number of the given bit size. The error reports a string that is not one. |

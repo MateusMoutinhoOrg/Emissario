@@ -94,6 +94,12 @@ type Contract struct {
 	// side like every other standard package.
 	MatchPattern func(pattern string, s string) (bool, error)
 
+	// ReplacePattern returns s with every match of the regular expression
+	// pattern (RE2 syntax) replaced by replacement, where $1 or ${name}
+	// stand for a submatch. The error reports a pattern that does not
+	// compile.
+	ReplacePattern func(pattern string, s string, replacement string) (string, error)
+
 	// Atoi parses s as a decimal integer. The error reports a string that is
 	// not one.
 	Atoi func(s string) (int, error)

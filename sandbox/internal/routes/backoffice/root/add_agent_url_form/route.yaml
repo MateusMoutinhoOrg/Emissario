@@ -1,0 +1,40 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            description:
+                maxLength: 1000
+                type: string
+            headers:
+                maxLength: 8192
+                type: string
+            method:
+                maxLength: 8
+                type: string
+            name:
+                maxLength: 64
+                type: string
+            url:
+                maxLength: 2048
+                type: string
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Agent
+description: 'Root only. name is a slug, unique; method GET or POST; url a whole http(s) address; headers one Name: value per line. A refused value answers the form again under a 400; an add answers 303 to the urls with ?notice=added.'
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/add-agent-url -H ''Origin: http://localhost:3000'' --data-urlencode ''name=order-status'' --data-urlencode ''description=The status of an order, by its number'' --data-urlencode ''method=GET'' --data-urlencode ''url=https://api.example.com/orders'' --data-urlencode ''headers=Authorization: Bearer abc'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootAddAgentUrl
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/add-agent-url
+priority: 100
+private: true
+response-type: text/html
+summary: Adds a url the public agent can call

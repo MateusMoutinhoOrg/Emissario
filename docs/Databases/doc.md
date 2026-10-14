@@ -6,6 +6,7 @@ with the `generated.new.go` they render.
 
 | Database | Package | Keys under |
 | --- | --- | --- |
+| [`AgentDb`](agent_db.md) | `agent_db` | `agentdb` |
 | [`BackofficeDb`](backoffice_db.md) | `backoffice_db` | `backofficedb` |
 | [`Backup`](backup.md) | `backup` | `backup` |
 | [`EmissarioDb`](emissario_db.md) | `emissario_db` | `emissariodb` |

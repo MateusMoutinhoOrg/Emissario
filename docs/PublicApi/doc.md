@@ -62,6 +62,7 @@ field is that package's `Sandbox` struct, filled by `adapters/impls/<name>.Bind(
 | [`deps.PasswordDeps`](deps.passworddeps.md) | `Contract` |
 | [`deps.RandDeps`](deps.randdeps.md) | `Contract` |
 | [`deps.RatelimitDeps`](deps.ratelimitdeps.md) | `Contract` |
+| [`deps.RequestDeps`](deps.requestdeps.md) | `Contract`, `Request`, `Response` |
 | [`deps.RunDeps`](deps.rundeps.md) | `Contract`, `RunProps`, `Result` |
 | [`deps.SerializableDeps`](deps.serializabledeps.md) | `SerializableObject`, `Contract` |
 | [`deps.ServerDeps`](deps.serverdeps.md) | `Contract`, `ServerProps`, `Server`, `Request`, `Response` |

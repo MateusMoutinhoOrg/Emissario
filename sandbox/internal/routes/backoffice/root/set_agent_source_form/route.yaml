@@ -1,0 +1,34 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            branch:
+                maxLength: 255
+                type: string
+            repo-url:
+                maxLength: 2048
+                type: string
+            sync-time:
+                maxLength: 32
+                type: string
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Agent
+description: Root only. The repository is cloned into <fonts>/agent and its branch pulled every sync time by the goroutine start-server runs; a blank sync time stops the automatic syncing. It may be the repository of the website. A refused value answers the form again under a 400.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/set-agent-source -H ''Origin: http://localhost:3000'' --data ''repo-url=https://github.com/org/site.git&branch=main&sync-time=10m'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSetAgentSource
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-agent-source
+priority: 100
+private: true
+response-type: text/html
+summary: Sets the git repository, branch and sync time the agent reads its instructions from

@@ -1,0 +1,37 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            branch:
+                maxLength: 255
+                type: string
+            repo_url:
+                maxLength: 2048
+                type: string
+            sync_time:
+                maxLength: 32
+                type: string
+        required:
+            - branch
+            - repo_url
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Agent API
+description: 'Root only. The rules of the page /admin/root/set-agent-source: a blank sync_time stops the automatic syncing. Answers {source: {repo_url, branch, sync_time}}; 400 for a value refused.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/set-agent-source -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"repo_url":"https://github.com/org/site.git","branch":"main","sync_time":"10m"}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootSetAgentSource
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/set-agent-source
+priority: 100
+private: true
+response-type: application/json
+summary: Sets the git repository, branch and sync time the agent reads its instructions from

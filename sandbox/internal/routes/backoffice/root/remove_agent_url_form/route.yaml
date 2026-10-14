@@ -1,0 +1,28 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            id:
+                maxLength: 20
+                type: string
+        type: object
+    max-bytes: 1024
+    required: true
+    type: form
+category: Agent
+description: Root only. Answers 303 to the urls with ?notice=removed; an id no url holds answers the urls under a 404.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/remove-agent-url -H ''Origin: http://localhost:3000'' --data ''id=1'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootRemoveAgentUrl
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/remove-agent-url
+priority: 100
+private: true
+response-type: text/html
+summary: Removes a url the public agent can call

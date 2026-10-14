@@ -5,7 +5,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/rundeps"
 )
 
-// tickMilliseconds is how long the sync loop waits between two looks at the
+// tickMilliseconds is how long a sync loop waits between two looks at the
 // settings: a new url, branch or sync time is picked up within it. A sync asked
 // for through RequestSync wakes it at once.
 const tickMilliseconds = 2000
@@ -28,16 +28,15 @@ var gitConfig = []string{
 const (
 	// OutcomeRequested follows a sync asked for: the loop runs it at once.
 	OutcomeRequested = "sync-requested"
-	// OutcomeNoSource follows a sync asked for before any website source was
-	// saved.
+	// OutcomeNoSource follows a sync asked for before the source was saved.
 	OutcomeNoSource = "no-source"
 	// OutcomeNotRunning follows a sync asked for in a process whose sync loop
 	// does not run: it runs in the one start-server started.
 	OutcomeNotRunning = "not-running"
 )
 
-// Status is what the sync loop of this process is doing and what its last
-// sync did, for the backoffice page.
+// Status is what the sync loop of one source is doing in this process and
+// what its last sync did, for the backoffice page.
 type Status struct {
 	// Running is true once Start ran in this process.
 	Running bool
@@ -59,51 +58,80 @@ type Status struct {
 	Output string
 }
 
-// status is the Status CurrentStatus answers, guarded by statusLock.
-var status Status
+// source is the sync loop of one source: what it is doing and the token a
+// sync asked for leaves it.
+type source struct {
+	// status is the Status CurrentStatus answers, guarded by statusLock.
+	status Status
+	// requested holds a token from the moment a sync is asked for until the
+	// loop takes it.
+	requested chan struct{}
+}
 
-// statusLock is held while status is read or written.
+// sources is the loop of each of Names. It is filled once, before any
+// goroutine runs, and only the sources it points to change afterwards.
+var sources = newSources()
+
+// newSources is one source per name of Names.
+func newSources() map[string]*source {
+	made := map[string]*source{}
+	for _, name := range Names {
+		made[name] = &source{requested: make(chan struct{}, 1)}
+	}
+	return made
+}
+
+// sourceOf is the loop of the source name. A name that is not one of Names is
+// a mistake of the caller: it panics rather than syncing nothing.
+func sourceOf(sandbox *api.Sandbox, name string) *source {
+	found, ok := sources[name]
+	if !ok {
+		panic("websitesource: no source is named " + name)
+	}
+	return found
+}
+
+// statusLock is held while the status of any source is read or written.
 var statusLock = make(chan struct{}, 1)
-
-// requested holds a token from the moment a sync is asked for until the loop
-// takes it.
-var requested = make(chan struct{}, 1)
 
 // started holds a token once Start ran, so a second call starts nothing.
 var started = make(chan struct{}, 1)
 
-// CurrentStatus is a copy of what the sync loop of this process is doing and
-// what its last sync did.
-func CurrentStatus(sandbox *api.Sandbox) Status {
+// CurrentStatus is a copy of what the sync loop of the source name is doing
+// in this process and what its last sync did.
+func CurrentStatus(sandbox *api.Sandbox, name string) Status {
+	found := sourceOf(sandbox, name)
 	statusLock <- struct{}{}
 	defer func() { <-statusLock }()
-	return status
+	return found.status
 }
 
-// updateStatus runs change on status under statusLock.
-func updateStatus(sandbox *api.Sandbox, change func(current *Status)) {
+// updateStatus runs change on the status of the source name under
+// statusLock.
+func updateStatus(sandbox *api.Sandbox, name string, change func(current *Status)) {
+	found := sourceOf(sandbox, name)
 	statusLock <- struct{}{}
 	defer func() { <-statusLock }()
-	change(&status)
+	change(&found.status)
 }
 
-// RequestSync asks the sync loop for a sync now — whatever the sync time, a
-// blank one included, and even when the checkout is already at the head of
-// its branch: the loop wakes at once, fetches the branch and checks it out
-// again. It answers OutcomeRequested, or why nothing was asked:
-// OutcomeNoSource before any website source was saved, OutcomeNotRunning when
-// no sync loop runs in this process. One request pending is as good as
-// several.
-func RequestSync(sandbox *api.Sandbox) (string, error) {
-	_, ok, err := Read(sandbox)
+// RequestSync asks the sync loop of the source name for a sync now — whatever
+// the sync time, a blank one included, and even when the checkout is already
+// at the head of its branch: the loop wakes at once, fetches the branch and
+// checks it out again. It answers OutcomeRequested, or why nothing was asked:
+// OutcomeNoSource before the source was saved, OutcomeNotRunning when no sync
+// loop runs in this process. One request pending is as good as several.
+func RequestSync(sandbox *api.Sandbox, name string) (string, error) {
+	_, ok, err := Read(sandbox, name)
 	if err != nil {
 		return "", err
 	}
 	if !ok {
 		return OutcomeNoSource, nil
 	}
+	requested := sourceOf(sandbox, name).requested
 	outcome := OutcomeRequested
-	updateStatus(sandbox, func(current *Status) {
+	updateStatus(sandbox, name, func(current *Status) {
 		if !current.Running {
 			outcome = OutcomeNotRunning
 			return
@@ -117,85 +145,89 @@ func RequestSync(sandbox *api.Sandbox) (string, error) {
 	return outcome, nil
 }
 
-// takeRequest reports whether a sync was asked for and not taken yet, and
-// takes it.
-func takeRequest(sandbox *api.Sandbox) bool {
+// takeRequest reports whether a sync of the source name was asked for and
+// not taken yet, and takes it.
+func takeRequest(sandbox *api.Sandbox, name string) bool {
 	select {
-	case <-requested:
+	case <-sourceOf(sandbox, name).requested:
 		return true
 	default:
 		return false
 	}
 }
 
-// wait sleeps tickMilliseconds, or less when a sync is asked for meanwhile,
-// and reports whether one was — taking it.
-func wait(sandbox *api.Sandbox) bool {
+// wait sleeps tickMilliseconds, or less when a sync of the source name is
+// asked for meanwhile, and reports whether one was — taking it.
+func wait(sandbox *api.Sandbox, name string) bool {
 	woke := make(chan struct{}, 1)
 	go func() {
 		sandbox.Deps.SleepDeps.Sleep(tickMilliseconds)
 		woke <- struct{}{}
 	}()
 	select {
-	case <-requested:
+	case <-sourceOf(sandbox, name).requested:
 		return true
 	case <-woke:
-		return takeRequest(sandbox)
+		return takeRequest(sandbox, name)
 	}
 }
 
-// Start runs the sync loop in a goroutine of its own, once per process: it
-// lives as long as the process does and stops with it. Every tick it reads the
-// settings of the frontend source and, when a sync time is set, syncs the
+// Start runs the sync loop of every source of Names, each in a goroutine of
+// its own, once per process: they live as long as the process does and stop
+// with it, and a slow clone of one never holds the others. Every tick a loop
+// reads the settings of its source and, when a sync time is set, syncs the
 // repository at once on the first tick, again every sync time, and whenever
 // the url, the branch or the sync time changed. With no sync time set it syncs
 // nothing on its own; a sync time set later is picked up on the next tick,
 // with no restart. A sync asked for through RequestSync runs at once in
-// either case.
+// either case. Two syncs of one source never run at once.
 func Start(sandbox *api.Sandbox) {
 	select {
 	case started <- struct{}{}:
 	default:
 		return
 	}
-	updateStatus(sandbox, func(current *Status) { current.Running = true })
-	go loop(sandbox)
+	for _, name := range Names {
+		updateStatus(sandbox, name, func(current *Status) { current.Running = true })
+		go loop(sandbox, name)
+	}
 }
 
-// loop is the body of the goroutine Start runs. It never returns.
-func loop(sandbox *api.Sandbox) {
+// loop is the body of the goroutine Start runs for the source name. It never
+// returns.
+func loop(sandbox *api.Sandbox, name string) {
 	synced := Settings{}
 	syncedAt := int64(0)
-	forced := takeRequest(sandbox)
+	forced := takeRequest(sandbox, name)
 	for {
-		settings, ok, err := Read(sandbox)
+		settings, ok, err := Read(sandbox, name)
 		if err == nil && ok {
 			interval, timed := SyncMilliseconds(sandbox, settings.SyncTime)
 			now := sandbox.Deps.StdDeps.Now() / 1000000
 			if forced || timed && (syncedAt == 0 || settings != synced || now-syncedAt >= interval) {
-				syncAndReport(sandbox, settings)
+				syncAndReport(sandbox, name, settings)
 				synced = settings
 				syncedAt = now
 				forced = false
 			}
 		}
 		if forced {
-			updateStatus(sandbox, func(current *Status) { current.Pending = false })
+			updateStatus(sandbox, name, func(current *Status) { current.Pending = false })
 		}
-		forced = wait(sandbox)
+		forced = wait(sandbox, name)
 	}
 }
 
-// syncAndReport runs Sync, records what it did for the backoffice page and
-// says so on stderr.
-func syncAndReport(sandbox *api.Sandbox, settings Settings) {
+// syncAndReport runs Sync for the source name, records what it did for the
+// backoffice page and says so on stderr.
+func syncAndReport(sandbox *api.Sandbox, name string, settings Settings) {
 	attemptedAt := sandbox.Deps.StdDeps.Now() / 1000000000
-	updateStatus(sandbox, func(current *Status) {
+	updateStatus(sandbox, name, func(current *Status) {
 		current.Pending = false
 		current.Syncing = true
 	})
-	commit, output, err := Sync(sandbox, settings)
-	updateStatus(sandbox, func(current *Status) {
+	commit, output, err := Sync(sandbox, name, settings)
+	updateStatus(sandbox, name, func(current *Status) {
 		current.Syncing = false
 		current.AttemptedAt = attemptedAt
 		current.Ok = err == nil
@@ -207,23 +239,23 @@ func syncAndReport(sandbox *api.Sandbox, settings Settings) {
 		}
 	})
 	if err != nil {
-		sandbox.Deps.StdDeps.Eprintf("warning: the website source %s could not be synced from %s (%s): %s\n", FrontendName, settings.RepoUrl, settings.Branch, err.Error())
+		sandbox.Deps.StdDeps.Eprintf("warning: the %s %s could not be synced from %s (%s): %s\n", LabelOf(sandbox, name), name, settings.RepoUrl, settings.Branch, err.Error())
 		return
 	}
-	sandbox.Deps.StdDeps.Logf("website source %s synced from %s (%s) at %s\n", FrontendName, settings.RepoUrl, settings.Branch, commit)
+	sandbox.Deps.StdDeps.Logf("%s %s synced from %s (%s) at %s\n", LabelOf(sandbox, name), name, settings.RepoUrl, settings.Branch, commit)
 }
 
-// Sync leaves RepoDir a checkout of the head of settings.Branch of
-// settings.RepoUrl, and answers the short hash it is at. A checkout already
+// Sync leaves the RepoDir of the source name a checkout of the head of
+// settings.Branch of settings.RepoUrl, and answers the short hash it is at. A checkout already
 // there is pointed at settings.RepoUrl, fetches the branch and checks it out
 // over whatever it held, so a url or a branch that fails to fetch leaves the
 // site as it was. Anything else at RepoDir — a folder that is no checkout, or
 // one git cannot read — is removed and the repository cloned. On a failure,
 // output is what git wrote.
-func Sync(sandbox *api.Sandbox, settings Settings) (string, string, error) {
+func Sync(sandbox *api.Sandbox, name string, settings Settings) (string, string, error) {
 	io := sandbox.Deps.IoDeps
 	strings := sandbox.Deps.StringsDeps
-	dir := RepoDir(sandbox)
+	dir := RepoDir(sandbox, name)
 
 	if io.IsDir(io.Join(dir, ".git")) {
 		origin, err := git(sandbox, dir, "remote", "get-url", "origin")

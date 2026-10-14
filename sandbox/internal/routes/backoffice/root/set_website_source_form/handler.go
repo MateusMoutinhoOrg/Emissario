@@ -24,7 +24,7 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 		Branch:   input.Body.Branch,
 		SyncTime: input.Body.SyncTime,
 	}
-	message, err := websitesource.Save(sandbox, settings)
+	message, err := websitesource.Save(sandbox, websitesource.FrontendName, settings)
 	if err != nil {
 		return err
 	}

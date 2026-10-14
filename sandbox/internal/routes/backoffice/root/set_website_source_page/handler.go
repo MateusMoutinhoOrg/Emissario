@@ -18,7 +18,7 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 		return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusUnauthorized, "", "no authenticated user")
 	}
 
-	settings, ok, err := websitesource.Read(sandbox)
+	settings, ok, err := websitesource.Read(sandbox, websitesource.FrontendName)
 	if err != nil {
 		return err
 	}

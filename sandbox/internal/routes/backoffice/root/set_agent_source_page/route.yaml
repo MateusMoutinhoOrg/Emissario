@@ -1,0 +1,24 @@
+category: Agent
+description: Root only.
+examples:
+    - curl -b "backoffice_session=$SESSION" localhost:3000/admin/root/set-agent-source
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last save
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootSetAgentSource
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-agent-source
+priority: 100
+private: true
+response-type: text/html
+summary: Shows the form that sets the git repository the agent reads its instructions from, and what the last sync did

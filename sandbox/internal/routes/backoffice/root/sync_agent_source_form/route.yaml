@@ -1,0 +1,17 @@
+category: Agent
+description: Root only. Answers 303 back to the agent source page, which refreshes until the sync ends.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/sync-agent-source -H ''Origin: http://localhost:3000'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSyncAgentSource
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/sync-agent-source
+priority: 100
+private: true
+response-type: text/html
+summary: 'Syncs the agent source now, even when it is up to date, and answers at once: the sync runs in the background'

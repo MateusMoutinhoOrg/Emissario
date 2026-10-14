@@ -1,0 +1,17 @@
+category: Agent
+description: Root and viewer. The model and the endpoint, and the last sync of the agent source, are shown to a root alone.
+examples:
+    - curl -b "backoffice_session=$SESSION" localhost:3000/admin/agent
+methods:
+    - GET
+paths:
+    - end: -1
+      id: AdminAgent
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/agent
+priority: 100
+private: true
+response-type: text/html
+summary: Shows whether the public agent answers and why not, the tokens of today against the limits, and the latest summaries

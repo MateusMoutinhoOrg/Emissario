@@ -23,6 +23,7 @@ Opens the port and serves every route declared under sandbox/internal/routes, un
 
 | Runs in front of it | When |
 | --- | --- |
+| [`agent-start-server`](agent-start-server.md) | always |
 | [`backoffice-start-server`](backoffice-start-server.md) | always |
 | [`database-dir`](database-dir.md) | always |
 | [`help-flag`](help-flag.md) | always |

@@ -1,0 +1,52 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            api-key:
+                maxLength: 4096
+                type: string
+            base-url:
+                maxLength: 2048
+                type: string
+            clear-api-key:
+                maxLength: 8
+                type: string
+            daily-limit:
+                maxLength: 16
+                type: string
+            enabled:
+                maxLength: 8
+                type: string
+            ip-daily-limit:
+                maxLength: 16
+                type: string
+            max-tokens:
+                maxLength: 16
+                type: string
+            model:
+                maxLength: 200
+                type: string
+            rate-per-minute:
+                maxLength: 16
+                type: string
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Agent
+description: Root only. enabled=1 turns the chat on, its absence off; a blank api-key keeps the one saved, clear-api-key=1 removes it; a blank max-tokens is 1024, a blank rate-per-minute 10, a blank daily limit no limit. A refused value answers the form again under a 400; a save answers 303 back to the page with ?notice=saved.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/set-agent-settings -H ''Origin: http://localhost:3000'' --data ''enabled=1&base-url=https://api.openai.com/v1&api-key=sk-...&model=gpt-4o-mini&max-tokens=1024&daily-limit=200000&ip-daily-limit=20000&rate-per-minute=10'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSetAgentSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-agent-settings
+priority: 100
+private: true
+response-type: text/html
+summary: Saves the provider and the limits of the public agent

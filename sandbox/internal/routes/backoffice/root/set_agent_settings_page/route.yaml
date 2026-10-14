@@ -1,0 +1,24 @@
+category: Agent
+description: 'Root only. The API key is never shown: its last four characters at most.'
+examples:
+    - curl -b "backoffice_session=$SESSION" localhost:3000/admin/root/set-agent-settings
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last save
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootSetAgentSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-agent-settings
+priority: 100
+private: true
+response-type: text/html
+summary: Shows the form that sets the provider and the limits of the public agent, beside its state

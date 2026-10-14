@@ -235,5 +235,9 @@ func newResponse(writer http.ResponseWriter) serverdeps.Response {
 			_, err := writer.Write(body)
 			return err
 		},
+		SetWriteDeadline: func(milliseconds int64) error {
+			deadline := time.Now().Add(time.Duration(milliseconds) * time.Millisecond)
+			return http.NewResponseController(writer).SetWriteDeadline(deadline)
+		},
 	}
 }

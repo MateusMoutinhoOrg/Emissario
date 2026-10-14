@@ -25,6 +25,9 @@
   ],
   "tags": [
     {
+      "name": "Agent"
+    },
+    {
       "name": "Server"
     },
     {
@@ -32,6 +35,311 @@
     }
   ],
   "paths": {
+    "/api/agent/messages": {
+      "post": {
+        "operationId": "agent-messages",
+        "tags": [
+          "Agent"
+        ],
+        "summary": "Answers the next message of the public agent in a conversation the server signed",
+        "description": "No authentication: any visitor of the website may call it, from the same origin (no CORS; a request another site sent is answered 403). The history lives in the visitor and is signed by the server: send every message of the conversation, user and assistant in turns, the first and the last of the user, with the signature the last answer carried (empty on the first message); the answer is the next message of the agent and the signature covering the messages and it. The model reads instructions/README.md of the agent source as its system prompt and may list and read the files of instructions/ and call the urls a root declared, for up to 5 rounds. 400 invalid, 401 invalid-signature (the backoffice secret changed at a restart: start over), 403 origin, 413 over 64 KiB, 429 rate-limit, ip-daily-limit or daily-limit with Retry-After, 502 the provider failed, 503 disabled, not configured, no README.md or a restore running, 504 past the 60 s deadline. The conversation is sent to the provider configured, a third party, and is never stored.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "description": "the origin of the page that sent the request, sent by the browser",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-origin"
+          },
+          {
+            "name": "Host",
+            "in": "header",
+            "description": "the host the request was sent to",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-host"
+          },
+          {
+            "name": "x-request-method",
+            "in": "header",
+            "description": "the method of the request, set by the server and never by the client\n\nRead by `backoffice-maintenance`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-request-method"
+          },
+          {
+            "name": "x-client-ip",
+            "in": "header",
+            "description": "the ip of the connection, set by the server and never by the client\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-client-ip"
+          },
+          {
+            "name": "x-forwarded-for",
+            "in": "header",
+            "description": "the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-forwarded-for"
+          }
+        ],
+        "requestBody": {
+          "description": "Up to 64 KB.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "messages": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string",
+                          "maxLength": 4000
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "user",
+                            "assistant"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "content",
+                        "role"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1,
+                    "maxItems": 50
+                  },
+                  "signature": {
+                    "type": "string",
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "messages"
+                ]
+              },
+              "example": {
+                "messages": [
+                  {
+                    "content": "text",
+                    "role": "user"
+                  }
+                ],
+                "signature": "text"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "It worked. The answer comes as `application/json`.",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "400": {
+            "description": "Something you sent is missing or has the wrong type or format. The answer's `field` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 64 KB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body was not sent with `Content-Type: application/json`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/agent/summaries": {
+      "post": {
+        "operationId": "agent-summaries",
+        "tags": [
+          "Agent"
+        ],
+        "summary": "Keeps an anonymous summary of a conversation the server signed, and answers its id",
+        "description": "No authentication, same origin. Send the whole conversation — every message, ending with the last answer of the agent — and the signature that answer carried. The configured model writes a summary under the mandatory instructions (remove names, dates, places, ids, CPF, phones, emails, addresses) and instructions/SUMMARY.md of the agent source, a regex pass then removes what still looks like a CPF, a CNPJ, an email, a phone or a card number, and the summary is kept with no ip; it is answered 201 {\"id\"} and its text is never returned. Its tokens count in the limits. Errors as /api/agent/messages.",
+        "parameters": [
+          {
+            "name": "Origin",
+            "in": "header",
+            "description": "the origin of the page that sent the request, sent by the browser",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-origin"
+          },
+          {
+            "name": "Host",
+            "in": "header",
+            "description": "the host the request was sent to",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-host"
+          },
+          {
+            "name": "x-request-method",
+            "in": "header",
+            "description": "the method of the request, set by the server and never by the client\n\nRead by `backoffice-maintenance`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-request-method"
+          },
+          {
+            "name": "x-client-ip",
+            "in": "header",
+            "description": "the ip of the connection, set by the server and never by the client\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-client-ip"
+          },
+          {
+            "name": "x-forwarded-for",
+            "in": "header",
+            "description": "the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for\n\nRead by `backoffice-client-ip`, which runs in front of this route.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "my-x-forwarded-for"
+          }
+        ],
+        "requestBody": {
+          "description": "Up to 64 KB.",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "messages": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string",
+                          "maxLength": 4000
+                        },
+                        "role": {
+                          "type": "string",
+                          "enum": [
+                            "user",
+                            "assistant"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "content",
+                        "role"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 2,
+                    "maxItems": 50
+                  },
+                  "signature": {
+                    "type": "string",
+                    "maxLength": 128
+                  }
+                },
+                "required": [
+                  "messages",
+                  "signature"
+                ]
+              },
+              "example": {
+                "messages": [
+                  {
+                    "content": "text",
+                    "role": "user"
+                  },
+                  {
+                    "content": "text",
+                    "role": "user"
+                  }
+                ],
+                "signature": "text"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "It worked. The answer comes as `application/json`.",
+            "content": {
+              "application/json": {}
+            }
+          },
+          "400": {
+            "description": "Something you sent is missing or has the wrong type or format. The answer's `field` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The body is larger than 64 KB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "The body was not sent with `Content-Type: application/json`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "operationId": "health",

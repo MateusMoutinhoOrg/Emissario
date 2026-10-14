@@ -96,6 +96,7 @@ The contracts available to patch:
 | `deps.PasswordDeps` | `sandbox/deps/passworddeps` |
 | `deps.RandDeps` | `sandbox/deps/randdeps` |
 | `deps.RatelimitDeps` | `sandbox/deps/ratelimitdeps` |
+| `deps.RequestDeps` | `sandbox/deps/requestdeps` |
 | `deps.RunDeps` | `sandbox/deps/rundeps` |
 | `deps.SerializableDeps` | `sandbox/deps/serializabledeps` |
 | `deps.ServerDeps` | `sandbox/deps/serverdeps` |
@@ -121,6 +122,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/golangjwt` | `golangjwt.Bind(&deps)` |
 | `adapters/impls/maxmindgeoip` | `maxmindgeoip.Bind(&deps)` |
 | `adapters/impls/memoryratelimit` | `memoryratelimit.Bind(&deps)` |
+| `adapters/impls/nethttprequest` | `nethttprequest.Bind(&deps)` |
 | `adapters/impls/nethttpserver` | `nethttpserver.Bind(&deps)` |
 | `adapters/impls/osenv` | `osenv.Bind(&deps)` |
 | `adapters/impls/osexecrun` | `osexecrun.Bind(&deps)` |

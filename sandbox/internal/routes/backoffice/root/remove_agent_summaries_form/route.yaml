@@ -1,0 +1,31 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            before:
+                maxLength: 16
+                type: string
+            id:
+                maxLength: 64
+                type: string
+        type: object
+    max-bytes: 1024
+    required: true
+    type: form
+category: Agent
+description: Root only. Send id — the id of one summary — or before — YYYY-MM-DD, every summary before that day — not both. A deletion answers 303 to the summaries with ?notice=removed&removed=<n>; anything else answers the summaries under a 400 or a 404.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/remove-agent-summaries -H ''Origin: http://localhost:3000'' --data ''before=2026-07-01'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootRemoveAgentSummaries
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/remove-agent-summaries
+priority: 100
+private: true
+response-type: text/html
+summary: Deletes one summary, or every summary before a date

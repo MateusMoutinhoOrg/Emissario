@@ -1,0 +1,46 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            clear-headers:
+                maxLength: 8
+                type: string
+            description:
+                maxLength: 1000
+                type: string
+            headers:
+                maxLength: 8192
+                type: string
+            id:
+                maxLength: 20
+                type: string
+            method:
+                maxLength: 8
+                type: string
+            name:
+                maxLength: 64
+                type: string
+            url:
+                maxLength: 2048
+                type: string
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Agent
+description: Root only. Blank headers keep the ones saved; clear-headers=1 removes them. A refused value answers the form again under a 400; a save answers 303 to the urls with ?notice=saved.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/set-agent-url -H ''Origin: http://localhost:3000'' --data ''id=1&name=order-status&description=The+status+of+an+order&method=GET&url=https://api.example.com/orders'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSetAgentUrl
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-agent-url
+priority: 100
+private: true
+response-type: text/html
+summary: Changes a url the public agent can call

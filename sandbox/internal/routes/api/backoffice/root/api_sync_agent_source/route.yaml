@@ -1,0 +1,17 @@
+category: Agent API
+description: Root only. Answers 409 when no agent source was saved yet, and 503 when the sync loop does not run in this process. The page /admin/root/set-agent-source shows when the sync ends and why it failed.
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/sync-agent-source -H "Authorization: Bearer $TOKEN"'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootSyncAgentSource
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/sync-agent-source
+priority: 100
+private: true
+response-type: application/json
+summary: 'Syncs the agent source now, even when it is up to date, and answers 202 at once: the sync runs in the background'

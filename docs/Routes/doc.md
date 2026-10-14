@@ -18,6 +18,46 @@ it prints the address it took. Change it to wherever your server runs.
 | `*` | anything else, or nothing | `/admin/*` -> `/admin`, `/admin/users` |
 | `(a\|b)` | one of these words | `/(en\|pt)` -> `/en` |
 
+## Agent
+
+| Route | What it does |
+| --- | --- |
+| [`POST /api/agent/messages`](agent_messages.md) | Answers the next message of the public agent in a conversation the server signed |
+| [`POST /api/agent/summaries`](agent_summaries.md) | Keeps an anonymous summary of a conversation the server signed, and answers its id |
+| [`GET /admin/agent`](agent_dashboard_page.md) | Shows whether the public agent answers and why not, the tokens of today against the limits, and the latest summaries |
+| [`GET /admin/agent-usage`](agent_usage_page.md) | Shows the tokens of the agent: today against the limits, by day, by ip and the ips at their limit |
+| [`GET /admin/get-agent-summary`](get_agent_summary_page.md) | Shows one summary whole |
+| [`GET /admin/list-agent-summaries`](list_agent_summaries_page.md) | Lists the summaries of a period, newest first, searched by text |
+| [`POST /admin/root/add-agent-url`](add_agent_url_form.md) | Adds a url the public agent can call |
+| [`GET /admin/root/add-agent-url`](add_agent_url_page.md) | Shows the form that adds a url the public agent can call |
+| [`GET /admin/root/list-agent-urls`](list_agent_urls_page.md) | Lists the urls the public agent can call, by name |
+| [`POST /admin/root/remove-agent-summaries`](remove_agent_summaries_form.md) | Deletes one summary, or every summary before a date |
+| [`POST /admin/root/remove-agent-url`](remove_agent_url_form.md) | Removes a url the public agent can call |
+| [`POST /admin/root/set-agent-settings`](set_agent_settings_form.md) | Saves the provider and the limits of the public agent |
+| [`GET /admin/root/set-agent-settings`](set_agent_settings_page.md) | Shows the form that sets the provider and the limits of the public agent, beside its state |
+| [`POST /admin/root/set-agent-source`](set_agent_source_form.md) | Sets the git repository, branch and sync time the agent reads its instructions from |
+| [`GET /admin/root/set-agent-source`](set_agent_source_page.md) | Shows the form that sets the git repository the agent reads its instructions from, and what the last sync did |
+| [`POST /admin/root/set-agent-url`](set_agent_url_form.md) | Changes a url the public agent can call |
+| [`GET /admin/root/set-agent-url`](set_agent_url_page.md) | Shows the form that changes a url the public agent can call |
+| [`POST /admin/root/sync-agent-source`](sync_agent_source_form.md) | Syncs the agent source now, even when it is up to date, and answers at once: the sync runs in the background |
+
+## Agent API
+
+| Route | What it does |
+| --- | --- |
+| [`POST /api/admin/agent-usage`](api_agent_usage.md) | Answers the tokens of the agent: today against the limits, by day, by ip and the ips at their limit |
+| [`POST /api/admin/get-agent-summary`](api_get_agent_summary.md) | Answers one summary whole |
+| [`POST /api/admin/list-agent-summaries`](api_list_agent_summaries.md) | Answers one page of the summaries of a period, newest first, searched by text |
+| [`POST /api/admin/root/add-agent-url`](api_add_agent_url.md) | Adds a url the public agent can call |
+| [`POST /api/admin/root/get-agent-settings`](api_get_agent_settings.md) | Answers the settings of the public agent and its state |
+| [`POST /api/admin/root/list-agent-urls`](api_list_agent_urls.md) | Answers the urls the public agent can call, by name |
+| [`POST /api/admin/root/remove-agent-summaries`](api_remove_agent_summaries.md) | Deletes one summary, or every summary before a date |
+| [`POST /api/admin/root/remove-agent-url`](api_remove_agent_url.md) | Removes a url the public agent can call |
+| [`POST /api/admin/root/set-agent-settings`](api_set_agent_settings.md) | Saves the provider and the limits of the public agent |
+| [`POST /api/admin/root/set-agent-source`](api_set_agent_source.md) | Sets the git repository, branch and sync time the agent reads its instructions from |
+| [`POST /api/admin/root/set-agent-url`](api_set_agent_url.md) | Changes a url the public agent can call |
+| [`POST /api/admin/root/sync-agent-source`](api_sync_agent_source.md) | Syncs the agent source now, even when it is up to date, and answers 202 at once: the sync runs in the background |
+
 ## Backoffice Users API
 
 | Route | What it does |

@@ -1,0 +1,63 @@
+category: Agent
+description: Root and viewer. A period covers at most 366 days; a bad date or from after to answers the page under a 400 with the reason. A root also sees the form that deletes every summary before a date.
+examples:
+    - curl -b "backoffice_session=$SESSION" "localhost:3000/admin/list-agent-summaries?from=2026-10-01&to=2026-10-14&q=refund"
+methods:
+    - GET
+parameters:
+    - description: the first day, YYYY-MM-DD; the last 30 days by default
+      id: From
+      key: from
+      sources:
+        - query
+      type: string
+    - description: the last day, YYYY-MM-DD, included
+      id: To
+      key: to
+      sources:
+        - query
+      type: string
+    - description: a text the summary or its id holds, any case
+      id: Q
+      key: q
+      sources:
+        - query
+      type: string
+    - default: "1"
+      description: the page, from 1
+      id: Page
+      key: page
+      sources:
+        - query
+      type: integer
+    - default: "20"
+      description: the summaries per page, 1 to 100
+      id: Limit
+      key: limit
+      sources:
+        - query
+      type: integer
+    - description: the outcome code of the last removal
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many summaries the last removal removed
+      id: Removed
+      key: removed
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminListAgentSummaries
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/list-agent-summaries
+priority: 100
+private: true
+response-type: text/html
+summary: Lists the summaries of a period, newest first, searched by text

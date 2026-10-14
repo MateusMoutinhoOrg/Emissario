@@ -1,0 +1,17 @@
+category: Agent API
+description: 'Root only. Answers {settings: {enabled, base_url, api_key_hint, api_key_from_env, model, max_tokens, daily_limit, ip_daily_limit, rate_per_minute}, status: {answering, problem, readme, summary, running, dropped}}. The api key is never answered: its last four characters at most.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/get-agent-settings -H "Authorization: Bearer $TOKEN"'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootGetAgentSettings
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/get-agent-settings
+priority: 100
+private: true
+response-type: application/json
+summary: Answers the settings of the public agent and its state

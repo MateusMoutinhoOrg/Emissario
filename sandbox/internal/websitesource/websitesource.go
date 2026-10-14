@@ -5,25 +5,38 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/emissario_db"
 )
 
-// The website source is the repository the public website is served from. A root
-// sets its url, branch and sync time in the backoffice; they are kept as the
-// frontend record of the source table of emissario-db. The goroutine Start
-// runs clones the repository into <FontsDir>/frontend and pulls the branch
-// every sync time (sync.go), and the site is the SiteFolder of that checkout
-// (site.go): / answers the frontend/index.html of the repository. git runs with whatever credentials the user running the
-// server has set up — an ssh key, a credential helper — and none is ever
-// asked for, stored or put on a command line here.
+// A source is a git repository the server keeps a checkout of. Each one is a
+// record of the source table of emissario-db, named after it — Names lists
+// them — whose url, branch and sync time a root sets in the backoffice. Start
+// runs one goroutine per source, which clones it into <FontsDir>/<name> and
+// pulls the branch every sync time (sync.go).
+//
+// The website source, FrontendName, is the repository the public website is
+// served from: the site is the SiteFolder of its checkout (site.go), and /
+// answers the frontend/index.html of the repository. The agent source,
+// AgentName, holds the instructions of the public agent
+// (sandbox/internal/agent); it may be the same url as the website's.
+//
+// git runs with whatever credentials the user running the server has set up —
+// an ssh key, a credential helper — and none is ever asked for, stored or put
+// on a command line here.
 
 const (
 	// FrontendName is the name of the source record the public website is
 	// served from, and of the folder under FontsDir its repository is cloned
 	// into.
 	FrontendName = "frontend"
+	// AgentName is the name of the source record the public agent reads its
+	// instructions from, and of the folder under FontsDir its repository is
+	// cloned into.
+	AgentName = "agent"
 	// SiteFolder is the folder of the repository the public website is served
 	// from: / answers its index.html.
 	SiteFolder = "frontend"
 	// PagePath is the backoffice page that sets the website source.
 	PagePath = "/admin/root/set-website-source"
+	// AgentPagePath is the backoffice page that sets the agent source.
+	AgentPagePath = "/admin/root/set-agent-source"
 	// DefaultBranch fills the branch of a form no root saved yet.
 	DefaultBranch = "main"
 	// DefaultSyncTime fills the sync time of a form no root saved yet.
@@ -45,13 +58,36 @@ const (
 )
 
 const (
-	// NoSourceMessage is why a sync cannot be asked for before any website
-	// source was saved.
-	NoSourceMessage = "no website source is saved yet: save a repository at " + PagePath + " first"
 	// NotRunningMessage is why a sync cannot be asked for in a process whose
 	// sync loop does not run.
 	NotRunningMessage = "the sync loop does not run in this process: it runs in the one start-server started"
 )
+
+// Names are the sources the server keeps a checkout of, each synced by a loop
+// of its own.
+var Names = []string{FrontendName, AgentName}
+
+// LabelOf is how the source name is called on a page or in a log line.
+func LabelOf(sandbox *api.Sandbox, name string) string {
+	if name == AgentName {
+		return "agent source"
+	}
+	return "website source"
+}
+
+// PageOf is the backoffice page that sets the source name.
+func PageOf(sandbox *api.Sandbox, name string) string {
+	if name == AgentName {
+		return AgentPagePath
+	}
+	return PagePath
+}
+
+// NoSourceMessage is why a sync of the source name cannot be asked for before
+// any was saved.
+func NoSourceMessage(sandbox *api.Sandbox, name string) string {
+	return "no " + LabelOf(sandbox, name) + " is saved yet: save a repository at " + PageOf(sandbox, name) + " first"
+}
 
 // Settings is what a root sets in the backoffice: the repository to clone,
 // the branch to pull, and how often to pull it — "" for never.
@@ -61,8 +97,8 @@ type Settings struct {
 	SyncTime string
 }
 
-// sourceLock is held while the frontend record is read or written, so the
-// sync loop never reads the url of one save with the branch of another.
+// sourceLock is held while a source record is read or written, so a sync loop
+// never reads the url of one save with the branch of another.
 var sourceLock = make(chan struct{}, 1)
 
 // lockSource takes sourceLock, waiting for it.
@@ -80,15 +116,15 @@ func Defaults(sandbox *api.Sandbox) Settings {
 	return Settings{Branch: DefaultBranch, SyncTime: DefaultSyncTime}
 }
 
-// RepoDir is the folder the frontend repository is cloned into.
-func RepoDir(sandbox *api.Sandbox) string {
-	return sandbox.Deps.IoDeps.Join(fontsDir(sandbox), FrontendName)
+// RepoDir is the folder the repository of the source name is cloned into.
+func RepoDir(sandbox *api.Sandbox, name string) string {
+	return sandbox.Deps.IoDeps.Join(fontsDir(sandbox), name)
 }
 
 // SiteDir is the folder the public website is served from: the SiteFolder of
-// the checkout at RepoDir.
+// the checkout of the website source.
 func SiteDir(sandbox *api.Sandbox) string {
-	return sandbox.Deps.IoDeps.Join(RepoDir(sandbox), SiteFolder)
+	return sandbox.Deps.IoDeps.Join(RepoDir(sandbox, FrontendName), SiteFolder)
 }
 
 // fontsDir is sandbox.Config.FontsDir, api.DefaultFontsDir when it was left
@@ -100,22 +136,22 @@ func fontsDir(sandbox *api.Sandbox) string {
 	return sandbox.Config.FontsDir
 }
 
-// Read answers the settings of the frontend source, false when no root saved
-// any yet.
-func Read(sandbox *api.Sandbox) (Settings, bool, error) {
+// Read answers the settings of the source name, false when no root saved any
+// yet.
+func Read(sandbox *api.Sandbox, name string) (Settings, bool, error) {
 	lockSource(sandbox)
 	defer unlockSource(sandbox)
-	record, ok, err := findFrontend(sandbox)
+	record, ok, err := find(sandbox, name)
 	if err != nil || !ok {
 		return Settings{}, false, err
 	}
 	return Settings{RepoUrl: record.Repourl, Branch: record.Branch, SyncTime: record.SyncTime}, true, nil
 }
 
-// findFrontend is the source record named FrontendName — the first one, were
-// there ever two — false when there is none. The caller holds sourceLock.
-func findFrontend(sandbox *api.Sandbox) (emissario_db.SourceRecord, bool, error) {
-	records, err := emissario_db.New(sandbox).ListSources(emissario_db.SourceFilter{NameEquals: FrontendName})
+// find is the source record named name — the first one, were there ever two —
+// false when there is none. The caller holds sourceLock.
+func find(sandbox *api.Sandbox, name string) (emissario_db.SourceRecord, bool, error) {
+	records, err := emissario_db.New(sandbox).ListSources(emissario_db.SourceFilter{NameEquals: name})
 	if err != nil {
 		return emissario_db.SourceRecord{}, false, err
 	}
@@ -125,11 +161,11 @@ func findFrontend(sandbox *api.Sandbox) (emissario_db.SourceRecord, bool, error)
 	return records[0], true, nil
 }
 
-// Save validates settings and writes them on the frontend source record,
-// creating it the first time; with a sync time set, the sync loop syncs a new
+// Save validates settings and writes them on the record of the source name,
+// creating it the first time; with a sync time set, its sync loop syncs a new
 // url or branch on its next tick. A refused value comes back as message, a
 // sentence for the form, and nothing is written; err is a store that failed.
-func Save(sandbox *api.Sandbox, settings Settings) (string, error) {
+func Save(sandbox *api.Sandbox, name string, settings Settings) (string, error) {
 	settings, message := Validate(sandbox, settings)
 	if message != "" {
 		return message, nil
@@ -137,20 +173,20 @@ func Save(sandbox *api.Sandbox, settings Settings) (string, error) {
 
 	lockSource(sandbox)
 	defer unlockSource(sandbox)
-	return "", writeFrontend(sandbox, settings)
+	return "", write(sandbox, name, settings)
 }
 
-// writeFrontend writes settings on the frontend source record, adding it when
+// write writes settings on the record of the source name, adding it when
 // there is none. The caller holds sourceLock.
-func writeFrontend(sandbox *api.Sandbox, settings Settings) error {
+func write(sandbox *api.Sandbox, name string, settings Settings) error {
 	db := emissario_db.New(sandbox)
-	record, ok, err := findFrontend(sandbox)
+	record, ok, err := find(sandbox, name)
 	if err != nil {
 		return err
 	}
 	if !ok {
 		_, err := db.AddSource(emissario_db.SourceInput{
-			Name:     FrontendName,
+			Name:     name,
 			Repourl:  settings.RepoUrl,
 			Branch:   settings.Branch,
 			SyncTime: settings.SyncTime,

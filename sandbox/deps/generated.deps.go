@@ -20,6 +20,7 @@ import (
 	passworddeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/passworddeps"
 	randdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/randdeps"
 	ratelimitdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/ratelimitdeps"
+	requestdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/requestdeps"
 	rundeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/rundeps"
 	serializabledeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serializabledeps"
 	serverdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
@@ -52,6 +53,7 @@ type Deps struct {
 	PasswordDeps             passworddeps.Contract
 	RandDeps                 randdeps.Contract
 	RatelimitDeps            ratelimitdeps.Contract
+	RequestDeps              requestdeps.Contract
 	RunDeps                  rundeps.Contract
 	SerializableDeps         serializabledeps.Contract
 	ServerDeps               serverdeps.Contract

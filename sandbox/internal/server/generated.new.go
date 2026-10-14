@@ -6,8 +6,13 @@ import (
 	api "github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	opinionatedagnosserver "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/OpinionatedAgnosServer"
 	routeprops "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
+	routes_agent_messages "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/agent/agent_messages"
+	routes_agent_summaries "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/agent/agent_summaries"
+	routes_api_agent_usage "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_agent_usage"
+	routes_api_get_agent_summary "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_get_agent_summary"
 	routes_api_get_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_get_backoffice_user"
 	routes_api_get_current_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_get_current_backoffice_user"
+	routes_api_list_agent_summaries "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_list_agent_summaries"
 	routes_api_list_backoffice_users "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_list_backoffice_users"
 	routes_api_list_visualization_pages "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_list_visualization_pages"
 	routes_api_list_visualization_views "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_list_visualization_views"
@@ -15,6 +20,7 @@ import (
 	routes_api_visualization_metrics "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/api_visualization_metrics"
 	routes_backoffice_api_root_guard "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/middleware/backoffice_api_root_guard"
 	routes_backoffice_api_token_auth "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/middleware/backoffice_api_token_auth"
+	routes_api_add_agent_url "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_add_agent_url"
 	routes_api_add_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_add_backoffice_user"
 	routes_api_add_backup_blob "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_add_backup_blob"
 	routes_api_add_backup_file "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_add_backup_file"
@@ -24,25 +30,37 @@ import (
 	routes_api_create_empty_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_create_empty_backup"
 	routes_api_download_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_download_backup"
 	routes_api_download_backup_file "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_download_backup_file"
+	routes_api_get_agent_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_agent_settings"
 	routes_api_get_visualization_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_visualization_settings"
+	routes_api_list_agent_urls "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_agent_urls"
 	routes_api_list_backup_files "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_backup_files"
 	routes_api_list_backups "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_backups"
 	routes_api_optimize_backup_storage "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_optimize_backup_storage"
 	routes_api_purge_visualization_views "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_purge_visualization_views"
+	routes_api_remove_agent_summaries "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_agent_summaries"
+	routes_api_remove_agent_url "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_agent_url"
 	routes_api_remove_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_backoffice_user"
 	routes_api_remove_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_backup"
 	routes_api_restore_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_restore_backup"
+	routes_api_set_agent_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_agent_settings"
+	routes_api_set_agent_source "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_agent_source"
+	routes_api_set_agent_url "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_agent_url"
 	routes_api_set_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_backoffice_user"
 	routes_api_set_visualization_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_visualization_settings"
+	routes_api_sync_agent_source "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_sync_agent_source"
 	routes_api_sync_website_source "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_sync_website_source"
 	routes_api_upload_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_upload_backup"
 	routes_add_backoffice_api_token_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/add_backoffice_api_token_form"
 	routes_add_backoffice_api_token_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/add_backoffice_api_token_page"
+	routes_agent_dashboard_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/agent_dashboard_page"
+	routes_agent_usage_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/agent_usage_page"
 	routes_backoffice_home "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/backoffice_home"
 	routes_backoffice_index "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/backoffice_index"
 	routes_backoffice_login "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/backoffice_login"
 	routes_backoffice_login_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/backoffice_login_page"
 	routes_backoffice_logout "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/backoffice_logout"
+	routes_get_agent_summary_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/get_agent_summary_page"
+	routes_list_agent_summaries_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/list_agent_summaries_page"
 	routes_list_backoffice_api_tokens_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/list_backoffice_api_tokens_page"
 	routes_list_backoffice_users_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/list_backoffice_users_page"
 	routes_list_visualization_pages_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/list_visualization_pages_page"
@@ -55,23 +73,35 @@ import (
 	routes_backoffice_security_headers "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/middleware/backoffice_security_headers"
 	routes_backoffice_session_auth "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/middleware/backoffice_session_auth"
 	routes_revoke_backoffice_api_token_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/revoke_backoffice_api_token_form"
+	routes_add_agent_url_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/add_agent_url_form"
+	routes_add_agent_url_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/add_agent_url_page"
 	routes_add_backoffice_user_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/add_backoffice_user_form"
 	routes_add_backoffice_user_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/add_backoffice_user_page"
 	routes_create_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/create_backup_form"
 	routes_download_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/download_backup"
 	routes_export_visualization_views "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_visualization_views"
+	routes_list_agent_urls_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/list_agent_urls_page"
 	routes_list_backups_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/list_backups_page"
 	routes_optimize_backup_storage_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/optimize_backup_storage_form"
 	routes_purge_visualization_views_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/purge_visualization_views_form"
+	routes_remove_agent_summaries_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_agent_summaries_form"
+	routes_remove_agent_url_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_agent_url_form"
 	routes_remove_backoffice_user_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_backoffice_user_form"
 	routes_remove_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_backup_form"
 	routes_restore_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/restore_backup_form"
+	routes_set_agent_settings_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_agent_settings_form"
+	routes_set_agent_settings_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_agent_settings_page"
+	routes_set_agent_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_agent_source_form"
+	routes_set_agent_source_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_agent_source_page"
+	routes_set_agent_url_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_agent_url_form"
+	routes_set_agent_url_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_agent_url_page"
 	routes_set_backoffice_user_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_backoffice_user_form"
 	routes_set_backoffice_user_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_backoffice_user_page"
 	routes_set_visualization_settings_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_visualization_settings_form"
 	routes_set_visualization_settings_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_visualization_settings_page"
 	routes_set_website_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_website_source_form"
 	routes_set_website_source_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_website_source_page"
+	routes_sync_agent_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/sync_agent_source_form"
 	routes_sync_website_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/sync_website_source_form"
 	routes_upload_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/upload_backup"
 	routes_visualization_dashboard_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/visualization_dashboard_page"
@@ -101,22 +131,34 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_backoffice_session_auth.NewRoute(sandbox),
 		routes_backoffice_api_root_guard.NewRoute(sandbox),
 		routes_backoffice_root_guard.NewRoute(sandbox),
+		routes_add_agent_url_form.NewRoute(sandbox),
+		routes_add_agent_url_page.NewRoute(sandbox),
 		routes_add_backoffice_api_token_form.NewRoute(sandbox),
 		routes_add_backoffice_api_token_page.NewRoute(sandbox),
 		routes_add_backoffice_user_form.NewRoute(sandbox),
 		routes_add_backoffice_user_page.NewRoute(sandbox),
+		routes_agent_dashboard_page.NewRoute(sandbox),
+		routes_agent_messages.NewRoute(sandbox),
+		routes_agent_summaries.NewRoute(sandbox),
+		routes_agent_usage_page.NewRoute(sandbox),
+		routes_api_add_agent_url.NewRoute(sandbox),
 		routes_api_add_backoffice_user.NewRoute(sandbox),
 		routes_api_add_backup_blob.NewRoute(sandbox),
 		routes_api_add_backup_file.NewRoute(sandbox),
 		routes_api_add_backup_reference.NewRoute(sandbox),
+		routes_api_agent_usage.NewRoute(sandbox),
 		routes_api_close_backup.NewRoute(sandbox),
 		routes_api_create_backup.NewRoute(sandbox),
 		routes_api_create_empty_backup.NewRoute(sandbox),
 		routes_api_download_backup.NewRoute(sandbox),
 		routes_api_download_backup_file.NewRoute(sandbox),
+		routes_api_get_agent_settings.NewRoute(sandbox),
+		routes_api_get_agent_summary.NewRoute(sandbox),
 		routes_api_get_backoffice_user.NewRoute(sandbox),
 		routes_api_get_current_backoffice_user.NewRoute(sandbox),
 		routes_api_get_visualization_settings.NewRoute(sandbox),
+		routes_api_list_agent_summaries.NewRoute(sandbox),
+		routes_api_list_agent_urls.NewRoute(sandbox),
 		routes_api_list_backoffice_users.NewRoute(sandbox),
 		routes_api_list_backup_files.NewRoute(sandbox),
 		routes_api_list_backups.NewRoute(sandbox),
@@ -125,11 +167,17 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_list_visualization_visitors.NewRoute(sandbox),
 		routes_api_optimize_backup_storage.NewRoute(sandbox),
 		routes_api_purge_visualization_views.NewRoute(sandbox),
+		routes_api_remove_agent_summaries.NewRoute(sandbox),
+		routes_api_remove_agent_url.NewRoute(sandbox),
 		routes_api_remove_backoffice_user.NewRoute(sandbox),
 		routes_api_remove_backup.NewRoute(sandbox),
 		routes_api_restore_backup.NewRoute(sandbox),
+		routes_api_set_agent_settings.NewRoute(sandbox),
+		routes_api_set_agent_source.NewRoute(sandbox),
+		routes_api_set_agent_url.NewRoute(sandbox),
 		routes_api_set_backoffice_user.NewRoute(sandbox),
 		routes_api_set_visualization_settings.NewRoute(sandbox),
+		routes_api_sync_agent_source.NewRoute(sandbox),
 		routes_api_sync_website_source.NewRoute(sandbox),
 		routes_api_upload_backup.NewRoute(sandbox),
 		routes_api_visualization_metrics.NewRoute(sandbox),
@@ -141,7 +189,10 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_create_backup_form.NewRoute(sandbox),
 		routes_download_backup.NewRoute(sandbox),
 		routes_export_visualization_views.NewRoute(sandbox),
+		routes_get_agent_summary_page.NewRoute(sandbox),
 		routes_health.NewRoute(sandbox),
+		routes_list_agent_summaries_page.NewRoute(sandbox),
+		routes_list_agent_urls_page.NewRoute(sandbox),
 		routes_list_backoffice_api_tokens_page.NewRoute(sandbox),
 		routes_list_backoffice_users_page.NewRoute(sandbox),
 		routes_list_backups_page.NewRoute(sandbox),
@@ -151,16 +202,25 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_openapi.NewRoute(sandbox),
 		routes_optimize_backup_storage_form.NewRoute(sandbox),
 		routes_purge_visualization_views_form.NewRoute(sandbox),
+		routes_remove_agent_summaries_form.NewRoute(sandbox),
+		routes_remove_agent_url_form.NewRoute(sandbox),
 		routes_remove_backoffice_user_form.NewRoute(sandbox),
 		routes_remove_backup_form.NewRoute(sandbox),
 		routes_restore_backup_form.NewRoute(sandbox),
 		routes_revoke_backoffice_api_token_form.NewRoute(sandbox),
+		routes_set_agent_settings_form.NewRoute(sandbox),
+		routes_set_agent_settings_page.NewRoute(sandbox),
+		routes_set_agent_source_form.NewRoute(sandbox),
+		routes_set_agent_source_page.NewRoute(sandbox),
+		routes_set_agent_url_form.NewRoute(sandbox),
+		routes_set_agent_url_page.NewRoute(sandbox),
 		routes_set_backoffice_user_form.NewRoute(sandbox),
 		routes_set_backoffice_user_page.NewRoute(sandbox),
 		routes_set_visualization_settings_form.NewRoute(sandbox),
 		routes_set_visualization_settings_page.NewRoute(sandbox),
 		routes_set_website_source_form.NewRoute(sandbox),
 		routes_set_website_source_page.NewRoute(sandbox),
+		routes_sync_agent_source_form.NewRoute(sandbox),
 		routes_sync_website_source_form.NewRoute(sandbox),
 		routes_upload_backup.NewRoute(sandbox),
 		routes_visualization_dashboard_page.NewRoute(sandbox),

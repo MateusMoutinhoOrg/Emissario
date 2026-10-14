@@ -1,0 +1,30 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            id:
+                minimum: 1
+                type: integer
+        required:
+            - id
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Agent API
+description: 'Root only. Answers {removed: 1}; 404 for an id no url holds.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/remove-agent-url -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"id":1}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootRemoveAgentUrl
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/remove-agent-url
+priority: 100
+private: true
+response-type: application/json
+summary: Removes a url the public agent can call

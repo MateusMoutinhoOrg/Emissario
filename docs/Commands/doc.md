@@ -35,6 +35,7 @@ Run in front of the commands they match, lowest `priority` first; typed by nobod
 
 | Middleware | Runs before | Priority | Flags it adds |
 | --- | --- | --- | --- |
+| [`agent-start-server`](agent-start-server.md) | `start-server` | 53 | — |
 | [`backoffice-start-server`](backoffice-start-server.md) | `start-server` | 50 | `--addr`, `--allow-x-forwarded-for`, `--insecure-http` |
 | [`database-dir`](database-dir.md) | `*` | 6 | `--database` |
 | [`help-flag`](help-flag.md) | `*` | 5 | `--help`, `-h` |

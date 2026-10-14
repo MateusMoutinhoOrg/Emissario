@@ -1,0 +1,4 @@
+description: 'The public agent of the website: an anonymous visitor talks to a configurable model through /api/agent/messages, its instructions synced from a git repository, its urls, limits, signed history and anonymous summaries set and read in the backoffice at /admin/agent'
+name: Agent
+themes:
+    - server-usage

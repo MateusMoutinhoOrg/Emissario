@@ -1,5 +1,5 @@
 dep: hashdeps
-help: SHA-256 over crypto/sha256 and encoding/hex
+help: SHA-256 and HMAC-SHA256 over crypto/sha256, crypto/hmac and encoding/hex
 module: ""
 name: sha256hash
 origin: catalog

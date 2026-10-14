@@ -1,0 +1,64 @@
+key-prefix: agentdb
+name: agent-db
+tables:
+    - fields:
+        - name: enabled
+          type: integer
+        - name: base-url
+          type: string
+        - name: api-key
+          type: string
+        - name: model
+          type: string
+        - name: max-tokens
+          type: integer
+        - name: daily-limit
+          type: integer
+        - name: ip-daily-limit
+          type: integer
+        - name: rate-per-minute
+          type: integer
+      name: agent-setting
+    - fields:
+        - name: name
+          required: true
+          type: key
+        - name: description
+          type: string
+        - name: method
+          type: string
+        - name: url
+          type: string
+        - name: headers
+          type: string
+      name: agent-url
+    - fields:
+        - name: at
+          required: true
+          type: integer
+        - name: ip
+          type: string
+        - name: kind
+          required: true
+          type: string
+        - name: input-tokens
+          type: integer
+        - name: output-tokens
+          type: integer
+      name: agent-usage
+    - fields:
+        - name: ref
+          required: true
+          type: key
+        - name: at
+          required: true
+          type: integer
+        - name: summary
+          type: string
+        - name: messages
+          type: integer
+        - name: input-tokens
+          type: integer
+        - name: output-tokens
+          type: integer
+      name: agent-summary

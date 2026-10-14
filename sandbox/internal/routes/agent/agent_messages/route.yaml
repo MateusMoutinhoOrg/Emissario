@@ -1,0 +1,59 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            messages:
+                items:
+                    additionalProperties: false
+                    properties:
+                        content:
+                            maxLength: 4000
+                            type: string
+                        role:
+                            enum:
+                                - user
+                                - assistant
+                            type: string
+                    required:
+                        - content
+                        - role
+                    type: object
+                maxItems: 50
+                minItems: 1
+                type: array
+            signature:
+                maxLength: 128
+                type: string
+        required:
+            - messages
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Agent
+description: 'No authentication: any visitor of the website may call it, from the same origin (no CORS; a request another site sent is answered 403). The history lives in the visitor and is signed by the server: send every message of the conversation, user and assistant in turns, the first and the last of the user, with the signature the last answer carried (empty on the first message); the answer is the next message of the agent and the signature covering the messages and it. The model reads instructions/README.md of the agent source as its system prompt and may list and read the files of instructions/ and call the urls a root declared, for up to 5 rounds. 400 invalid, 401 invalid-signature (the backoffice secret changed at a restart: start over), 403 origin, 413 over 64 KiB, 429 rate-limit, ip-daily-limit or daily-limit with Retry-After, 502 the provider failed, 503 disabled, not configured, no README.md or a restore running, 504 past the 60 s deadline. The conversation is sent to the provider configured, a third party, and is never stored.'
+examples:
+    - 'curl -X POST localhost:3000/api/agent/messages -H ''Content-Type: application/json'' -d ''{"messages":[{"role":"user","content":"Hello"}],"signature":""}'''
+methods:
+    - POST
+parameters:
+    - description: the origin of the page that sent the request, sent by the browser
+      id: Origin
+      sources:
+        - header
+      type: string
+    - description: the host the request was sent to
+      id: Host
+      sources:
+        - header
+      type: string
+paths:
+    - end: -1
+      id: ApiAgentMessages
+      start: 0
+      trigger:
+        type: equal
+        value: /api/agent/messages
+priority: 100
+response-type: application/json
+summary: Answers the next message of the public agent in a conversation the server signed
