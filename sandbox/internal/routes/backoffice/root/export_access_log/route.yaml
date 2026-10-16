@@ -1,0 +1,46 @@
+category: Privacy
+description: 'Root readers only, with two-factor sign-in while it is required: the rows the filter of the access log page keeps (ip, from, to, kind), at most 100000, as JSON (format=json, the default) or CSV (format=csv), each with its time in UTC with milliseconds, in the server''s time zone, the ip, the source port, the kind and the ref. Every export is inventoried. Disclose it only on a court order (Marco Civil art. 10 §1).'
+methods:
+    - GET
+parameters:
+    - description: the ip of the filter, or json or csv
+      id: Ip
+      key: ip
+      sources:
+        - query
+      type: string
+    - description: the from of the filter, or json or csv
+      id: From
+      key: from
+      sources:
+        - query
+      type: string
+    - description: the to of the filter, or json or csv
+      id: To
+      key: to
+      sources:
+        - query
+      type: string
+    - description: the kind of the filter, or json or csv
+      id: Kind
+      key: kind
+      sources:
+        - query
+      type: string
+    - description: the format of the filter, or json or csv
+      id: Format
+      key: format
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootExportAccessLog
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/export-access-log
+priority: 100
+private: true
+response-type: text/plain
+summary: Exports the access log rows a filter keeps, to its readers

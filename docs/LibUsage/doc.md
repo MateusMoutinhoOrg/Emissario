@@ -107,6 +107,7 @@ The contracts available to patch:
 | `deps.StdDeps` | `sandbox/deps/stddeps` |
 | `deps.StringsDeps` | `sandbox/deps/stringsdeps` |
 | `deps.TimeDeps` | `sandbox/deps/timedeps` |
+| `deps.TotpDeps` | `sandbox/deps/totpdeps` |
 
 Each one is filled by a matching implementation under `adapters/impls/`, every package
 exposing the same `Bind(deps *deps.Deps)` entry point:
@@ -132,6 +133,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/ossignal` | `ossignal.Bind(&deps)` |
 | `adapters/impls/osstd` | `osstd.Bind(&deps)` |
 | `adapters/impls/pbkdf2password` | `pbkdf2password.Bind(&deps)` |
+| `adapters/impls/rfc6238totp` | `rfc6238totp.Bind(&deps)` |
 | `adapters/impls/sha256hash` | `sha256hash.Bind(&deps)` |
 | `adapters/impls/stdargv` | `stdargv.Bind(&deps)` |
 | `adapters/impls/stdlocaltime` | `stdlocaltime.Bind(&deps)` |

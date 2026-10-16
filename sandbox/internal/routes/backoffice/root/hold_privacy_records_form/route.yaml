@@ -1,0 +1,39 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            back:
+                maxLength: 2048
+                type: string
+            ids:
+                items:
+                    type: integer
+                type: array
+            reason:
+                maxLength: 500
+                type: string
+            table:
+                maxLength: 32
+                type: string
+            until:
+                maxLength: 10
+                type: string
+        type: object
+    max-bytes: 262144
+    required: true
+    type: form
+category: Privacy
+description: Root only, and a reader of the access log to hold its rows. table is contact-request, agent-summary or access-log; ids the rows; reason the request the hold answers — an ofício, a court order, a lawsuit; until the last day it holds, a day after today (60 days from now for a Marco Civil art. 15 §2 request). Held rows are skipped by the cleanup and by Find and erase until then. Redirects to back with ?notice=held&count=<n>.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootHoldPrivacyRecords
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/hold-privacy-records
+priority: 100
+private: true
+response-type: text/html
+summary: Puts rows on a legal hold

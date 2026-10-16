@@ -15,6 +15,7 @@ lists the flags of the middlewares in front of it too.
 | Command | Does |
 | --- | --- |
 | [`add-backoffice-user`](add-backoffice-user.md) | Create a backoffice user with a generated password, printed once |
+| [`reset-backoffice-totp`](reset-backoffice-totp.md) | Turn off the two-factor sign-in of a backoffice user |
 
 ## Info
 
@@ -48,6 +49,7 @@ Run in front of the commands they match, lowest `priority` first; typed by nobod
 | [`database-dir`](database-dir.md) | `*` | 6 | `--database` |
 | [`database-encryption`](database-encryption.md) | `* !(help|version|generate-encrypt-key|rotate-encrypt-key)` | 7 | `--notencrypt` |
 | [`help-flag`](help-flag.md) | `*` | 5 | `--help`, `-h` |
+| [`privacy-start-server`](privacy-start-server.md) | `start-server` | 55 | `--client-port-header` |
 | [`visualization-start-server`](visualization-start-server.md) | `start-server` | 52 | `--visualization-geoip` |
 | [`website-source-start-server`](website-source-start-server.md) | `start-server` | 51 | `--fonts` |
 

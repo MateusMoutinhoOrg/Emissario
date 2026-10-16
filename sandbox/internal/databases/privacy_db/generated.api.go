@@ -119,7 +119,7 @@ type AccessLogRecord struct {
 	Ip   string
 	Port int64
 	Kind string
-	Ref  int64
+	Ref  string
 }
 
 // AccessLogInput is one insert into access-log: the fields a new record carries.
@@ -128,7 +128,7 @@ type AccessLogInput struct {
 	Ip   string
 	Port int64
 	Kind string
-	Ref  int64
+	Ref  string
 }
 
 // AccessLogFilter narrows a ListAccessLog. Every plain field is here, because
@@ -143,8 +143,8 @@ type AccessLogFilter struct {
 	PortMax        int64
 	KindStartsWith string
 	KindEquals     string
-	RefMin         int64
-	RefMax         int64
+	RefStartsWith  string
+	RefEquals      string
 }
 
 // PrivacyAccessRecord is one stored privacy-access record: its permanent id and every
@@ -336,7 +336,7 @@ type PrivacyDb struct {
 	// SetAccessLogKind writes a new kind on one access-log record.
 	SetAccessLogKind func(id int64, value string) error
 	// SetAccessLogRef writes a new ref on one access-log record.
-	SetAccessLogRef func(id int64, value int64) error
+	SetAccessLogRef func(id int64, value string) error
 	// RemoveAccessLog deletes one access-log record and everything nested under it.
 	RemoveAccessLog func(id int64) error
 	// AddPrivacyAccess inserts one privacy-access record.

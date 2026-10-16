@@ -2,17 +2,20 @@ body:
     content-type: application/x-www-form-urlencoded
     form-schema:
         properties:
+            code:
+                maxLength: 16
+                type: string
             password:
                 maxLength: 1024
+                type: string
+            pending:
+                maxLength: 4096
                 type: string
             username:
                 maxLength: 254
                 type: string
-        required:
-            - password
-            - username
         type: object
-    max-bytes: 4096
+    max-bytes: 8192
     required: true
     type: form
 category: Backoffice

@@ -6,6 +6,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeauth"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeusers"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/totp"
 )
 
 // BackofficeUsersPage is what backoffice/backoffice_users.html is rendered with.
@@ -43,6 +44,10 @@ type BackofficeUserRow struct {
 	IsRoot   bool
 	// IsSelf marks the signed-in user, who may not remove themselves.
 	IsSelf bool
+	// Totp is true when the user signs in with a two-factor code.
+	Totp bool
+	// Reader is true for a reader of the access log.
+	Reader bool
 }
 
 // Notice is the outcome of the last add, edit or remove.
@@ -77,6 +82,8 @@ func noticeOf(sandbox *api.Sandbox, code string) Notice {
 		return Notice{Text: "That user no longer exists.", Kind: "error"}
 	case backofficeusers.NoticeSelf:
 		return Notice{Text: "You cannot remove your own account.", Kind: "error"}
+	case TotpNoticeReset:
+		return Notice{Text: "Two-factor sign-in reset: the user signs in with their password until they set it up again.", Kind: "ok"}
 	case backofficeusers.NoticeNotRoot:
 		return Notice{Text: "You are no longer a root user, so nothing was removed.", Kind: "error"}
 	}
@@ -116,6 +123,8 @@ func RenderUsersPage(sandbox *api.Sandbox, response *serverdeps.Response, user *
 			Role:     backofficeauth.RoleName(sandbox, backofficeauth.Role(item.Role)),
 			IsRoot:   backofficeauth.Role(item.Role) == backofficeauth.RoleRoot,
 			IsSelf:   item.Id == user.Id,
+			Totp:     totp.Enabled(item),
+			Reader:   item.AccessLogReader == 1,
 		})
 	}
 

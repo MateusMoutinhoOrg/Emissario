@@ -20,6 +20,7 @@ curl localhost:3000/my-rest \
   -H 'host: my-host' \
   -H 'x-client-ip: my-x-client-ip' \
   -H 'x-forwarded-for: my-x-forwarded-for' \
+  -H 'x-client-port: my-x-client-port' \
   -H 'x-request-method: my-x-request-method'
 ```
 
@@ -39,6 +40,7 @@ curl localhost:3000/my-rest \
 | `host` | header | text | no | `my-host` | the host the request was sent to: a Referer naming it is a link inside the site |
 | `x-client-ip` | header | text | no | `my-x-client-ip` | the ip of the connection, set by the server and never by the client — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
 | `x-forwarded-for` | header | text | no | `my-x-forwarded-for` | the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
+| `x-client-port` | header | text | no | `my-x-client-port` | the source port of the visitor's connection, set by the server and never by the client — or by the reverse proxy start-server trusts with --client-port-header — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
 | `x-request-method` | header | text | no | `my-x-request-method` | the method of the request, set by the server and never by the client — read by [`backoffice-maintenance`](backoffice_maintenance.md), which runs first |
 
 ## What comes back
@@ -84,9 +86,11 @@ or `403`, for example — or let it through to this route.
 | [`backoffice-same-origin`](backoffice_same_origin.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-security-headers`](backoffice_security_headers.md) | always |
 | [`backoffice-session-auth`](backoffice_session_auth.md) | depends on the address — `explain-route` gives the exact answer |
+| [`access-log-page`](access_log_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`add-agent-url-page`](add_agent_url_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`add-backoffice-user-page`](add_backoffice_user_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`download-backup`](download_backup.md) | depends on the address — `explain-route` gives the exact answer |
+| [`export-access-log`](export_access_log.md) | depends on the address — `explain-route` gives the exact answer |
 | [`export-visualization-views`](export_visualization_views.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-agent-urls-page`](list_agent_urls_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backups-page`](list_backups_page.md) | depends on the address — `explain-route` gives the exact answer |
@@ -97,6 +101,8 @@ or `403`, for example — or let it through to this route.
 | [`set-contact-settings-page`](set_contact_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-visualization-settings-page`](set_visualization_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-website-source-page`](set_website_source_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-totp-page`](set_totp_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-totp-qr`](set_totp_qr.md) | depends on the address — `explain-route` gives the exact answer |
 | [`visualization-dashboard-page`](visualization_dashboard_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`health`](health.md) | depends on the address — `explain-route` gives the exact answer |
 | [`openapi`](openapi.md) | depends on the address — `explain-route` gives the exact answer |

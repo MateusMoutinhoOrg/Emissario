@@ -38,7 +38,7 @@
 | `ip` | `string` |  |  |
 | `port` | `integer` |  |  |
 | `kind` | `string` |  |  |
-| `ref` | `integer` |  |  |
+| `ref` | `string` |  |  |
 
 ## `privacy-access`
 
@@ -111,7 +111,7 @@
 | `SetAccessLogIp(id int64, value string) error` | writes a new ip on one access-log record |
 | `SetAccessLogPort(id int64, value int64) error` | writes a new port on one access-log record |
 | `SetAccessLogKind(id int64, value string) error` | writes a new kind on one access-log record |
-| `SetAccessLogRef(id int64, value int64) error` | writes a new ref on one access-log record |
+| `SetAccessLogRef(id int64, value string) error` | writes a new ref on one access-log record |
 | `RemoveAccessLog(id int64) error` | deletes one access-log record and everything nested under it |
 | `AddPrivacyAccess(props PrivacyAccessInput) (PrivacyAccessRecord, error)` | inserts one privacy-access record |
 | `FindPrivacyAccessById(id int64) (PrivacyAccessRecord, bool)` | reads one privacy-access record by its permanent id |

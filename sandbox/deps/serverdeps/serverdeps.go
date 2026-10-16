@@ -20,6 +20,13 @@ type Contract struct {
 	// NewServer builds a server over the given props. It binds nothing until
 	// Server.Bind or Server.Listen is called.
 	NewServer func(props ServerProps) Server
+	// TrustPortHeader names the header a reverse proxy in front sets to the
+	// source port of the visitor's connection (X-Client-Port): from then on
+	// "X-Client-Port" answers the last value of that header when it is a
+	// port, and the connection's own port otherwise. "" — the default —
+	// trusts none. Whether a proxy in front is trusted is the sandbox's to
+	// say, as for X-Forwarded-For.
+	TrustPortHeader func(name string)
 }
 
 // ServerProps is everything one server needs to run: where to listen, how
@@ -70,10 +77,12 @@ type Request struct {
 	GetPath func() string
 	// GetHeader returns the first value of the named header, matched
 	// without regard to case, or "" when it is absent. "Host" answers what
-	// GetHost does, "X-Client-Ip" what GetClientIp does and
-	// "X-Request-Method" what GetMethod does — never what the client sent
-	// under either name. "X-Forwarded-For" answers every value it was sent
-	// with, joined by ", ".
+	// GetHost does, "X-Client-Ip" what GetClientIp does,
+	// "X-Request-Method" what GetMethod does and "X-Client-Port" the source
+	// port of the visitor's connection — the connection's own, or the one
+	// the header TrustPortHeader named carries — never what the client sent
+	// under one of those names. "X-Forwarded-For" answers every value it was
+	// sent with, joined by ", ".
 	GetHeader func(key string) string
 	// GetHeaders returns every header of the request, each name in its
 	// canonical spelling ("Content-Type") with every value it was sent with.

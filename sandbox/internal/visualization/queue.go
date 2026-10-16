@@ -18,6 +18,9 @@ import (
 type Hit struct {
 	// At is when it was answered, in Unix seconds; 0 is now.
 	At int64
+	// AtMs is the same instant in Unix milliseconds, which the access log
+	// keeps; 0 is now.
+	AtMs int64
 	// Method is the method of the request, as the server read it — HEAD for
 	// a HEAD answered as a GET.
 	Method string
@@ -29,6 +32,9 @@ type Hit struct {
 	ContentType string
 	// Ip is the client ip, props.ClientIp.
 	Ip string
+	// Port is the source port of the visitor's connection,
+	// props.ClientPort.
+	Port string
 	// UserAgent is the User-Agent header.
 	UserAgent string
 	// Referer is the Referer header.
@@ -67,8 +73,11 @@ func Enqueue(sandbox *api.Sandbox, hit Hit) {
 	if !Running(sandbox) || !Counted(sandbox, hit.Method, hit.Status, hit.ContentType, hit.Path) {
 		return
 	}
+	if hit.AtMs == 0 {
+		hit.AtMs = sandbox.Deps.StdDeps.Now() / 1000000
+	}
 	if hit.At == 0 {
-		hit.At = NowSeconds(sandbox)
+		hit.At = hit.AtMs / 1000
 	}
 	select {
 	case queue <- hit:
@@ -103,9 +112,11 @@ func Start(sandbox *api.Sandbox) {
 func write(sandbox *api.Sandbox) {
 	for hit := range queue {
 		holdForBackups(sandbox)
-		if err := store(sandbox, hit); err != nil {
+		id, err := store(sandbox, hit)
+		if err != nil {
 			sandbox.Deps.StdDeps.Eprintf("warning: the view of %s could not be recorded: %s\n", truncate(hit.Path, 128), err.Error())
 		}
+		privacy.RecordAccess(sandbox, privacy.Access{AtMs: hit.AtMs, Ip: hit.Ip, Port: hit.Port, Kind: privacy.AccessView, Ref: id})
 	}
 }
 
@@ -117,29 +128,29 @@ func holdForBackups(sandbox *api.Sandbox) {
 }
 
 // store writes hit as a visualization-view, unless tracking is off or its ip
-// is ignored. The country and the ignored ips read the raw ip, in memory;
-// the view keeps it as the IP mode says — hashed by default, with no user
-// agent but its device, browser and os — and the full user agent only in
-// the full mode.
-func store(sandbox *api.Sandbox, hit Hit) error {
+// is ignored, and answers the id of the view, "" when none was written. The
+// country and the ignored ips read the raw ip, in memory; the view keeps it
+// as the IP mode says — hashed by default, with no user agent but its
+// device, browser and os — and the full user agent only in the full mode.
+func store(sandbox *api.Sandbox, hit Hit) (string, error) {
 	settings := currentSettings(sandbox)
 	if !settings.Enabled || Ignored(sandbox, settings, hit.Ip) {
-		return nil
+		return "", nil
 	}
 	privacySettings, err := privacy.CurrentSettings(sandbox)
 	if err != nil {
-		return err
+		return "", err
 	}
 	ip, err := privacy.StoredIp(sandbox, privacySettings, hit.Ip)
 	if err != nil {
-		return err
+		return "", err
 	}
 	userAgent := ""
 	if privacySettings.IpMode == privacy.IpModeFull {
 		userAgent = truncate(hit.UserAgent, MaxUserAgentLength)
 	}
 	agent := ParseUserAgent(sandbox, hit.UserAgent)
-	_, err = visualization_db.New(sandbox).AddVisualizationView(visualization_db.VisualizationViewInput{
+	view, err := visualization_db.New(sandbox).AddVisualizationView(visualization_db.VisualizationViewInput{
 		At:        hit.At,
 		Path:      CleanPath(sandbox, hit.Path),
 		Page:      CanonicalPage(sandbox, hit.Path, hit.Status),
@@ -152,5 +163,8 @@ func store(sandbox *api.Sandbox, hit Hit) error {
 		UserAgent: userAgent,
 		Referrer:  Referrer(sandbox, hit.Referer, hit.Host),
 	})
-	return err
+	if err != nil {
+		return "", err
+	}
+	return sandbox.Deps.StringsDeps.FormatInt(view.Id, 10), nil
 }

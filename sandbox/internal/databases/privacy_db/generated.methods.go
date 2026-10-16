@@ -666,7 +666,7 @@ func SetAccessLogKind(sandbox *api.Sandbox, self *PrivacyDb, id int64, value str
 }
 
 // SetAccessLogRef writes a new ref on one access-log record.
-func SetAccessLogRef(sandbox *api.Sandbox, self *PrivacyDb, id int64, value int64) error {
+func SetAccessLogRef(sandbox *api.Sandbox, self *PrivacyDb, id int64, value string) error {
 	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "access-log")
 	if err != nil {
 		return err
@@ -1504,7 +1504,7 @@ func buildAccessLogRecord(sandbox *api.Sandbox, record databasedeps.Record) (Acc
 	}
 	built.Kind = valueKind
 
-	valueRef, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadInt(record, "ref")
+	valueRef, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadString(record, "ref")
 	if err != nil {
 		return built, err
 	}
@@ -1528,7 +1528,7 @@ func matchAccessLog(sandbox *api.Sandbox, item AccessLogRecord, filter AccessLog
 	if !sandbox.Deps.OpinionatedAgnosDatabase.TextMatches(item.Kind, filter.KindStartsWith, filter.KindEquals) {
 		return false
 	}
-	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.Ref, filter.RefMin, filter.RefMax) {
+	if !sandbox.Deps.OpinionatedAgnosDatabase.TextMatches(item.Ref, filter.RefStartsWith, filter.RefEquals) {
 		return false
 	}
 	return true

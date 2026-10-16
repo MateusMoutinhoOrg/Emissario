@@ -1,0 +1,26 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            code:
+                maxLength: 16
+                type: string
+        type: object
+    max-bytes: 4096
+    required: true
+    type: form
+category: Two-factor sign-in
+description: 'Any user, for their own account. code is the 6-digit code the authenticator app shows for the secret of the page. A match turns two-factor sign-in on: every sign-in asks for a code from then on, the user''s API tokens are revoked and their other sessions closed. A wrong code answers the page under a 400.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminSetTotp
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/set-totp
+priority: 100
+private: true
+response-type: text/html
+summary: Turns two-factor sign-in on with one code of the secret shown

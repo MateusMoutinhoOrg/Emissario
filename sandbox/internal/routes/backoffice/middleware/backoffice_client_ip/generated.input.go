@@ -13,4 +13,5 @@ type Input struct {
 	Root          string `id:"Root"`
 	XClientIp     string `id:"XClientIp"`
 	XForwardedFor string `id:"XForwardedFor"`
+	XClientPort   string `id:"XClientPort"`
 }

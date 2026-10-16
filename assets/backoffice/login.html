@@ -170,6 +170,7 @@
       font-size: 0.9rem;
       margin-bottom: 1.5rem;
     }
+    .hint { color: var(--text-muted, #9CA3AF); font-size: 0.85rem; margin: -0.5rem 0 1.25rem; }
   </style>
 </head>
 <body>
@@ -184,6 +185,17 @@
     
     {{if .Error}}<div class="alert" role="alert">{{html .Error}}</div>{{end}}
 
+    {{if .Pending}}
+    <form id="codeForm" action="/admin/login" method="POST">
+      <input type="hidden" name="pending" value="{{.Pending}}">
+      <div class="form-group">
+        <label for="code" class="form-label">Two-factor code</label>
+        <input type="text" id="code" name="code" class="form-control" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" placeholder="123456" required autocomplete="one-time-code" autofocus>
+      </div>
+      <p class="hint">Type the 6-digit code your authenticator app shows for this account.</p>
+      <button type="submit" class="btn-submit">Verify</button>
+    </form>
+    {{else}}
     <form id="loginForm" action="/admin/login" method="POST">
       <div class="form-group">
         <label for="username" class="form-label">Email or Username</label>
@@ -197,6 +209,7 @@
       
       <button type="submit" class="btn-submit">Sign In</button>
     </form>
+    {{end}}
   </div>
 
 </body>

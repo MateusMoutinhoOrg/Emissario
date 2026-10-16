@@ -1,0 +1,67 @@
+category: Privacy
+description: 'Root readers only, with two-factor sign-in while it is required: every page view and call to the public APIs the access log kept — the time in UTC and in the server''s time zone, the full ip, the source port, the kind and the record it wrote — filtered by ip (exact or CIDR), period and kind, with Export (JSON, CSV), Hold and Delete for the rows shown. Every list is inventoried. Disclose it only on a court order (Marco Civil art. 10 §1).'
+methods:
+    - GET
+parameters:
+    - description: the ip of the access log filter, or the outcome code of the last action
+      id: Ip
+      key: ip
+      sources:
+        - query
+      type: string
+    - description: the from of the access log filter, or the outcome code of the last action
+      id: From
+      key: from
+      sources:
+        - query
+      type: string
+    - description: the to of the access log filter, or the outcome code of the last action
+      id: To
+      key: to
+      sources:
+        - query
+      type: string
+    - description: the kind of the access log filter, or the outcome code of the last action
+      id: Kind
+      key: kind
+      sources:
+        - query
+      type: string
+    - description: the notice of the access log filter, or the outcome code of the last action
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "1"
+      description: the page of the rows
+      id: Page
+      key: page
+      sources:
+        - query
+      type: integer
+    - default: "50"
+      description: how many rows a page shows
+      id: Limit
+      key: limit
+      sources:
+        - query
+      type: integer
+    - default: "0"
+      description: how many rows the last action changed
+      id: Count
+      key: count
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminRootAccessLog
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/access-log
+priority: 100
+private: true
+response-type: text/html
+summary: Shows the access log of the Marco Civil, to its readers

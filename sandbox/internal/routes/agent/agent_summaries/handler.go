@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/agent"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 )
 
@@ -14,6 +15,8 @@ import (
 // refused like POST /api/agent/messages, and has the same deadline.
 func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
 	response.SetWriteDeadline(agent.WriteDeadlineMilliseconds)
+	access := privacy.Access{AtMs: privacy.NowMilliseconds(sandbox), Ip: props.ClientIp, Port: props.ClientPort, Kind: privacy.AccessAgent}
+	defer func() { privacy.RecordAccess(sandbox, access) }()
 	if refusal := agent.Admit(sandbox, props.ClientIp, input.Origin, input.Host); refusal != nil {
 		return agent.Fail(sandbox, response.SetHeader, refusal)
 	}
@@ -25,6 +28,7 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 		return agent.Fail(sandbox, response.SetHeader, refusal)
 	}
 	ref, refusal := agent.Summarize(sandbox, props.ClientIp, messages)
+	access.Ref = ref
 	if refusal != nil {
 		return agent.Fail(sandbox, response.SetHeader, refusal)
 	}

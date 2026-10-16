@@ -66,6 +66,7 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /api/admin/list-backoffice-users`](api_list_backoffice_users.md) | Lists backoffice users, filtered and paginated |
 | [`POST /api/admin/root/add-backoffice-user`](api_add_backoffice_user.md) | Adds a backoffice user |
 | [`POST /api/admin/root/remove-backoffice-user`](api_remove_backoffice_user.md) | Removes a backoffice user and every session of it |
+| [`POST /api/admin/root/reset-backoffice-totp`](api_reset_backoffice_totp.md) | Resets the two-factor sign-in of a backoffice user |
 | [`POST /api/admin/root/set-backoffice-user`](api_set_backoffice_user.md) | Edits a backoffice user; a missing or blank password keeps the current one |
 
 ## Contact Requests API
@@ -96,6 +97,12 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /api/admin/root/get-visualization-settings`](api_get_visualization_settings.md) | Answers the settings of the visualization, the country database in use, how many views are stored, the oldest one and how many were dropped |
 | [`POST /api/admin/root/purge-visualization-views`](api_purge_visualization_views.md) | Deletes every page view before a date, or every one, and answers how many were removed |
 | [`POST /api/admin/root/set-visualization-settings`](api_set_visualization_settings.md) | Sets the settings of the visualization: tracking on or off, the retention in days and the ignored ips |
+
+## Two-factor sign-in API
+
+| Route | What it does |
+| --- | --- |
+| [`POST /api/admin/set-totp`](api_set_totp.md) | Begins or confirms the two-factor sign-in of the token's owner |
 
 ## Middleware
 
@@ -128,6 +135,19 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /api/admin/root/remove-backup`](api_remove_backup.md) | Deletes a snapshot; the contents only it held stay stored until the backups size is optimized |
 | [`POST /api/admin/root/restore-backup`](api_restore_backup.md) | Starts putting a snapshot back over every database, after a pre-restore snapshot of them, and answers 202 at once |
 | [`POST /api/admin/root/upload-backup`](api_upload_backup.md) | Stores a zip archive a download built as a new snapshot |
+
+## Privacy API
+
+| Route | What it does |
+| --- | --- |
+| [`POST /api/admin/root/delete-access-log`](api_delete_access_log.md) | Deletes access log rows, to its readers |
+| [`POST /api/admin/root/export-access-log`](api_export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`POST /api/admin/root/hold-privacy-records`](api_hold_privacy_records.md) | Puts rows on a legal hold |
+| [`POST /api/admin/root/list-access-log`](api_list_access_log.md) | Lists the access log rows a filter keeps, to its readers |
+| [`POST /api/admin/root/list-privacy-access`](api_list_privacy_access.md) | Lists the inventory of the access log reads |
+| [`POST /api/admin/root/list-privacy-holds`](api_list_privacy_holds.md) | Lists the legal holds |
+| [`POST /api/admin/root/release-privacy-hold`](api_release_privacy_hold.md) | Releases a legal hold |
+| [`POST /api/admin/root/set-access-log-readers`](api_set_access_log_readers.md) | Names the roots who read the access log |
 
 ## Website Source API
 
@@ -174,6 +194,7 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /admin/root/add-backoffice-user`](add_backoffice_user_form.md) | Adds a backoffice user |
 | [`GET /admin/root/add-backoffice-user`](add_backoffice_user_page.md) | Shows the form that adds a backoffice user |
 | [`POST /admin/root/remove-backoffice-user/{Id:integer}`](remove_backoffice_user_form.md) | Removes a backoffice user and every session of it |
+| [`POST /admin/root/reset-backoffice-totp`](reset_backoffice_totp_form.md) | Resets the two-factor sign-in of a backoffice user |
 | [`POST /admin/root/set-backoffice-user/{Id:integer}`](set_backoffice_user_form.md) | Edits a backoffice user; a blank password keeps the current one |
 | [`GET /admin/root/set-backoffice-user/{Id:integer}`](set_backoffice_user_page.md) | Shows the form that edits a backoffice user |
 
@@ -189,6 +210,17 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /admin/root/set-visualization-settings`](set_visualization_settings_form.md) | Saves the settings of the visualization: tracking on or off, the retention in days and the ignored ips |
 | [`GET /admin/root/set-visualization-settings`](set_visualization_settings_page.md) | Shows the settings of the visualization: tracking, retention, ignored ips, the country database in use and the Delete views form |
 | [`GET /admin/visualization`](visualization_dashboard_page.md) | Shows the dashboard of the page views of the public website: cards, views over time and the top pages, countries, devices, browsers, operating systems, referrers, not-found paths and visitors |
+
+## Privacy
+
+| Route | What it does |
+| --- | --- |
+| [`GET /admin/root/access-log`](access_log_page.md) | Shows the access log of the Marco Civil, to its readers |
+| [`POST /admin/root/delete-access-log`](delete_access_log_form.md) | Deletes access log rows, to its readers |
+| [`GET /admin/root/export-access-log`](export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`POST /admin/root/hold-privacy-records`](hold_privacy_records_form.md) | Puts rows on a legal hold |
+| [`POST /admin/root/release-privacy-hold`](release_privacy_hold_form.md) | Releases a legal hold |
+| [`POST /admin/root/set-access-log-readers`](set_access_log_readers_form.md) | Names the roots who read the access log |
 
 ## Backoffice Backups
 
@@ -209,6 +241,14 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /admin/root/set-website-source`](set_website_source_form.md) | Sets the git repository, branch and sync time the public website is served from |
 | [`GET /admin/root/set-website-source`](set_website_source_page.md) | Shows the form that sets the git repository the public website is served from, and what the last sync did |
 | [`POST /admin/root/sync-website-source`](sync_website_source_form.md) | Syncs the website source now, even when it is up to date, and answers at once: the sync runs in the background |
+
+## Two-factor sign-in
+
+| Route | What it does |
+| --- | --- |
+| [`POST /admin/set-totp`](set_totp_form.md) | Turns two-factor sign-in on with one code of the secret shown |
+| [`GET /admin/set-totp`](set_totp_page.md) | Shows the two-factor sign-in of the user signed in |
+| [`GET /admin/set-totp-qr`](set_totp_qr.md) | Draws the QR code of the two-factor setup of the user signed in |
 
 ## Assets
 

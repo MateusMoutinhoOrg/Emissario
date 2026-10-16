@@ -480,6 +480,7 @@
             <th>Username</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Two-factor</th>
             {{if .Viewer.IsRoot}}<th class="right">Actions</th>{{end}}
           </tr>
         </thead>
@@ -489,11 +490,18 @@
             <td class="id" data-label="ID">#{{.Id}}</td>
             <td data-label="Username"><span>{{html .Username}}{{if .IsSelf}}<span class="tag">you</span>{{end}}</span></td>
             <td data-label="Email">{{html .Email}}</td>
-            <td data-label="Role"><span class="badge{{if .IsRoot}} badge-root{{end}}">{{html .Role}}</span></td>
+            <td data-label="Role"><span class="badge{{if .IsRoot}} badge-root{{end}}">{{html .Role}}</span>{{if .Reader}} <span class="tag">access log</span>{{end}}</td>
+            <td data-label="Two-factor">{{if .Totp}}On{{else}}<span class="muted">Off</span>{{end}}</td>
             {{if $.Viewer.IsRoot}}
             <td data-label="Actions">
               <div class="row-actions">
                 <a class="btn btn-small" href="/admin/root/set-backoffice-user/{{.Id}}">Edit</a>
+                {{if .Totp}}
+                <form action="/admin/root/reset-backoffice-totp" method="POST" data-confirm="Turn off the two-factor sign-in of {{html .Username}}? They sign in with their password alone until they set it up again.">
+                  <input type="hidden" name="id" value="{{.Id}}">
+                  <button type="submit" class="btn btn-small">Reset two-factor</button>
+                </form>
+                {{end}}
                 {{if not .IsSelf}}
                 <form action="/admin/root/remove-backoffice-user/{{.Id}}" method="POST" data-confirm="Remove the user {{html .Username}}? This cannot be undone.">
                   <button type="submit" class="btn btn-small btn-danger">Remove</button>

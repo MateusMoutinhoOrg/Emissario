@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 )
 
@@ -12,13 +13,19 @@ import (
 // settings — is kept exactly as sent, with the time, the ip and its country,
 // and its id answered 201. It is refused 503 while the route is off or a
 // restore runs, 403 from another site's page, 429 past the limits of the ip,
-// 413 for a body too large and 400 for one that is not JSON.
+// 413 for a body too large and 400 for one that is not JSON. With the access
+// log on, every call writes one row of it, with the id of the contact
+// request it kept, if any.
 func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
+	access := privacy.Access{AtMs: privacy.NowMilliseconds(sandbox), Ip: props.ClientIp, Port: props.ClientPort, Kind: privacy.AccessContactRequest}
 	settings, refusal := contact.Admit(sandbox, props.ClientIp, input.Origin, input.Host)
 	if refusal != nil {
+		privacy.RecordAccess(sandbox, access)
 		return contact.Fail(sandbox, response.SetHeader, refusal)
 	}
 	ref, refusal := contact.Receive(sandbox, settings, props.ClientIp, input.Body)
+	access.Ref = ref
+	privacy.RecordAccess(sandbox, access)
 	if refusal != nil {
 		return contact.Fail(sandbox, response.SetHeader, refusal)
 	}

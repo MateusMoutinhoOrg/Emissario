@@ -1,0 +1,27 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            ids:
+                items:
+                    type: integer
+                type: array
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Privacy
+description: Root only. ids are the roots who read the access log from now on, and no one else; a viewer's id is refused. Redirects to the Privacy page.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSetAccessLogReaders
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-access-log-readers
+priority: 100
+private: true
+response-type: text/html
+summary: Names the roots who read the access log

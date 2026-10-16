@@ -1,0 +1,5 @@
+dep: totpdeps
+help: TOTP (RFC 6238, HMAC-SHA1, 6 digits, 30 s) over crypto/hmac, and its setup QR code over rsc.io/qr
+module: rsc.io/qr@v0.2.0
+name: rfc6238totp
+origin: project

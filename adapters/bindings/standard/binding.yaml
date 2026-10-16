@@ -17,6 +17,7 @@ adapters:
     - ossignal
     - osstd
     - pbkdf2password
+    - rfc6238totp
     - sha256hash
     - stdargv
     - stdlocaltime

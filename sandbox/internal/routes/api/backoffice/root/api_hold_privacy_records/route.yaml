@@ -1,0 +1,44 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            ids:
+                items:
+                    type: integer
+                type: array
+            reason:
+                maxLength: 500
+                type: string
+            table:
+                enum:
+                    - contact-request
+                    - agent-summary
+                    - access-log
+                type: string
+            until:
+                maxLength: 10
+                type: string
+        required:
+            - ids
+            - reason
+            - table
+            - until
+        type: object
+    max-bytes: 262144
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only, and a reader of the access log to hold its rows. table is contact-request, agent-summary or access-log; ids the rows; reason the request the hold answers; until the last day it holds (2026-12-31). Answers {hold: {id, table, ids, reason, until}}.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootHoldPrivacyRecords
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/hold-privacy-records
+priority: 100
+private: true
+response-type: application/json
+summary: Puts rows on a legal hold

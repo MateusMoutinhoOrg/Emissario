@@ -50,7 +50,7 @@ tables:
         - name: kind
           type: string
         - name: ref
-          type: integer
+          type: string
       name: access-log
     - fields:
         - name: at

@@ -1,0 +1,28 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            id:
+                minimum: 1
+                type: integer
+        required:
+            - id
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Backoffice Users API
+description: 'Root only. id is the user''s. Their secret is forgotten and two-factor sign-in turned off: they sign in with their password alone until they set it up again. Answers {status: ok}, 404 for an id no user holds.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootResetBackofficeTotp
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/reset-backoffice-totp
+priority: 100
+private: true
+response-type: application/json
+summary: Resets the two-factor sign-in of a backoffice user

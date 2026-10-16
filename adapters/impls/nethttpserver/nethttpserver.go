@@ -7,7 +7,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps"
@@ -18,7 +20,13 @@ import (
 // implementation built on the standard library's net/http package.
 func Bind(deps *deps.Deps) {
 	deps.ServerDeps.NewServer = newServer
+	deps.ServerDeps.TrustPortHeader = func(name string) {
+		trustedPortHeader.Store(http.CanonicalHeaderKey(strings.TrimSpace(name)))
+	}
 }
+
+// trustedPortHeader is the header TrustPortHeader named, "" for none.
+var trustedPortHeader atomic.Value
 
 // newServer builds one net/http server over props. Every request goes to the
 // single props.Handler: no ServeMux, no PathValue, no routing of any kind —
@@ -106,6 +114,8 @@ func newRequest(request *http.Request) serverdeps.Request {
 				return request.Host
 			case ClientIpHeader:
 				return clientIp(request)
+			case ClientPortHeader:
+				return clientPort(request)
 			case MethodHeader:
 				return request.Method
 			case ForwardedForHeader:
@@ -119,6 +129,7 @@ func newRequest(request *http.Request) serverdeps.Request {
 				headers[key] = append([]string{}, values...)
 			}
 			headers[ClientIpHeader] = []string{clientIp(request)}
+			headers[ClientPortHeader] = []string{clientPort(request)}
 			headers[MethodHeader] = []string{request.Method}
 			return headers
 		},
@@ -163,6 +174,39 @@ func newRequest(request *http.Request) serverdeps.Request {
 // never read off the request: what a client sends under that name is dropped,
 // so a route may declare it as a header parameter and trust what it binds.
 const ClientIpHeader = "X-Client-Ip"
+
+// ClientPortHeader is the header GetHeader answers the source port of the
+// visitor's connection under: the port of the connection the request came
+// on, or — once TrustPortHeader named one — the last value of the header a
+// reverse proxy sets it in. Like ClientIpHeader it is never read off the
+// request, unless it is the very header the proxy was trusted to set.
+const ClientPortHeader = "X-Client-Port"
+
+// clientPort is the source port of the visitor's connection, "" when none
+// reads as a port.
+func clientPort(request *http.Request) string {
+	if name, _ := trustedPortHeader.Load().(string); name != "" {
+		values := request.Header.Values(name)
+		if len(values) > 0 {
+			parts := strings.Split(values[len(values)-1], ",")
+			if port := strings.TrimSpace(parts[len(parts)-1]); validPort(port) {
+				return port
+			}
+		}
+		return ""
+	}
+	_, port, err := net.SplitHostPort(request.RemoteAddr)
+	if err != nil || !validPort(port) {
+		return ""
+	}
+	return port
+}
+
+// validPort tells whether text is a port, 1 to 65535.
+func validPort(text string) bool {
+	value, err := strconv.Atoi(text)
+	return err == nil && value >= 1 && value <= 65535 && strconv.Itoa(value) == text
+}
 
 // MethodHeader is the header GetHeader answers the request's method under.
 // Like ClientIpHeader it is never read off the request, so a route — a

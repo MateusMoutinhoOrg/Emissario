@@ -1,0 +1,40 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            format:
+                enum:
+                    - json
+                    - csv
+                type: string
+            from:
+                maxLength: 128
+                type: string
+            ip:
+                maxLength: 128
+                type: string
+            kind:
+                maxLength: 128
+                type: string
+            to:
+                maxLength: 128
+                type: string
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root readers only: every row the filter keeps, at most 100000, as {rows: […]} (format json, the default) or {csv: "…"} (format csv). Every export is inventoried. Disclose it only on a court order (Marco Civil art. 10 §1).'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootExportAccessLog
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/export-access-log
+priority: 100
+private: true
+response-type: application/json
+summary: Exports the access log rows a filter keeps, to its readers

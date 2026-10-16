@@ -1,0 +1,17 @@
+args:
+    - end: 0
+      id: Verb
+      start: 0
+      trigger:
+        type: equal
+        value: reset-backoffice-totp
+category: Backoffice
+description: 'Forgets the two-factor secret of a backoffice user and turns two-factor sign-in off: they sign in with their password alone until they set it up again on /admin/set-totp. It is the way back in for a root who lost their phone; a root resets another user''s from the users page.'
+examples:
+    - reset-backoffice-totp --username admin
+flags:
+    - description: the username or the email of the backoffice user
+      id: Username
+      required: true
+priority: 100
+summary: Turn off the two-factor sign-in of a backoffice user

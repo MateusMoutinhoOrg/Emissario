@@ -1,0 +1,22 @@
+category: Two-factor sign-in
+description: Any user, for their own account. Off, it shows the QR code and the base32 secret to add the account to an authenticator app, and asks for one code to turn it on; on, since when. A root resets it from the users page.
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last confirmation
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminSetTotp
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/set-totp
+priority: 100
+private: true
+response-type: text/html
+summary: Shows the two-factor sign-in of the user signed in

@@ -31,6 +31,7 @@ import (
 	stddeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/stddeps"
 	stringsdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/stringsdeps"
 	timedeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/timedeps"
+	totpdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/totpdeps"
 )
 
 // Deps is every capability the sandbox needs from the outside world, one field
@@ -65,4 +66,5 @@ type Deps struct {
 	StdDeps                  stddeps.Contract
 	StringsDeps              stringsdeps.Contract
 	TimeDeps                 timedeps.Contract
+	TotpDeps                 totpdeps.Contract
 }

@@ -18,6 +18,7 @@ With every value it reads:
 curl 'localhost:3000/admin/list-visualization-views?from=my-from&to=my-to&path=my-path&prefix=my-prefix&ip=my-ip&country=my-country&device=my-device&browser=my-browser&os=my-os&status=my-status&bots=my-bots&page=1&limit=20' \
   -H 'x-client-ip: my-x-client-ip' \
   -H 'x-forwarded-for: my-x-forwarded-for' \
+  -H 'x-client-port: my-x-client-port' \
   -H 'x-request-method: my-x-request-method' \
   -H 'origin: my-origin' \
   -H 'host: my-host'
@@ -48,6 +49,7 @@ curl -b "backoffice_session=$SESSION" 'localhost:3000/admin/list-visualization-v
 | `limit` | query string | whole number | no — `20` when left out | `20` | how many rows a page shows, from 1 to 100 |
 | `x-client-ip` | header | text | no | `my-x-client-ip` | the ip of the connection, set by the server and never by the client — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
 | `x-forwarded-for` | header | text | no | `my-x-forwarded-for` | the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
+| `x-client-port` | header | text | no | `my-x-client-port` | the source port of the visitor's connection, set by the server and never by the client — or by the reverse proxy start-server trusts with --client-port-header — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
 | `x-request-method` | header | text | no | `my-x-request-method` | the method of the request, set by the server and never by the client — read by [`backoffice-maintenance`](backoffice_maintenance.md), which runs first |
 | `origin` | header | text | no | `my-origin` | the origin of the page that sent the request, sent by the browser — read by [`backoffice-same-origin`](backoffice_same_origin.md), which runs first |
 | `host` | header | text | no | `my-host` | the host the request was sent to — read by [`backoffice-same-origin`](backoffice_same_origin.md), which runs first |

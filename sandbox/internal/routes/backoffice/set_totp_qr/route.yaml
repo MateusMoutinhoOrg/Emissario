@@ -1,0 +1,15 @@
+category: Two-factor sign-in
+description: 'Any user, for their own account: the otpauth uri of the secret the set-totp page shows, as a PNG. 404 once two-factor sign-in is on, or before the page drew a secret.'
+methods:
+    - GET
+paths:
+    - end: -1
+      id: AdminSetTotpQr
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/set-totp-qr
+priority: 100
+private: true
+response-type: image/png
+summary: Draws the QR code of the two-factor setup of the user signed in

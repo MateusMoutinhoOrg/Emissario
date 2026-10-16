@@ -8,6 +8,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/cli/errors"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commandprops"
 	add_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/backoffice/add_backoffice_user"
+	reset_backoffice_totp "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/backoffice/reset_backoffice_totp"
 	help "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/info/help"
 	version "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/info/version"
 	agent_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/agent_start_server"
@@ -16,6 +17,7 @@ import (
 	database_dir "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/database_dir"
 	database_encryption "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/database_encryption"
 	help_flag "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/help_flag"
+	privacy_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/privacy_start_server"
 	visualization_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/visualization_start_server"
 	website_source_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/website_source_start_server"
 	generate_encrypt_key "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/privacy/generate_encrypt_key"
@@ -42,9 +44,11 @@ func NewCli(sandbox *api.Sandbox) api.Cli {
 		visualization_start_server.NewCommand(sandbox),
 		agent_start_server.NewCommand(sandbox),
 		contact_start_server.NewCommand(sandbox),
+		privacy_start_server.NewCommand(sandbox),
 		add_backoffice_user.NewCommand(sandbox),
 		generate_encrypt_key.NewCommand(sandbox),
 		help.NewCommand(sandbox),
+		reset_backoffice_totp.NewCommand(sandbox),
 		rotate_encrypt_key.NewCommand(sandbox),
 		start_server.NewCommand(sandbox),
 		version.NewCommand(sandbox),

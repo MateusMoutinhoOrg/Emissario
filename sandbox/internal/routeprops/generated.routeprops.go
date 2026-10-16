@@ -18,4 +18,5 @@ package routeprops
 // field in project.go, or in a file of your own in this package.
 type RouteProps struct {
 	Backoffice
+	Privacy
 }

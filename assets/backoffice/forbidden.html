@@ -343,8 +343,8 @@
     {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
     <div class="card denied">
       <div class="code">403 &middot; Forbidden</div>
-      <h1>Root access required</h1>
-      <p class="muted">Only root users can add, edit or remove backoffice users. Ask a root user if something needs to change.</p>
+      <h1>{{if .Title}}{{.Title}}{{else}}Root access required{{end}}</h1>
+      <p class="muted">{{if .Message}}{{.Message}}{{else}}Only root users can add, edit or remove backoffice users. Ask a root user if something needs to change.{{end}}</p>
       <div class="links">
         <a class="btn btn-primary" href="/admin/list-backoffice-users">Back to users</a>
         <a class="btn" href="/admin/home">Home</a>

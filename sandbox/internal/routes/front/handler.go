@@ -47,6 +47,7 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 		Status:      page.Status,
 		ContentType: contentType,
 		Ip:          props.ClientIp,
+		Port:        props.ClientPort,
 		UserAgent:   input.UserAgent,
 		Referer:     input.Referer,
 		Host:        input.Host,

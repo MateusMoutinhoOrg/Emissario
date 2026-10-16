@@ -21,6 +21,7 @@ import (
 	ossignal "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/ossignal"
 	osstd "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/osstd"
 	pbkdf2password "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/pbkdf2password"
+	rfc6238totp "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/rfc6238totp"
 	sha256hash "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/sha256hash"
 	stdargv "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdargv"
 	stdlocaltime "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdlocaltime"
@@ -54,6 +55,7 @@ func New() deps.Deps {
 	ossignal.Bind(&deps)
 	osstd.Bind(&deps)
 	pbkdf2password.Bind(&deps)
+	rfc6238totp.Bind(&deps)
 	sha256hash.Bind(&deps)
 	stdargv.Bind(&deps)
 	stdlocaltime.Bind(&deps)

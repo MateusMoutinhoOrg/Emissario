@@ -22,17 +22,19 @@ type Input struct {
 // Body is one object of this route's declared form-schema, as the
 // generated ReadBody hands it over.
 type Body struct {
+	Code     string
 	Password string
+	Pending  string
 	Username string
 }
 
 // MaxBodyBytes is the largest request body this route reads, from the
 // `max-bytes` of its declaration. A longer one is answered 413.
-const MaxBodyBytes = 4096
+const MaxBodyBytes = 8192
 
 // BodySchema is this route's declared form-schema in canonical form — the text
 // Deps.OpinionatedAgnosServer.ValidateForm checks a request body against.
-const BodySchema = "{\"properties\":{\"password\":{\"maxLength\":1024,\"type\":\"string\"},\"username\":{\"maxLength\":254,\"type\":\"string\"}},\"required\":[\"password\",\"username\"],\"type\":\"object\"}"
+const BodySchema = "{\"properties\":{\"code\":{\"maxLength\":16,\"type\":\"string\"},\"password\":{\"maxLength\":1024,\"type\":\"string\"},\"pending\":{\"maxLength\":4096,\"type\":\"string\"},\"username\":{\"maxLength\":254,\"type\":\"string\"}},\"type\":\"object\"}"
 
 // ReadBody reads, validates and converts the request body of one bound route.
 // The generic Run calls it — through the ReadBody generated.new.go closes over
@@ -50,7 +52,7 @@ func ReadBody(sandbox *api.Sandbox, route *api.Route) (Body, error) {
 	raw, err := route.Request.ReadBody(MaxBodyBytes)
 	if err != nil {
 		return body, sandbox.Deps.OpinionatedAgnosServer.FailWithCause(api.StatusPayloadTooLarge, "",
-			"the request body is larger than 4096 bytes", err.Error())
+			"the request body is larger than 8192 bytes", err.Error())
 	}
 
 	if len(raw) == 0 {
@@ -79,7 +81,9 @@ func ReadBody(sandbox *api.Sandbox, route *api.Route) (Body, error) {
 // optional and comes back as its zero value.
 func bindBody(sandbox *api.Sandbox, document *serializabledeps.SerializableObject) Body {
 	value := Body{}
+	value.Code = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "code")
 	value.Password = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "password")
+	value.Pending = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "pending")
 	value.Username = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "username")
 	return value
 }

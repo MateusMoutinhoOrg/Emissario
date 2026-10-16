@@ -3,16 +3,22 @@ methods:
     - ANY
 parameters:
     - description: the ip of the connection, set by the server and never by the client
-      sources:
-        - header
       id: XClientIp
       key: x-client-ip
-      type: string
-    - description: the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for
       sources:
         - header
+      type: string
+    - description: the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for
       id: XForwardedFor
       key: x-forwarded-for
+      sources:
+        - header
+      type: string
+    - description: the source port of the visitor's connection, set by the server and never by the client — or by the reverse proxy start-server trusts with --client-port-header
+      id: XClientPort
+      key: x-client-port
+      sources:
+        - header
       type: string
 paths:
     - end: -1

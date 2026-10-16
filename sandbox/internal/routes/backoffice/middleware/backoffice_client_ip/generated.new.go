@@ -65,6 +65,17 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 			Description: "the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for",
 			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
 		},
+		{
+			Id:          "XClientPort",
+			Key:         "x-client-port",
+			Sources:     []api.ParameterSource{api.SourceHeader},
+			Required:    false,
+			Type:        api.ParameterString,
+			Default:     "",
+			HasDefault:  false,
+			Description: "the source port of the visitor's connection, set by the server and never by the client — or by the reverse proxy start-server trusts with --client-port-header",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
 	}
 
 	self.Body = api.RouteBody{

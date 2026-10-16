@@ -1,0 +1,28 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            id:
+                minimum: 1
+                type: integer
+        required:
+            - id
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only, and a reader of the access log to release a hold of its rows. Answers {status: ok}, 404 for an id no hold has.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootReleasePrivacyHold
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/release-privacy-hold
+priority: 100
+private: true
+response-type: application/json
+summary: Releases a legal hold

@@ -1,0 +1,26 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            code:
+                maxLength: 16
+                type: string
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Two-factor sign-in API
+description: 'Any user, for their own account. Without code it answers the secret to add to an authenticator app, its otpauth uri and its QR code as a data: uri, or enabled true when it is on already. With code — 6 digits of that secret — it turns two-factor sign-in on: every token of the user is revoked, the one of this call included, and their other sessions closed. A wrong code answers 400.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminSetTotp
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/set-totp
+priority: 100
+private: true
+response-type: application/json
+summary: Begins or confirms the two-factor sign-in of the token's owner

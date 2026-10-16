@@ -1,0 +1,30 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            limit:
+                maximum: 500
+                minimum: 1
+                type: integer
+            page:
+                minimum: 1
+                type: integer
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only: every read of the access log the inventory kept while it was on — when it started and ended, who, what (access-log-list, access-log-export), the filter and how many rows came back — newest first, as {accesses: […], total, page, pages, limit} (Decreto 8.771/2016 art. 13 III).'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootListPrivacyAccess
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/list-privacy-access
+priority: 100
+private: true
+response-type: application/json
+summary: Lists the inventory of the access log reads

@@ -3,7 +3,7 @@
 Start the http server
 
 ```bash
-emissario start-server [--addr <addr>] [--read-timeout-ms <read-timeout-ms>] [--write-timeout-ms <write-timeout-ms>] [--shutdown-timeout-ms <shutdown-timeout-ms>] [--allow-x-forwarded-for] [--insecure-http] [--database <database>] [--notencrypt] [--help] [--visualization-geoip <visualization-geoip>] [--fonts <fonts>]
+emissario start-server [--addr <addr>] [--read-timeout-ms <read-timeout-ms>] [--write-timeout-ms <write-timeout-ms>] [--shutdown-timeout-ms <shutdown-timeout-ms>] [--allow-x-forwarded-for] [--insecure-http] [--database <database>] [--notencrypt] [--help] [--client-port-header <client-port-header>] [--visualization-geoip <visualization-geoip>] [--fonts <fonts>]
 ```
 
 Opens the port and serves every route declared under sandbox/internal/routes, until the process is stopped. An interrupt (Ctrl+C) or a termination request stops it gracefully: no new request is taken, and the ones in flight get --shutdown-timeout-ms to finish.
@@ -19,6 +19,7 @@ Opens the port and serves every route declared under sandbox/internal/routes, un
 | `--database` | string | `data` | the folder every database lives under, relative to where the command runs, lower-case letters, digits, - and _ (defaults to data) | [database-dir](database-dir.md) |
 | `--notencrypt` | boolean |  | open the databases in clear, without EMISSARIO_ENCRYPT_KEY: for local debugging only, never in production | [database-encryption](database-encryption.md) |
 | `--help`, `-h` | boolean |  | Print the help of the command this command line is for | [help-flag](help-flag.md) |
+| `--client-port-header` | string |  | the header the reverse proxy in front sets to the source port of the visitor's connection (X-Client-Port, with nginx: proxy_set_header X-Client-Port $remote_port), which the access log keeps; read only with --allow-x-forwarded-for | [privacy-start-server](privacy-start-server.md) |
 | `--visualization-geoip` | string |  | a country database (.mmdb) to look the ip of each page view up in instead of the embedded DB-IP Lite: a newer DB-IP Lite, MaxMind GeoLite2-Country, IPinfo Lite; a file that does not open stops the server at start | [visualization-start-server](visualization-start-server.md) |
 | `--fonts` | string | `EmissarioFonts` | the folder the git sources are cloned into, one folder per source named after it, relative to where the server runs (defaults to EmissarioFonts) | [website-source-start-server](website-source-start-server.md) |
 
@@ -30,6 +31,7 @@ Opens the port and serves every route declared under sandbox/internal/routes, un
 | [`database-dir`](database-dir.md) | always |
 | [`database-encryption`](database-encryption.md) | always |
 | [`help-flag`](help-flag.md) | always |
+| [`privacy-start-server`](privacy-start-server.md) | always |
 | [`visualization-start-server`](visualization-start-server.md) | always |
 | [`website-source-start-server`](website-source-start-server.md) | always |
 

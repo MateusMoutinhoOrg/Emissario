@@ -74,3 +74,4 @@ field is that package's `Sandbox` struct, filled by `adapters/impls/<name>.Bind(
 | [`deps.StdDeps`](deps.stddeps.md) | `Contract` |
 | [`deps.StringsDeps`](deps.stringsdeps.md) | `Contract` |
 | [`deps.TimeDeps`](deps.timedeps.md) | `Contract` |
+| [`deps.TotpDeps`](deps.totpdeps.md) | `Contract` |

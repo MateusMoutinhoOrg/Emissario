@@ -1,0 +1,33 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            acknowledge:
+                items:
+                    type: string
+                type: array
+            ids:
+                items:
+                    type: integer
+                type: array
+        required:
+            - ids
+        type: object
+    max-bytes: 262144
+    required: true
+    type: json
+category: Privacy API
+description: Root readers only. ids are the rows to delete. A row younger than the access log retention answers 409 acknowledgement-required with the erase-kept-v1 notice until acknowledge holds it — at every call. A row on a legal hold is never deleted. Answers {deleted, held, missing}; nothing records the deletion.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootDeleteAccessLog
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/delete-access-log
+priority: 100
+private: true
+response-type: application/json
+summary: Deletes access log rows, to its readers

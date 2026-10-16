@@ -54,7 +54,7 @@ func New(sandbox *api.Sandbox) *PrivacyDb {
 					{Name: "ip", Type: databasedeps.String},
 					{Name: "port", Type: databasedeps.Int},
 					{Name: "kind", Type: databasedeps.String},
-					{Name: "ref", Type: databasedeps.Int},
+					{Name: "ref", Type: databasedeps.String},
 				},
 			},
 			{
@@ -210,7 +210,7 @@ func New(sandbox *api.Sandbox) *PrivacyDb {
 	self.SetAccessLogKind = func(id int64, value string) error {
 		return SetAccessLogKind(self.sandbox, &self, id, value)
 	}
-	self.SetAccessLogRef = func(id int64, value int64) error {
+	self.SetAccessLogRef = func(id int64, value string) error {
 		return SetAccessLogRef(self.sandbox, &self, id, value)
 	}
 	self.RemoveAccessLog = func(id int64) error {
