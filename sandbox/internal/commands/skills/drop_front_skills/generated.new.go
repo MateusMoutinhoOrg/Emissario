@@ -26,7 +26,7 @@ func NewCommand(sandbox *api.Sandbox) *api.Command {
 	self.Pattern = "drop-front-skills"
 	self.Category = "Skills"
 	self.Summary = "Write the skills that teach a coding agent to build the website emissario serves"
-	self.Description = "Writes the emissario-website skill into the website repository at --path, once for each coding agent: .claude/skills/ (Claude Code), .agents/skills/ (Codex) and .agent/skills/ (Antigravity). The skill holds the public interface the website needs and nothing else: how its frontend/ folder is served, the paths the server keeps, the contact form at POST /api/contact-requests and the chat of the agent at POST /api/agent/messages. A run removes the emissario-website folder of each agent and writes it again, so a second run changes nothing and a new version leaves no stale file; nothing else of the repository is touched. It opens no database."
+	self.Description = "Writes the emissario-website skill into the website repository at --path, in the folders the coding agents read: .claude/skills/ (Claude Code) and .agents/skills/ (Codex, Antigravity). The skill holds the public interface the website needs and nothing else: how its frontend/ folder is served, the paths the server keeps, the contact form at POST /api/contact-requests and the chat of the agent at POST /api/agent/messages. A run removes the emissario-website folder of each agent and writes it again, so a second run changes nothing and a new version leaves no stale file; nothing else of the repository is touched. It opens no database."
 	self.Examples = []string{"drop-front-skills --path .", "drop-front-skills --path ../my-site"}
 	self.Hidden = false
 

@@ -6,7 +6,7 @@ Write the skills that teach a coding agent to write the instructions of the agen
 emissario drop-agents-skills [--path <path>] [--database <database>] [--help]
 ```
 
-Writes the emissario-agent skill into the agent instructions repository at --path, once for each coding agent: .claude/skills/ (Claude Code), .agents/skills/ (Codex) and .agent/skills/ (Antigravity). The skill holds what the repository needs to know of the agent and nothing else: instructions/README.md read first at every message, instructions/SUMMARY.md for the summaries, every other file of instructions/ read on demand through the tools of the model, the limits, and the mandatory rules that come before the instructions. A run removes the emissario-agent folder of each agent and writes it again, so a second run changes nothing and a new version leaves no stale file; nothing else of the repository is touched. It opens no database.
+Writes the emissario-agent skill into the agent instructions repository at --path, in the folders the coding agents read: .claude/skills/ (Claude Code) and .agents/skills/ (Codex, Antigravity). The skill holds what the repository needs to know of the agent and nothing else: instructions/README.md read first at every message, instructions/SUMMARY.md for the summaries, every other file of instructions/ read on demand through the tools of the model, the limits, and the mandatory rules that come before the instructions. A run removes the emissario-agent folder of each agent and writes it again, so a second run changes nothing and a new version leaves no stale file; nothing else of the repository is touched. It opens no database.
 
 | Flag | Type | Default | Description | From |
 | --- | --- | --- | --- | --- |

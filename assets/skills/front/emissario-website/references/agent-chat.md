@@ -5,18 +5,10 @@ that the people who run the site configure. They also write its instructions, in
 Emissario stores no conversation: **the history lives in the page** (memory or `localStorage`), and
 the server signs it so that it cannot be forged.
 
-## Tell the visitor it is an AI, before the chat starts
+## The agent says it is an AI
 
-The law (EU AI Act art. 50(1)) requires people to be told they are talking to an AI. The model is told
-to say so, but a model can fail; the page cannot. Put a visible line above the chat box, shown before
-the first message:
-
-```html
-<p class="chat-disclosure">You are chatting with an AI assistant.</p>
-```
-
-Never present the agent as a person (a human name and photo with no disclosure, "typing…" from
-"Ana").
+The model is instructed to say it is an AI in its first answer and whenever asked, and never to claim
+to be a person, whatever the page shows around it.
 
 ## The protocol
 
@@ -96,14 +88,13 @@ async function send(text, retried = false) {
 }
 ```
 
-Keeping the history in `localStorage` is what lets the conversation survive a reload; it is strictly
-necessary for the chat the visitor asked for, so it needs no consent banner. Offer a "New conversation"
-button that calls `reset()`.
+Keeping the history in `localStorage` lets the conversation survive a reload; kept in memory alone, it
+ends with the page. A "New conversation" button calls `reset()`.
 
 ## Summaries (optional): `POST /api/agent/summaries`
 
 A page may hand the conversation over as an anonymous summary for the people who run the site, for
-example behind a "Send this conversation to the team" button. The visitor should choose it.
+example behind a "Send this conversation to the team" button.
 
 ```json
 {"messages": [/* the whole conversation, ending with the last answer of the agent */], "signature": "<the one that answer carried>"}

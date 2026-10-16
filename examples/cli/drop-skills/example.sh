@@ -1,7 +1,7 @@
 # drop-front-skills writes the emissario-website skill into a website
 # repository, and drop-agents-skills the emissario-agent skill into an agent
-# instructions repository, once for each coding agent: .claude/skills/ (Claude
-# Code), .agents/skills/ (Codex) and .agent/skills/ (Antigravity). This example
+# instructions repository, in the folders the coding agents read: .claude/skills/
+# (Claude Code) and .agents/skills/ (Codex, Antigravity). This example
 # drops both into two repositories, twice, and checks that a run opens no
 # database, needs no key, rewrites only its own folders and refuses a --path
 # that is not a directory.
@@ -17,7 +17,7 @@ echo 'a skill of the repository itself' > site/.claude/skills/my-own-skill/SKILL
 mkdir -p agent/instructions
 echo '# Assistant of Example' > agent/instructions/README.md
 
-echo "== the website repository: one skill per agent"
+echo "== the website repository: the skill in .claude/skills/ and .agents/skills/"
 env -u EMISSARIO_ENCRYPT_KEY emissario drop-front-skills --path site
 echo "exit $?"
 

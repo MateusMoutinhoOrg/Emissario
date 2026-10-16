@@ -26,9 +26,10 @@ const (
 )
 
 // Targets are the folders, relative to the repository, the agents read the
-// skills of a project from: Claude Code, Codex and Antigravity. The same
-// skill is written into each.
-var Targets = []string{".claude/skills", ".agents/skills", ".agent/skills"}
+// skills of a project from: .claude/skills for Claude Code, which reads no
+// other, and .agents/skills, the shared one Codex and Antigravity read. The
+// same skill is written into each.
+var Targets = []string{".claude/skills", ".agents/skills"}
 
 // Vars is what a skill template reads: the limits it quotes, taken from the
 // code that enforces them, and the mandatory prompts of the agent, so a skill

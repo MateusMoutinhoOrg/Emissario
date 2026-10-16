@@ -59,19 +59,11 @@ them to be pages of the site:
 - Both features can be turned off by the people who run the site. They then answer `503 disabled`,
   so a page must still work, and say so, without them.
 
-## What not to add
+## Good to know
 
-- **No analytics script, tracking pixel or cookie banner for analytics.** Emissario records page views
-  on the server itself, with no cookie.
-- **No secrets.** Everything under `frontend/` is public. There is no API key to put in a page: the
-  routes above need none.
-
-## Privacy
-
-The contact form keeps what the visitor sends, with the time and the IP. The chat sends the
-conversation to an AI provider. The site's privacy notice must say so: what is kept, why, for how long,
-and how to ask for its deletion. The people who run the site set those retentions. Ask them for the
-text rather than inventing it.
+- **Page views are already counted.** Emissario records them on the server, with no script and no
+  cookie: the site needs nothing for that.
+- **Everything under `frontend/` is public.** No route above needs an API key, so no page holds one.
 
 ## References
 

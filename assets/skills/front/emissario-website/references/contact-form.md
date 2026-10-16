@@ -54,7 +54,6 @@ change that and add a daily limit.
   <label>Name <input name="name" required></label>
   <label>Email <input name="email" type="email" required></label>
   <label>Message <textarea name="message" required></textarea></label>
-  <p><a href="/privacy">How we use what you send</a></p>
   <button>Send</button>
   <p id="contact-status" role="status"></p>
 </form>
@@ -91,5 +90,3 @@ form.addEventListener("submit", async (event) => {
   }[error] ?? "Your message could not be sent. Try again later.";
 });
 ```
-
-Link the privacy notice next to the form: what the visitor types is kept, with their IP.

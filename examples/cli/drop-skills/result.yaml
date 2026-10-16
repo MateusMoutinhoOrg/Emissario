@@ -1,14 +1,11 @@
 cli-output: |
-    == the website repository: one skill per agent
+    == the website repository: the skill in .claude/skills/ and .agents/skills/
     .claude/skills/emissario-website/SKILL.md
     .claude/skills/emissario-website/references/agent-chat.md
     .claude/skills/emissario-website/references/contact-form.md
     .agents/skills/emissario-website/SKILL.md
     .agents/skills/emissario-website/references/agent-chat.md
     .agents/skills/emissario-website/references/contact-form.md
-    .agent/skills/emissario-website/SKILL.md
-    .agent/skills/emissario-website/references/agent-chat.md
-    .agent/skills/emissario-website/references/contact-form.md
     exit 0
     == the agent repository
     .claude/skills/emissario-agent/SKILL.md
@@ -17,9 +14,6 @@ cli-output: |
     .agents/skills/emissario-agent/SKILL.md
     .agents/skills/emissario-agent/references/mandatory-rules.md
     .agents/skills/emissario-agent/references/readme-template.md
-    .agent/skills/emissario-agent/SKILL.md
-    .agent/skills/emissario-agent/references/mandatory-rules.md
-    .agent/skills/emissario-agent/references/readme-template.md
     exit 0
     == a second run changes nothing but a file it did not write, which it removes
     Only in before/site/.agents/skills/emissario-website: stale.md
@@ -36,12 +30,6 @@ cli-output: |
     no data/ folder
 exit-code: 0
 tree:
-    - file: agent/.agent/skills/emissario-agent/SKILL.md
-      sha: ee732bd323660d0a99497ffe98891563369db6b4ffc6de941548dcf2c54aedbb
-    - file: agent/.agent/skills/emissario-agent/references/mandatory-rules.md
-      sha: cac46042e1ad79c7ba7af2eee42fcda9502a71f740b2abc096a2479655a87447
-    - file: agent/.agent/skills/emissario-agent/references/readme-template.md
-      sha: f49efa6bc35554fe31203de0dbdc2508b026a9a2e4bf69be84c7df1666f444db
     - file: agent/.agents/skills/emissario-agent/SKILL.md
       sha: ee732bd323660d0a99497ffe98891563369db6b4ffc6de941548dcf2c54aedbb
     - file: agent/.agents/skills/emissario-agent/references/mandatory-rules.md
@@ -56,24 +44,18 @@ tree:
       sha: f49efa6bc35554fe31203de0dbdc2508b026a9a2e4bf69be84c7df1666f444db
     - file: agent/instructions/README.md
       sha: cd2e37aa5083963d1dd2ca7b853360be1d0a1257f75d7195e5836e6e47abf88a
-    - file: site/.agent/skills/emissario-website/SKILL.md
-      sha: ee8335c1d208bdc37a54d5079d8d6adb198a27b0c9707f82f5254937703046ae
-    - file: site/.agent/skills/emissario-website/references/agent-chat.md
-      sha: aad0306fda5492b7525a32d039c49063f9ffa8248e3d730c04135dd2b326c98f
-    - file: site/.agent/skills/emissario-website/references/contact-form.md
-      sha: ed26a4f26a6c7bf6dd582ee8aea47988bd53547c686fdd4842088e65b833f0c4
     - file: site/.agents/skills/emissario-website/SKILL.md
-      sha: ee8335c1d208bdc37a54d5079d8d6adb198a27b0c9707f82f5254937703046ae
+      sha: d2957fabefe344f7ad433abeceb6c50bb58887059a1f5f927d5de08b2e5c512a
     - file: site/.agents/skills/emissario-website/references/agent-chat.md
-      sha: aad0306fda5492b7525a32d039c49063f9ffa8248e3d730c04135dd2b326c98f
+      sha: a57ee8de9dd4ca35cbfbe99baeecec3f101be88bc38069f4c5a2a06d8b4c3c17
     - file: site/.agents/skills/emissario-website/references/contact-form.md
-      sha: ed26a4f26a6c7bf6dd582ee8aea47988bd53547c686fdd4842088e65b833f0c4
+      sha: d04141ee94dab2df3551c6098fcc99cf9858fc4ad6b0c4b8460fdbf55bd0e59c
     - file: site/.claude/skills/emissario-website/SKILL.md
-      sha: ee8335c1d208bdc37a54d5079d8d6adb198a27b0c9707f82f5254937703046ae
+      sha: d2957fabefe344f7ad433abeceb6c50bb58887059a1f5f927d5de08b2e5c512a
     - file: site/.claude/skills/emissario-website/references/agent-chat.md
-      sha: aad0306fda5492b7525a32d039c49063f9ffa8248e3d730c04135dd2b326c98f
+      sha: a57ee8de9dd4ca35cbfbe99baeecec3f101be88bc38069f4c5a2a06d8b4c3c17
     - file: site/.claude/skills/emissario-website/references/contact-form.md
-      sha: ed26a4f26a6c7bf6dd582ee8aea47988bd53547c686fdd4842088e65b833f0c4
+      sha: d04141ee94dab2df3551c6098fcc99cf9858fc4ad6b0c4b8460fdbf55bd0e59c
     - file: site/.claude/skills/my-own-skill/SKILL.md
       sha: 01393c7daebd670b7eeb47df900b6a8111210c294175cae52f2dc2bd66f619f7
     - file: site/frontend/index.html

@@ -24,14 +24,13 @@ live side by side.
 
 ## Where they go
 
-The same skill is written once for each agent, in the folder that agent reads a project's skills from,
-in the [Agent Skills](https://agentskills.io) layout (`<name>/SKILL.md` and its `references/`):
+The same skill is written into the two folders the agents read a project's skills from, in the
+[Agent Skills](https://agentskills.io) layout (`<name>/SKILL.md` and its `references/`):
 
-| Agent | Folder |
+| Folder | Read by |
 |---|---|
-| Claude Code | `.claude/skills/<name>/` |
-| Codex | `.agents/skills/<name>/` |
-| Antigravity | `.agent/skills/<name>/` |
+| `.claude/skills/<name>/` | Claude Code, which reads no other folder |
+| `.agents/skills/<name>/` | Codex, Antigravity, and the other agents of the Agent Skills standard |
 
 A run removes `<folder>/<name>/` and writes it again. A second run changes nothing, a newer
 emissario leaves no stale file, and an edit made by hand to these folders is lost. Nothing else of the
@@ -47,9 +46,9 @@ given. Never how the server works, its backoffice, its databases or its source.
 
 | File | Holds |
 |---|---|
-| `SKILL.md` | only `frontend/` is served, as committed, with no build step; how a path is answered and the `404` page; dotfiles; the headers every file gets; the paths the server keeps (`/admin`, `/api/…`, `/backoffice/`, `/health`, `/openapi.json`); same origin, no CORS; no analytics script needed; what the privacy notice must say |
+| `SKILL.md` | only `frontend/` is served, as committed, with no build step; how a path is answered and the `404` page; dotfiles; the headers every file gets; the paths the server keeps (`/admin`, `/api/…`, `/backoffice/`, `/health`, `/openapi.json`); same origin, no CORS; page views counted by the server |
 | `references/contact-form.md` | `POST /api/contact-requests`: the body, `201 {id}`, every error and what to tell the visitor, the default limits, a form that sends it |
-| `references/agent-chat.md` | the AI disclosure before the chat; `POST /api/agent/messages` and its signed history; the limits; every error and what the page does; a client keeping the history in `localStorage`; `POST /api/agent/summaries` |
+| `references/agent-chat.md` | `POST /api/agent/messages` and its signed history; the limits; every error and what the page does; a client keeping the history in `localStorage`; `POST /api/agent/summaries` |
 
 ### `emissario-agent`, from `drop-agents-skills`
 
