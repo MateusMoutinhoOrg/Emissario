@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent URLs</title>
+  <title>{{t "agent_urls.agent_urls"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -667,6 +667,20 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -675,74 +689,78 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent" class="active">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent" class="active">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>URLs</h1>
-        <p class="muted">The endpoints the agent can call, by name: the model never writes a url. At most {{.Max}}.</p>
+        <h1>{{t "agent_urls.urls"}}</h1>
+        <p class="muted">{{t "agent_urls.endpoints_agent_can_call_name" .Max}}</p>
       </div>
-      <a class="btn btn-primary" href="{{.AddHref}}">Add url</a>
+      <a class="btn btn-primary" href="{{.AddHref}}">{{t "common.add_url"}}</a>
     </section>
 
-    <nav class="tabs" aria-label="Agent">
-      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
+    <nav class="tabs" aria-label="{{t "common.agent"}}">
+      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{tr .Label}}</a>
       {{end}}
     </nav>
 
-    <div class="warning" role="note"><strong>Anything the agent can call, any anonymous visitor can call, with these headers.</strong> Declare only endpoints whose every answer may be read by anyone, and give their headers no more access than that.</div>
+    <div class="warning" role="note">{{th "agent_urls.anything_agent_can_call_any"}}</div>
 
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     <div class="card table-card">
       {{if .Rows}}
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Endpoint</th>
-            <th>When the agent calls it</th>
-            <th>Headers</th>
+            <th>{{t "common.name"}}</th>
+            <th>{{t "common.endpoint"}}</th>
+            <th>{{t "agent_urls.when_agent_calls"}}</th>
+            <th>{{t "common.headers"}}</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {{range .Rows}}
           <tr>
-            <td class="nowrap" data-label="Name"><code>{{.Name}}</code></td>
-            <td data-label="Endpoint"><span class="badge">{{.Method}}</span> <code>{{.Url}}</code></td>
-            <td class="preview" data-label="When">{{.Description}}</td>
-            <td data-label="Headers">{{if .Headers}}{{.Headers}}{{else}}<span class="muted">none</span>{{end}}</td>
+            <td class="nowrap" data-label="{{t "common.name"}}"><code>{{.Name}}</code></td>
+            <td data-label="{{t "common.endpoint"}}"><span class="badge">{{.Method}}</span> <code>{{.Url}}</code></td>
+            <td class="preview" data-label="{{t "common.when"}}">{{.Description}}</td>
+            <td data-label="{{t "common.headers"}}">{{if .Headers}}{{.Headers}}{{else}}<span class="muted">{{t "common.none"}}</span>{{end}}</td>
             <td data-label="">
               <div class="row-actions">
-                <a class="btn btn-small" href="{{.EditHref}}">Edit</a>
-                <form action="{{$.RemoveAction}}" method="POST" data-confirm="Remove the url {{.Name}}? The agent stops calling it.">
+                <a class="btn btn-small" href="{{.EditHref}}">{{t "common.edit"}}</a>
+                <form action="{{$.RemoveAction}}" method="POST" data-confirm="{{t "agent_urls.remove_url_agent_stops_calling" .Name}}">
                   <input type="hidden" name="id" value="{{.Id}}">
-                  <button type="submit" class="btn btn-small btn-danger">Remove</button>
+                  <button type="submit" class="btn btn-small btn-danger">{{t "common.remove"}}</button>
                 </form>
               </div>
             </td>
@@ -751,7 +769,7 @@
         </tbody>
       </table>
       {{else}}
-      <p class="empty">No url yet: the agent only reads its instructions.</p>
+      <p class="empty">{{t "agent_urls.no_url_yet_agent_only"}}</p>
       {{end}}
     </div>
   </main>

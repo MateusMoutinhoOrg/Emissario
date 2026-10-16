@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{html .Title}}</title>
+  <title>{{tr .Title}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -319,6 +319,20 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -327,72 +341,77 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users" class="active">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users" class="active">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main class="narrow">
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
-    <a class="back" href="/admin/list-backoffice-users">&larr; Back to users</a>
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
+    <a class="back" href="/admin/list-backoffice-users">{{t "backoffice_user_form.back_users"}}</a>
 
     <div class="card">
-      <h1>{{html .Title}}</h1>
+      <h1>{{tr .Title}}</h1>
 
-      {{if .Error}}<div class="alert" role="alert">{{html .Error}}</div>{{end}}
+      {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
       <form action="{{html .Action}}" method="POST">
         <div class="form-group">
-          <label for="username">Username</label>
+          <label for="username">{{t "common.username"}}</label>
           <input type="text" id="username" name="username" value="{{html .Username}}" required autocomplete="off" spellcheck="false">
         </div>
 
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">{{t "common.email"}}</label>
           <input type="email" id="email" name="email" value="{{html .Email}}" required autocomplete="off">
         </div>
 
         <div class="form-group">
-          <label for="role">Role</label>
+          <label for="role">{{t "common.role"}}</label>
           <select id="role" name="role" required>
             {{range .Roles}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{html .Name}}</option>{{end}}
           </select>
-          <p class="hint">A root can add, edit and remove users. A viewer can only see them.</p>
+          <p class="hint">{{t "backoffice_user_form.root_can_add_edit_remove"}}</p>
         </div>
 
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">{{t "common.password"}}</label>
           {{if .PasswordRequired}}
-          <input type="password" id="password" name="password" required minlength="12" maxlength="1024" autocomplete="new-password" placeholder="At least 12 characters">
+          <input type="password" id="password" name="password" required minlength="12" maxlength="1024" autocomplete="new-password" placeholder="{{t "backoffice_user_form.least_12_characters"}}">
           {{else}}
-          <input type="password" id="password" name="password" minlength="12" maxlength="1024" autocomplete="new-password" placeholder="Leave blank to keep the current one">
+          <input type="password" id="password" name="password" minlength="12" maxlength="1024" autocomplete="new-password" placeholder="{{t "backoffice_user_form.leave_blank_keep_current_one"}}">
           {{end}}
         </div>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary">{{html .Submit}}</button>
-          <a class="btn" href="/admin/list-backoffice-users">Cancel</a>
+          <a class="btn" href="/admin/list-backoffice-users">{{t "common.cancel"}}</a>
         </div>
       </form>
     </div>
   </main>
+  <script src="/backoffice/backoffice.js" defer></script>
 </body>
 </html>

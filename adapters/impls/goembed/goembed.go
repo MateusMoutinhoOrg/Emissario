@@ -11,6 +11,7 @@ package goembed
 
 import (
 	"bytes"
+	"fmt"
 	htmltemplate "html/template"
 	"io/fs"
 	"path"
@@ -114,5 +115,49 @@ func Bind(deps *deps.Deps) {
 			}
 			return buf.Bytes(), nil
 		},
+		RenderTranslatedHTMLTemplate: func(requested string, vars interface{}, translator embeddeps.Translator) ([]byte, error) {
+			content, err := assets.Files.ReadFile(assetPath(requested))
+			if err != nil {
+				return nil, err
+			}
+			t, err := htmltemplate.New(path.Base(requested)).Funcs(translationFuncs(translator)).Parse(string(content))
+			if err != nil {
+				return nil, err
+			}
+			var buf bytes.Buffer
+			if err := t.Execute(&buf, vars); err != nil {
+				return nil, err
+			}
+			return buf.Bytes(), nil
+		},
 	}
+}
+
+// translationFuncs are the functions a translated template calls, each one
+// a field of translator; embeddeps.Translator lists them. th is the one whose
+// result is markup: translator.Markup escaped every argument, and the rest
+// comes from a translation file shipped with the binary.
+func translationFuncs(translator embeddeps.Translator) htmltemplate.FuncMap {
+	return htmltemplate.FuncMap{
+		"lang":      func() string { return translator.Lang },
+		"languages": func() []embeddeps.Language { return translator.Languages },
+		"t": func(key string, args ...interface{}) string {
+			return translator.Text(key, texts(args))
+		},
+		"th": func(key string, args ...interface{}) htmltemplate.HTML {
+			return htmltemplate.HTML(translator.Markup(key, texts(args)))
+		},
+		"tr": func(text interface{}) string {
+			return translator.Message(fmt.Sprint(text))
+		},
+	}
+}
+
+// texts is every argument a template passed, in its text form.
+func texts(args []interface{}) []string {
+	converted := make([]string, len(args))
+	for i, arg := range args {
+		converted[i] = fmt.Sprint(arg)
+	}
+	return converted
 }

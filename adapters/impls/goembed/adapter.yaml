@@ -1,5 +1,5 @@
 dep: embeddeps
-help: Embedded assets over embed and text/template
+help: Embedded assets over embed, text/template and html/template
 module: ""
 name: goembed
 origin: catalog

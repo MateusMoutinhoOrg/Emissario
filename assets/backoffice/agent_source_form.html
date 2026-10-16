@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent Source</title>
+  <title>{{t "agent_source_form.agent_source"}}</title>
   {{if .Busy}}<meta http-equiv="refresh" content="2; url=/admin/root/set-agent-source">{{end}}
   <style>
     :root {
@@ -668,6 +668,20 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -676,108 +690,112 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent" class="active">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent" class="active">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Agent source</h1>
-        <p class="muted">The repository the agent reads: <code>instructions/README.md</code> is its system prompt, <code>instructions/SUMMARY.md</code> the extra instructions of the summaries, and every file under <code>instructions/</code> one it can list and read. It may be the website's repository.</p>
+        <h1>{{t "common.agent_source"}}</h1>
+        <p class="muted">{{th "agent_source_form.repository_agent_reads_instructions_readme"}}</p>
       </div>
     </section>
 
-    <nav class="tabs" aria-label="Agent">
-      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
+    <nav class="tabs" aria-label="{{t "common.agent"}}">
+      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{tr .Label}}</a>
       {{end}}
     </nav>
 
     <section class="settings">
       <div class="card">
-        {{if .Error}}<div class="alert" role="alert">{{html .Error}}</div>{{end}}
+        {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
         {{if .Notice}}<div class="notice {{if .NoticeIsError}}notice-error{{else}}notice-ok{{end}}" role="status">{{html .Notice}}</div>{{end}}
 
         <form action="{{html .Action}}" method="POST">
           <div class="form-group">
-            <label for="repo-url">Repository URL</label>
+            <label for="repo-url">{{t "common.repository_url"}}</label>
             <input type="text" id="repo-url" name="repo-url" value="{{html .RepoUrl}}" required maxlength="2048" autocomplete="off" spellcheck="false" placeholder="https://github.com/org/site.git">
-            <p class="hint">https://, ssh://, git://, file:// or user@host:path. git runs as the user that runs the server, with that user's ssh keys or credential helper: put no password or token here.</p>
+            <p class="hint">{{t "common.https_ssh_git_file_user"}}</p>
           </div>
 
           <div class="form-group">
-            <label for="branch">Branch</label>
-            <input type="text" id="branch" name="branch" value="{{html .Branch}}" required maxlength="255" autocomplete="off" spellcheck="false" placeholder="main">
+            <label for="branch">{{t "common.branch"}}</label>
+            <input type="text" id="branch" name="branch" value="{{html .Branch}}" required maxlength="255" autocomplete="off" spellcheck="false" placeholder="{{t "common.main"}}">
           </div>
 
           <div class="form-group">
-            <label for="sync-time">Sync time</label>
+            <label for="sync-time">{{t "common.sync_time"}}</label>
             <input type="text" id="sync-time" name="sync-time" value="{{html .SyncTime}}" maxlength="32" autocomplete="off" spellcheck="false" placeholder="10m">
-            <p class="hint">How often the branch is pulled: 30s, 10m, 1h or 1h30m, at least 10s. Leave it blank to stop syncing.</p>
+            <p class="hint">{{t "common.how_often_branch_pulled_30s"}}</p>
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary">{{t "common.save"}}</button>
           </div>
         </form>
       </div>
 
       <div class="card">
         <div class="card-head">
-          <h2>Last sync</h2>
+          <h2>{{t "common.last_sync"}}</h2>
           {{if .Saved}}
           <form action="{{html .SyncAction}}" method="POST">
-            <button type="submit" class="btn btn-primary btn-small"{{if .Busy}} disabled{{end}}>{{if .Busy}}Syncing…{{else}}Sync{{end}}</button>
+            <button type="submit" class="btn btn-primary btn-small"{{if .Busy}} disabled{{end}}>{{if .Busy}}{{t "common.syncing_2"}}{{else}}{{t "common.sync"}}{{end}}</button>
           </form>
           {{end}}
         </div>
         <dl class="facts">
-          <dt>Read from</dt>
+          <dt>{{t "agent_source_form.read_from"}}</dt>
           <dd><code>{{html .SiteDir}}</code></dd>
-          <dt>README.md</dt>
-          <dd>{{if .Readme}}<span class="badge badge-ok">found</span>{{else}}<span class="badge badge-failed">missing: the chat answers 503</span>{{end}}</dd>
-          <dt>Files</dt>
+          <dt>{{t "common.readme_md"}}</dt>
+          <dd>{{if .Readme}}<span class="badge badge-ok">{{t "common.found"}}</span>{{else}}<span class="badge badge-failed">{{t "agent_source_form.missing_chat_answers_503"}}</span>{{end}}</dd>
+          <dt>{{t "agent_source_form.files"}}</dt>
           <dd>{{.Files}}</dd>
-          <dt>Status</dt>
+          <dt>{{t "common.status"}}</dt>
           <dd>
-            {{if not .Running}}<span class="badge">not running</span>
-            {{else if .Busy}}<span class="badge badge-busy">syncing…</span>
-            {{else if not .Attempted}}<span class="badge">no sync yet</span>
-            {{else if .Ok}}<span class="badge badge-ok">synced</span>
-            {{else}}<span class="badge badge-failed">failed</span>{{end}}
+            {{if not .Running}}<span class="badge">{{t "common.not_running"}}</span>
+            {{else if .Busy}}<span class="badge badge-busy">{{t "common.syncing"}}</span>
+            {{else if not .Attempted}}<span class="badge">{{t "common.no_sync_yet"}}</span>
+            {{else if .Ok}}<span class="badge badge-ok">{{t "common.synced"}}</span>
+            {{else}}<span class="badge badge-failed">{{t "common.failed"}}</span>{{end}}
           </dd>
           {{if .Attempted}}
-          <dt>At</dt>
+          <dt>{{t "common.at"}}</dt>
           <dd>{{html .AttemptedAt}}</dd>
           {{end}}
           {{if .Commit}}
-          <dt>Commit</dt>
+          <dt>{{t "common.commit"}}</dt>
           <dd><code>{{html .Commit}}</code></dd>
           {{end}}
         </dl>
-        {{if not .Running}}<p class="hint">The sync loop runs in the process started by <code>start-server</code>.</p>
-        {{else if .Saved}}<p class="hint">Sync fetches the branch and checks it out now, even when it is up to date.</p>
-        {{else}}<p class="hint">Save a repository to sync it.</p>{{end}}
+        {{if not .Running}}<p class="hint">{{th "common.sync_loop_runs_process_started"}}</p>
+        {{else if .Saved}}<p class="hint">{{t "agent_source_form.sync_fetches_branch_checks_out"}}</p>
+        {{else}}<p class="hint">{{t "common.save_repository_sync"}}</p>{{end}}
         {{if .Output}}<pre class="output">{{html .Output}}</pre>{{end}}
       </div>
     </section>

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Privacy</title>
+  <title>{{t "common.privacy"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -739,6 +739,20 @@
     .table-card .card-head { padding: 0.75rem 1.5rem 0; }
     textarea.draft { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; line-height: 1.5; margin-top: 0.5rem; }
     .section-links { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1.25rem; }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -747,201 +761,205 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings" class="active">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings" class="active">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Privacy</h1>
-        <p class="muted disclaimer">How this server keeps personal data, under the LGPD, the Marco Civil da Internet and the GDPR. You — the operator of this website — are the <strong>controller</strong> (LGPD art. 5 VI; GDPR art. 4(7)): Emissario helps you comply and cannot comply for you. The notices are product information, not legal advice. Nothing here records who changed a setting, nor that a notice was read.</p>
+        <h1>{{t "common.privacy"}}</h1>
+        <p class="muted disclaimer">{{th "privacy_settings.how_this_server_keeps_personal"}}</p>
       </div>
     </section>
 
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
-    <nav class="section-links" aria-label="Privacy">
-      <a class="btn btn-small" href="{{.FindHref}}">Find and erase a person</a>
-      {{if .AccessLogHref}}<a class="btn btn-small" href="{{.AccessLogHref}}">Access log</a>{{end}}
-      <a class="btn btn-small" href="{{.PresetsHref}}">Presets</a>
-      <a class="btn btn-small" href="#kept">What this server keeps</a>
-      <a class="btn btn-small" href="#notice-draft">Privacy notice draft</a>
-      <a class="btn btn-small" href="#holds">Legal holds</a>
-      <a class="btn btn-small" href="#notices">Notices</a>
+    <nav class="section-links" aria-label="{{t "common.privacy"}}">
+      <a class="btn btn-small" href="{{.FindHref}}">{{t "common.find_erase_person"}}</a>
+      {{if .AccessLogHref}}<a class="btn btn-small" href="{{.AccessLogHref}}">{{t "common.access_log"}}</a>{{end}}
+      <a class="btn btn-small" href="{{.PresetsHref}}">{{t "common.presets"}}</a>
+      <a class="btn btn-small" href="#kept">{{t "privacy_settings.what_this_server_keeps"}}</a>
+      <a class="btn btn-small" href="#notice-draft">{{t "privacy_settings.privacy_notice_draft"}}</a>
+      <a class="btn btn-small" href="#holds">{{t "privacy_settings.legal_holds"}}</a>
+      <a class="btn btn-small" href="#notices">{{t "privacy_settings.notices"}}</a>
     </nav>
 
     <section class="grid-2">
       <article class="card">
-        <div class="card-head"><h2>Preset</h2></div>
-        <p>{{if .Preset}}Preset: <code>{{.Preset}}</code>{{else}}No preset (install defaults){{end}}</p>
-        <p class="hint">A preset applies a whole policy — LGPD, GDPR, both, or your company's own — in one step, and shows when this server drifts from it. <a href="{{.PresetsHref}}">Presets</a>.</p>
+        <div class="card-head"><h2>{{t "common.preset_2"}}</h2></div>
+        <p>{{if .Preset}}{{th "privacy_settings.preset" .Preset}}{{else}}{{t "privacy_settings.no_preset_install_defaults"}}{{end}}</p>
+        <p class="hint">{{t "privacy_settings.preset_applies_whole_policy_lgpd"}} <a href="{{.PresetsHref}}">{{t "common.presets"}}</a>.</p>
       </article>
       <article class="card">
-        <div class="card-head"><h2>Encryption at rest</h2></div>
+        <div class="card-head"><h2>{{t "privacy_settings.encryption_rest"}}</h2></div>
         <dl class="facts">
-          <dt>Databases</dt>
-          <dd>{{if .Encrypted}}<span class="badge badge-ok">encrypted</span>{{else}}<span class="badge badge-failed">in clear — debug only</span>{{end}}</dd>
-          {{if .Encrypted}}<dt>Algorithm</dt><dd>{{.Algorithm}}</dd>
-          <dt>Key id</dt><dd><code>{{.KeyId}}</code></dd>{{end}}
-          <dt>IP key made</dt>
+          <dt>{{t "privacy_settings.databases"}}</dt>
+          <dd>{{if .Encrypted}}<span class="badge badge-ok">{{t "privacy_settings.encrypted"}}</span>{{else}}<span class="badge badge-failed">{{t "privacy_settings.clear_debug_only"}}</span>{{end}}</dd>
+          {{if .Encrypted}}<dt>{{t "privacy_settings.algorithm"}}</dt><dd>{{.Algorithm}}</dd>
+          <dt>{{t "privacy_settings.key_id"}}</dt><dd><code>{{.KeyId}}</code></dd>{{end}}
+          <dt>{{t "privacy_settings.ip_key_made"}}</dt>
           <dd>{{if .IpKeyMade}}{{.IpKeyMade}}{{else}}—{{end}}</dd>
         </dl>
-        <p class="hint">The key comes from <code>EMISSARIO_ENCRYPT_KEY</code>: losing it loses every database and every backup. It protects a stolen disk or backup, not a running server.</p>
+        <p class="hint">{{th "privacy_settings.key_comes_from_emissario_encrypt"}}</p>
       </article>
     </section>
 
     <form class="card" action="{{.Action}}" method="POST">
-      <div class="card-head"><h2>IPs</h2></div>
+      <div class="card-head"><h2>{{t "privacy_settings.ips"}}</h2></div>
       <div class="form-group">
-        <label>What the records keep of an IP</label>
+        <label>{{t "privacy_settings.what_records_keep_ip"}}</label>
         <div class="radio-row">
-          <label><input type="radio" name="ip-mode" value="hashed"{{if eq .Form.IpMode "hashed"}} checked{{end}}> Hashed (default)</label>
-          <label><input type="radio" name="ip-mode" value="full"{{if eq .Form.IpMode "full"}} checked{{end}}> Full IPs and user agents</label>
+          <label><input type="radio" name="ip-mode" value="hashed"{{if eq .Form.IpMode "hashed"}} checked{{end}}> {{t "privacy_settings.hashed_default"}}</label>
+          <label><input type="radio" name="ip-mode" value="full"{{if eq .Form.IpMode "full"}} checked{{end}}> {{t "privacy_settings.full_ips_user_agents"}}</label>
         </div>
-        <span class="hint">Views, contact requests and agent usage. Hashed: an HMAC under a random key kept here — it counts visitors and matches an abuser, and cannot be reversed without the key. It is still personal data (pseudonymous). Full asks for a notice. A change applies to new rows.</span>
+        <span class="hint">{{t "privacy_settings.views_contact_requests_agent_usage"}}</span>
       </div>
       <div class="form-group">
-        <label>What viewers see of a full IP</label>
+        <label>{{t "privacy_settings.what_viewers_see_full_ip"}}</label>
         <div class="radio-row">
-          <label><input type="radio" name="viewer-ip" value="masked"{{if eq .Form.ViewerIp "masked"}} checked{{end}}> Masked, 203.0.113.xxx (default)</label>
-          <label><input type="radio" name="viewer-ip" value="full"{{if eq .Form.ViewerIp "full"}} checked{{end}}> Full</label>
+          <label><input type="radio" name="viewer-ip" value="masked"{{if eq .Form.ViewerIp "masked"}} checked{{end}}> {{t "privacy_settings.masked_203_0_113_xxx"}}</label>
+          <label><input type="radio" name="viewer-ip" value="full"{{if eq .Form.ViewerIp "full"}} checked{{end}}> {{t "privacy_settings.full"}}</label>
         </div>
       </div>
       <div class="form-group">
-        <label for="ip-retention-days">Keep the IPs of the records (days)</label>
-        <input type="text" inputmode="numeric" id="ip-retention-days" name="ip-retention-days" value="{{.Form.IpRetentionDays}}" placeholder="Until a root deletes them">
-        <span class="hint">Hashed or full, an IP older than this is blanked every hour; its record stays until its own retention ends. 184 by default; past 365, or blank, asks for a notice.</span>
+        <label for="ip-retention-days">{{t "privacy_settings.keep_ips_records_days"}}</label>
+        <input type="text" inputmode="numeric" id="ip-retention-days" name="ip-retention-days" value="{{.Form.IpRetentionDays}}" placeholder="{{t "privacy_settings.until_root_deletes_them"}}">
+        <span class="hint">{{t "privacy_settings.hashed_full_ip_older_than"}}</span>
       </div>
 
-      <div class="card-head"><h2>Access log (Marco Civil)</h2></div>
+      <div class="card-head"><h2>{{t "privacy_settings.access_log_marco_civil"}}</h2></div>
       <div class="form-group">
-        <label class="switch"><input type="checkbox" name="access-log" value="1"{{if .Form.AccessLog}} checked{{end}}> Keep the access log: every page view and public API call, with the full IP, the source port and the time in UTC</label>
-        <span class="hint">Off by default. Turning it on asks for a notice. Turning it off stops new rows; the rows kept stay until their retention ends.</span>
+        <label class="switch"><input type="checkbox" name="access-log" value="1"{{if .Form.AccessLog}} checked{{end}}> {{t "privacy_settings.keep_access_log_every_page"}}</label>
+        <span class="hint">{{t "privacy_settings.off_default_turning_asks_notice"}}</span>
       </div>
-      {{if not .Form.AccessLog}}<p class="hint privacy-hint"><strong>Brazil:</strong> if this website is run by a company for profit, Marco Civil art. 15 requires access logs (IP, source port, date and time) kept 6 months. Turn on the access log, or keep your reverse proxy's logs for 6 months under the same rules (Decreto 8.771/2016 art. 13).</p>{{end}}
-      {{if not .SourcePort}}<p class="hint privacy-hint"><strong>The access log has no source port:</strong> behind a reverse proxy, set <code>--client-port-header</code> (nginx: <code>proxy_set_header X-Client-Port $remote_port;</code>).</p>{{end}}
+      {{if not .Form.AccessLog}}<p class="hint privacy-hint">{{th "privacy_settings.brazil_if_this_website_run"}}</p>{{end}}
+      {{if not .SourcePort}}<p class="hint privacy-hint">{{th "privacy_settings.access_log_has_no_source"}}</p>{{end}}
       <div class="form-group">
-        <label for="access-log-retention-days">Keep each access log row (days)</label>
-        <input type="text" inputmode="numeric" id="access-log-retention-days" name="access-log-retention-days" value="{{.Form.AccessLogRetentionDays}}" placeholder="Until a root deletes them">
-        <span class="hint">184 by default, the longest 6-month span; below 184 (Brazil) or past 365 (EU), or blank, asks for a notice. A row on a legal hold is kept until the hold ends.</span>
+        <label for="access-log-retention-days">{{t "privacy_settings.keep_each_access_log_row"}}</label>
+        <input type="text" inputmode="numeric" id="access-log-retention-days" name="access-log-retention-days" value="{{.Form.AccessLogRetentionDays}}" placeholder="{{t "privacy_settings.until_root_deletes_them"}}">
+        <span class="hint">{{t "privacy_settings.184_default_longest_6_month"}}</span>
       </div>
       <div class="form-group">
-        <label class="switch"><input type="checkbox" name="access-log-totp" value="1"{{if .Form.AccessLogTotp}} checked{{end}}> Its readers sign in with two-factor (Decreto 8.771/2016 art. 13 II)</label>
-        <label class="switch"><input type="checkbox" name="access-log-inventory" value="1"{{if .Form.AccessLogInventory}} checked{{end}}> Keep an inventory of every read of it (art. 13 III)</label>
-        <span class="hint">Both on by default; turning one off asks for a notice.</span>
+        <label class="switch"><input type="checkbox" name="access-log-totp" value="1"{{if .Form.AccessLogTotp}} checked{{end}}> {{t "privacy_settings.readers_sign_with_two_factor"}}</label>
+        <label class="switch"><input type="checkbox" name="access-log-inventory" value="1"{{if .Form.AccessLogInventory}} checked{{end}}> {{t "privacy_settings.keep_inventory_every_read_art"}}</label>
+        <span class="hint">{{t "privacy_settings.both_default_turning_one_off"}}</span>
       </div>
 
-      <div class="card-head"><h2>Backups and the notice draft</h2></div>
+      <div class="card-head"><h2>{{t "privacy_settings.backups_notice_draft"}}</h2></div>
       <div class="form-group">
-        <label for="backup-retention-days">Keep each snapshot (days)</label>
-        <input type="text" inputmode="numeric" id="backup-retention-days" name="backup-retention-days" value="{{.Form.BackupRetentionDays}}" placeholder="Until a root deletes them">
-        <span class="hint">Data a retention deletes lives on in the snapshots taken before. Blank — the default — or longer than the longest retention of the records asks for a notice.</span>
+        <label for="backup-retention-days">{{t "privacy_settings.keep_each_snapshot_days"}}</label>
+        <input type="text" inputmode="numeric" id="backup-retention-days" name="backup-retention-days" value="{{.Form.BackupRetentionDays}}" placeholder="{{t "privacy_settings.until_root_deletes_them"}}">
+        <span class="hint">{{t "privacy_settings.data_retention_deletes_lives_snapshots"}}</span>
       </div>
       <div class="form-group">
-        <label for="notice-draft">Privacy notice draft</label>
+        <label for="notice-draft">{{t "privacy_settings.privacy_notice_draft"}}</label>
         <select id="notice-draft" name="notice-draft">
-          {{$draft := .Form.NoticeDraft}}{{range .Drafts}}<option value="{{.Value}}"{{if eq .Value $draft}} selected{{end}}>{{.Label}}</option>{{end}}
+          {{$draft := .Form.NoticeDraft}}{{range .Drafts}}<option value="{{.Value}}"{{if eq .Value $draft}} selected{{end}}>{{tr .Label}}</option>{{end}}
         </select>
       </div>
       {{if .Form.Notices}}<div class="law-panel" role="alert">
-        <p class="law-lead">Read before you confirm. These notices are product information, not legal advice: you are the controller of this data.</p>
-        {{range .Form.Notices}}<article class="law-notice"><h3>{{.Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> I have read this notice</label></article>{{end}}
+        <p class="law-lead">{{t "common.read_before_you_confirm_these"}}</p>
+        {{range .Form.Notices}}<article class="law-notice"><h3>{{tr .Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> {{t "common.i_have_read_this_notice"}}</label></article>{{end}}
       </div>{{end}}
-      <button type="submit" class="btn btn-primary">{{if .Form.Notices}}Confirm and save{{else}}Save settings{{end}}</button>
+      <button type="submit" class="btn btn-primary">{{if .Form.Notices}}{{t "common.confirm_save"}}{{else}}{{t "common.save_settings"}}{{end}}</button>
     </form>
 
     <section class="stack">
       <form class="card" action="{{.ReadersAction}}" method="POST">
-        <div class="card-head"><h2>Access log readers</h2></div>
-        <p class="hint">Only the roots ticked here read the access log (Decreto 8.771/2016 art. 13 I){{if .Form.AccessLogTotp}}, and only after a two-factor sign-in{{end}}. Viewers never do.</p>
+        <div class="card-head"><h2>{{t "privacy_settings.access_log_readers"}}</h2></div>
+        <p class="hint">{{t "privacy_settings.only_roots_ticked_here_read"}}{{if .Form.AccessLogTotp}}{{t "privacy_settings.only_after_two_factor_sign"}}{{end}}{{t "privacy_settings.viewers_never_do"}}</p>
         <div class="readers">
-          {{range .Readers}}<label><input type="checkbox" name="ids" value="{{.Id}}"{{if .Reader}} checked{{end}}> {{.Username}} {{if .Totp}}<span class="badge badge-ok">two-factor</span>{{else}}<span class="badge badge-failed">no two-factor</span>{{end}}</label>
+          {{range .Readers}}<label><input type="checkbox" name="ids" value="{{.Id}}"{{if .Reader}} checked{{end}}> {{.Username}} {{if .Totp}}<span class="badge badge-ok">{{t "privacy_settings.two_factor"}}</span>{{else}}<span class="badge badge-failed">{{t "privacy_settings.no_two_factor"}}</span>{{end}}</label>
           {{end}}
         </div>
-        <button type="submit" class="btn">Save readers</button>
-        <a class="btn" href="{{.TotpHref}}">Your two-factor sign-in</a>
+        <button type="submit" class="btn">{{t "privacy_settings.save_readers"}}</button>
+        <a class="btn" href="{{.TotpHref}}">{{t "privacy_settings.your_two_factor_sign"}}</a>
       </form>
     </section>
 
     <div class="card table-card" id="kept">
-      <div class="card-head"><h2>What this server keeps</h2></div>
-      <p class="hint" style="padding: 0 1.5rem;">The base of your records of processing (LGPD art. 37; GDPR art. 30). The legal basis is a suggestion: you choose it, and document it in your own records.</p>
+      <div class="card-head"><h2>{{t "privacy_settings.what_this_server_keeps"}}</h2></div>
+      <p class="hint" style="padding: 0 1.5rem;">{{t "privacy_settings.base_your_records_processing_lgpd"}}</p>
       <table class="kept">
-        <thead><tr><th>Table</th><th>Fields</th><th>Purpose and suggested basis</th><th>Retention</th><th>Rows</th><th>Oldest</th></tr></thead>
+        <thead><tr><th>{{t "privacy_settings.table"}}</th><th>{{t "privacy_settings.fields"}}</th><th>{{t "privacy_settings.purpose_suggested_basis"}}</th><th>{{t "common.retention"}}</th><th>{{t "privacy_settings.rows"}}</th><th>{{t "privacy_settings.oldest"}}</th></tr></thead>
         <tbody>
           {{range .Kept}}<tr>
-            <td data-label="Table"><code>{{.Table}}</code></td>
-            <td data-label="Fields">{{.Fields}}</td>
-            <td data-label="Purpose">{{.Purpose}}<br><span class="basis">{{.Basis}}</span></td>
-            <td data-label="Retention">{{.Retention}}</td>
-            <td data-label="Rows">{{.Count}}</td>
-            <td data-label="Oldest">{{.Oldest}}</td>
+            <td data-label="{{t "privacy_settings.table"}}"><code>{{.Table}}</code></td>
+            <td data-label="{{t "privacy_settings.fields"}}">{{tr .Fields}}</td>
+            <td data-label="{{t "privacy_settings.purpose"}}">{{tr .Purpose}}<br><span class="basis">{{tr .Basis}}</span></td>
+            <td data-label="{{t "common.retention"}}">{{tr .Retention}}</td>
+            <td data-label="{{t "privacy_settings.rows"}}">{{.Count}}</td>
+            <td data-label="{{t "privacy_settings.oldest"}}">{{.Oldest}}</td>
           </tr>{{end}}
         </tbody>
       </table>
     </div>
 
     <div class="card" id="notice-draft">
-      <div class="card-head"><h2>Privacy notice draft</h2></div>
-      <p class="hint"><strong>Draft — review it.</strong> Built from the settings in use: what is kept, why, for how long, the access log, the model provider, that no cookie is set and the chat history stays in the visitor's browser, the rights and the time to answer them. Fill in the [brackets] — the controller, the contact, the encarregado or DPO — and publish it on your website. Its template is set above.</p>
+      <div class="card-head"><h2>{{t "privacy_settings.privacy_notice_draft"}}</h2></div>
+      <p class="hint">{{th "privacy_settings.draft_review_built_from_settings"}}</p>
       <textarea class="draft" readonly rows="24" spellcheck="false">{{.NoticeDraft}}</textarea>
     </div>
 
     <div class="card table-card" id="holds">
-      <div class="card-head"><h2>Legal holds</h2></div>
-      <p class="hint" style="padding: 0 1.5rem;">Rows kept past their retention and out of Find and erase, for an authority's request (Marco Civil art. 15 §2) or a lawsuit. Hold rows from a contact request, a summary or the access log. A preservation request is confidential (Marco Civil art. 13 §4).</p>
+      <div class="card-head"><h2>{{t "privacy_settings.legal_holds"}}</h2></div>
+      <p class="hint" style="padding: 0 1.5rem;">{{t "privacy_settings.rows_kept_past_their_retention"}}</p>
       {{if .Holds}}<table>
-        <thead><tr><th>Table</th><th>Rows</th><th>Reason</th><th>Until</th><th></th></tr></thead>
+        <thead><tr><th>{{t "privacy_settings.table"}}</th><th>{{t "privacy_settings.rows"}}</th><th>{{t "common.reason"}}</th><th>{{t "common.until"}}</th><th></th></tr></thead>
         <tbody>
           {{range .Holds}}<tr>
-            <td data-label="Table"><code>{{.Table}}</code></td>
-            <td data-label="Rows">{{.Rows}}</td>
-            <td data-label="Reason">{{.Reason}}</td>
-            <td data-label="Until">{{.Until}}</td>
-            <td data-label=""><form action="{{$.ReleaseAction}}" method="POST" data-confirm="Release this hold? Its rows follow their retention again, and the cleanup may delete them at once.">
-              <input type="hidden" name="id" value="{{.Id}}"><button type="submit" class="btn btn-small btn-danger">Release</button>
+            <td data-label="{{t "privacy_settings.table"}}"><code>{{.Table}}</code></td>
+            <td data-label="{{t "privacy_settings.rows"}}">{{.Rows}}</td>
+            <td data-label="{{t "common.reason"}}">{{.Reason}}</td>
+            <td data-label="{{t "common.until"}}">{{.Until}}</td>
+            <td data-label=""><form action="{{$.ReleaseAction}}" method="POST" data-confirm="{{t "privacy_settings.release_this_hold_rows_follow"}}">
+              <input type="hidden" name="id" value="{{.Id}}"><button type="submit" class="btn btn-small btn-danger">{{t "privacy_settings.release"}}</button>
             </form></td>
           </tr>{{end}}
         </tbody>
-      </table>{{else}}<p class="empty">No legal hold.</p>{{end}}
+      </table>{{else}}<p class="empty">{{t "privacy_settings.no_legal_hold"}}</p>{{end}}
     </div>
 
     <div class="card" id="notices">
-      <div class="card-head"><h2>Notices of the settings in use</h2></div>
-      {{if .InUse}}{{range .InUse}}<details class="law-notice"><summary>{{.Title}}</summary>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}</details>{{end}}{{else}}<p class="hint">No setting in use needs a notice: this server runs with the private defaults.</p>{{end}}
+      <div class="card-head"><h2>{{t "privacy_settings.notices_settings_use"}}</h2></div>
+      {{if .InUse}}{{range .InUse}}<details class="law-notice"><summary>{{tr .Title}}</summary>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</p>{{end}}{{end}}</details>{{end}}{{else}}<p class="hint">{{t "privacy_settings.no_setting_use_needs_notice"}}</p>{{end}}
     </div>
 
     <section class="card danger">
-      <div class="card-head"><h2>Danger zone</h2></div>
-      <form action="{{.HashAction}}" method="POST" class="danger-row" data-confirm="Turn every full IP the views, contact requests and agent usage keep into its hash, and blank the full user agents? This cannot be undone. The access log keeps its full IPs.">
-        <div class="grow"><strong>Hash the IPs already stored</strong><p class="hint">Every full IP of the records becomes its hash under the current IP key. The access log is kept as it is.</p></div>
-        <button type="submit" class="btn btn-danger">Hash the IPs</button>
+      <div class="card-head"><h2>{{t "common.danger_zone"}}</h2></div>
+      <form action="{{.HashAction}}" method="POST" class="danger-row" data-confirm="{{t "privacy_settings.turn_every_full_ip_views"}}">
+        <div class="grow"><strong>{{t "privacy_settings.hash_ips_already_stored"}}</strong><p class="hint">{{t "privacy_settings.every_full_ip_records_becomes"}}</p></div>
+        <button type="submit" class="btn btn-danger">{{t "privacy_settings.hash_ips"}}</button>
       </form>
-      <form action="{{.RotateAction}}" method="POST" class="danger-row" data-confirm="Rotate the IP key? The hashes made before stop matching new visits and any IP you type. This cannot be undone.">
-        <div class="grow"><strong>Rotate IP key</strong><p class="hint">A new random key: the hashes kept can no longer be matched to new visits nor confirmed against an IP — the way to forget the linkage early, after a server compromise for one.</p></div>
-        <button type="submit" class="btn btn-danger">Rotate IP key</button>
+      <form action="{{.RotateAction}}" method="POST" class="danger-row" data-confirm="{{t "privacy_settings.rotate_ip_key_hashes_made"}}">
+        <div class="grow"><strong>{{t "privacy_settings.rotate_ip_key"}}</strong><p class="hint">{{t "privacy_settings.new_random_key_hashes_kept"}}</p></div>
+        <button type="submit" class="btn btn-danger">{{t "privacy_settings.rotate_ip_key"}}</button>
       </form>
     </section>
   </main>

@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>New API token</title>
+  <title>{{t "backoffice_api_token_form.new_api_token"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -332,6 +332,20 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -340,77 +354,81 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens" class="active">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens" class="active">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main class="narrow">
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
-    <a class="back" href="/admin/list-backoffice-api-tokens">&larr; Back to API tokens</a>
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
+    <a class="back" href="/admin/list-backoffice-api-tokens">{{t "backoffice_api_token_form.back_api_tokens"}}</a>
 
     <div class="card">
-      <h1>New API token</h1>
-      <p class="hint" style="margin: -1rem 0 1.5rem;">The token acts as you on /api/admin, with your role, until it expires or is revoked.</p>
+      <h1>{{t "backoffice_api_token_form.new_api_token"}}</h1>
+      <p class="hint" style="margin: -1rem 0 1.5rem;">{{t "backoffice_api_token_form.token_acts_you_api_admin"}}</p>
 
-      {{if .Error}}<div class="alert" role="alert">{{html .Error}}</div>{{end}}
+      {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
       <form action="/admin/add-backoffice-api-token" method="POST">
         <div class="form-group">
-          <label for="name">Name</label>
-          <input type="text" id="name" name="name" value="{{html .Name}}" required maxlength="100" autocomplete="off" placeholder="What is this token for?">
+          <label for="name">{{t "common.name"}}</label>
+          <input type="text" id="name" name="name" value="{{html .Name}}" required maxlength="100" autocomplete="off" placeholder="{{t "backoffice_api_token_form.what_this_token"}}">
         </div>
 
         <div class="form-group">
-          <label for="expiration">Expiration</label>
+          <label for="expiration">{{t "backoffice_api_token_form.expiration"}}</label>
           <select id="expiration" name="expiration" required>
-            {{range .Expirations}}<option value="{{html .Value}}"{{if .Selected}} selected{{end}}>{{html .Label}}</option>{{end}}
+            {{range .Expirations}}<option value="{{html .Value}}"{{if .Selected}} selected{{end}}>{{tr .Label}}</option>{{end}}
           </select>
-          <p class="hint">A token without an expiration stays valid until it is revoked.</p>
+          <p class="hint">{{t "backoffice_api_token_form.token_without_expiration_stays_valid"}}</p>
         </div>
 
         <div class="form-group" id="date-group"{{if not .IsCustom}} hidden{{end}}>
-          <label for="date">Expires after</label>
+          <label for="date">{{t "backoffice_api_token_form.expires_after"}}</label>
           <input type="date" id="date" name="date" value="{{html .Date}}" min="{{html .MinDate}}"{{if .IsCustom}} required{{end}}>
-          <p class="hint">The token is valid through the end of that day, in UTC.</p>
+          <p class="hint">{{t "backoffice_api_token_form.token_valid_through_end_that"}}</p>
         </div>
 
         <div class="form-group">
-          <label for="ips">Allowed IPs <span style="color: var(--text-muted); font-weight: 400;">(optional)</span></label>
-          <input type="text" id="ips" name="ips" value="{{html .Ips}}" autocomplete="off" spellcheck="false" placeholder="Any IP">
+          <label for="ips">{{th "backoffice_api_token_form.allowed_ips_optional"}}</label>
+          <input type="text" id="ips" name="ips" value="{{html .Ips}}" autocomplete="off" spellcheck="false" placeholder="{{t "backoffice_api_token_form.any_ip"}}">
           <div class="hint ip-hint">
-            <span>Separate several with commas; a range is written in CIDR notation (10.0.0.0/8). Leave it blank to accept the token from any IP.</span>
-            {{if .ClientIp}}<button type="button" class="btn btn-small" id="use-my-ip" data-ip="{{html .ClientIp}}">Add my IP (<code>{{html .ClientIp}}</code>)</button>{{end}}
+            <span>{{t "backoffice_api_token_form.separate_several_with_commas_range"}}</span>
+            {{if .ClientIp}}<button type="button" class="btn btn-small" id="use-my-ip" data-ip="{{html .ClientIp}}">{{th "backoffice_api_token_form.add_my_ip" .ClientIp}}</button>{{end}}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="password">Your password</label>
+          <label for="password">{{t "backoffice_api_token_form.your_password"}}</label>
           <input type="password" id="password" name="password" required maxlength="1024" autocomplete="current-password">
-          <p class="hint">A token acts as you until it expires, so creating one asks for your password again.</p>
+          <p class="hint">{{t "backoffice_api_token_form.token_acts_you_until_expires"}}</p>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Create token</button>
-          <a class="btn" href="/admin/list-backoffice-api-tokens">Cancel</a>
+          <button type="submit" class="btn btn-primary">{{t "backoffice_api_token_form.create_token"}}</button>
+          <a class="btn" href="/admin/list-backoffice-api-tokens">{{t "common.cancel"}}</a>
         </div>
       </form>
     </div>

@@ -2,6 +2,22 @@
 // the server itself, because their Content-Security-Policy runs no script
 // written inline: neither a <script> block nor an on* attribute.
 (function () {
+  // The language picker of every page: choosing a language asks the same
+  // page again with ?lang=, which the server keeps in a cookie for the next
+  // pages; the parameter is then taken out of the address bar.
+  document.querySelectorAll('select[data-language]').forEach(function (select) {
+    select.addEventListener('change', function () {
+      var url = new URL(location.href);
+      url.searchParams.set('lang', select.value);
+      location.href = url.toString();
+    });
+  });
+  if (new URL(location.href).searchParams.has('lang') && window.history.replaceState) {
+    var clean = new URL(location.href);
+    clean.searchParams.delete('lang');
+    window.history.replaceState(null, '', clean.toString());
+  }
+
   // A form carrying data-confirm asks before it is sent.
   document.querySelectorAll('form[data-confirm]').forEach(function (form) {
     form.addEventListener('submit', function (event) {
@@ -32,7 +48,7 @@
       var picked = Array.prototype.some.call(rows(), function (box) { return box.checked; });
       if (!picked) {
         event.preventDefault();
-        window.alert('Select at least one contact request.');
+        window.alert(selection.dataset.empty);
       }
     });
     var all = document.getElementById('select-all');
@@ -103,11 +119,12 @@
         error.textContent = message;
         error.hidden = false;
         button.disabled = false;
-        button.textContent = 'Upload';
+        button.textContent = label;
       };
+      var label = button.textContent;
       error.hidden = true;
       button.disabled = true;
-      button.textContent = 'Uploading…';
+      button.textContent = upload.dataset.uploading;
       fetch(upload.action, {
         method: 'POST',
         headers: { 'Content-Type': 'application/zip' },
@@ -118,12 +135,12 @@
           return;
         }
         return response.json().then(function (body) {
-          fail(body.error || 'The upload was refused.');
+          fail(body.error || upload.dataset.refused);
         }, function () {
-          fail('The upload was refused (' + response.status + ').');
+          fail(upload.dataset.refusedStatus.replace('{0}', response.status));
         });
       }, function () {
-        fail('The upload could not reach the server.');
+        fail(upload.dataset.unreachable);
       });
     });
   }
@@ -142,7 +159,7 @@
   if (copy && token) {
     copy.addEventListener('click', function () {
       token.select();
-      var done = function () { copy.textContent = 'Copied'; };
+      var done = function () { copy.textContent = copy.dataset.copied; };
       if (navigator.clipboard) {
         navigator.clipboard.writeText(token.value).then(done, function () { document.execCommand('copy'); done(); });
       } else {

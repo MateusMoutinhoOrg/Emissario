@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visualization Visitors</title>
+  <title>{{t "visualization_visitors.visualization_visitors"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -610,6 +610,20 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -618,123 +632,127 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization" class="active">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization" class="active">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Visitors</h1>
-        <p class="muted">Every ip that viewed the public website in the period. {{if not .Viewer.IsRoot}}Ips are masked: a root reads them whole.{{end}}</p>
+        <h1>{{t "visualization_visitors.visitors"}}</h1>
+        <p class="muted">{{t "visualization_visitors.every_ip_that_viewed_public"}} {{if not .Viewer.IsRoot}}{{t "common.ips_are_masked_root_reads"}}{{end}}</p>
       </div>
     </section>
 
-    <nav class="tabs" aria-label="Visualization">
-      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
+    <nav class="tabs" aria-label="{{t "common.visualization"}}">
+      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{tr .Label}}</a>
       {{end}}
     </nav>
 
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     <form class="card filters" action="{{.Filters.Action}}" method="GET">
       <div class="field">
-        <label for="from">From</label>
+        <label for="from">{{t "common.from"}}</label>
         <input type="date" id="from" name="from" value="{{.Filters.From}}">
       </div>
       <div class="field">
-        <label for="to">To</label>
+        <label for="to">{{t "common.to"}}</label>
         <input type="date" id="to" name="to" value="{{.Filters.To}}">
       </div>
       <div class="field grow">
-        <label for="path">Page</label>
+        <label for="path">{{t "common.page_2"}}</label>
         <input type="text" id="path" name="path" value="{{.Filters.Path}}" placeholder="/blog/">
       </div>
       <div class="field grow">
-        <label for="prefix">Pages starting with</label>
+        <label for="prefix">{{t "common.pages_starting_with"}}</label>
         <input type="text" id="prefix" name="prefix" value="{{.Filters.Prefix}}" placeholder="/blog/">
       </div>
       {{if .Filters.ShowIp}}
       <div class="field">
-        <label for="ip">Ip or range</label>
+        <label for="ip">{{t "common.ip_range"}}</label>
         <input type="text" id="ip" name="ip" value="{{.Filters.Ip}}" placeholder="203.0.113.0/24">
       </div>
       {{end}}
       <div class="field small">
-        <label for="country">Country</label>
+        <label for="country">{{t "common.country"}}</label>
         <input type="text" id="country" name="country" value="{{.Filters.Country}}" maxlength="2" placeholder="BR">
       </div>
       <div class="field">
-        <label for="device">Device</label>
+        <label for="device">{{t "common.device"}}</label>
         <select id="device" name="device">
-          {{range .Filters.Devices}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>{{end}}
+          {{range .Filters.Devices}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{tr .Label}}</option>{{end}}
         </select>
       </div>
       <div class="field">
-        <label for="browser">Browser</label>
+        <label for="browser">{{t "common.browser"}}</label>
         <select id="browser" name="browser">
-          {{range .Filters.Browsers}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>{{end}}
+          {{range .Filters.Browsers}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{tr .Label}}</option>{{end}}
         </select>
       </div>
       <div class="field">
-        <label for="os">Operating system</label>
+        <label for="os">{{t "common.operating_system"}}</label>
         <select id="os" name="os">
-          {{range .Filters.Systems}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>{{end}}
+          {{range .Filters.Systems}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{tr .Label}}</option>{{end}}
         </select>
       </div>
       <div class="field">
-        <label for="status">Status</label>
+        <label for="status">{{t "common.status"}}</label>
         <select id="status" name="status">
-          {{range .Filters.Statuses}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>{{end}}
+          {{range .Filters.Statuses}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{tr .Label}}</option>{{end}}
         </select>
       </div>
-      <label class="check"><input type="checkbox" name="bots" value="1"{{if .Filters.Bots}} checked{{end}}> Include bots</label>
+      <label class="check"><input type="checkbox" name="bots" value="1"{{if .Filters.Bots}} checked{{end}}> {{t "common.include_bots"}}</label>
       {{range .Filters.Hidden}}<input type="hidden" name="{{.Name}}" value="{{.Value}}">{{end}}
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Apply</button>
-        <a class="btn" href="{{.Filters.Clear}}">Clear</a>
+        <button type="submit" class="btn btn-primary">{{t "common.apply"}}</button>
+        <a class="btn" href="{{.Filters.Clear}}">{{t "common.clear"}}</a>
       </div>
     </form>
 
     <div class="period">
       <div class="quick">
-        {{range .Filters.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{.Label}}</a>
+        {{range .Filters.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{tr .Label}}</a>
         {{end}}
       </div>
-      <span class="muted">{{if .Filters.Period}}{{.Filters.Period}} · {{end}}days counted in {{.Filters.Zone}}</span>
+      <span class="muted">{{if .Filters.Period}}{{.Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
     </div>
 
     {{if .Filters.Chips}}
-    <div class="chips" aria-label="Active filters">
-      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{.Label}}</span> {{.Value}} <a href="{{.Remove}}" title="Remove this filter" aria-label="Remove the filter {{.Label}}">✕</a></span>
+    <div class="chips" aria-label="{{t "common.active_filters"}}">
+      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{.Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" .Label}}">✕</a></span>
       {{end}}
     </div>
     {{end}}
 
     {{if .Sorts}}
     <div class="sorts">
-      <span class="muted">Sort by</span>
-      {{range .Sorts}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{.Label}}</a>
+      <span class="muted">{{t "common.sort"}}</span>
+      {{range .Sorts}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{tr .Label}}</a>
       {{end}}
     </div>
     {{end}}
@@ -745,46 +763,46 @@
       <table>
         <thead>
           <tr>
-            <th>Ip</th>
-            <th>Country</th>
-            <th>Device</th>
-            <th>Browser</th>
-            <th>Os</th>
-            <th class="right">Views</th>
-            <th class="right">Pages</th>
-            <th>First seen</th>
-            <th>Last seen</th>
+            <th>{{t "common.ip"}}</th>
+            <th>{{t "common.country"}}</th>
+            <th>{{t "common.device"}}</th>
+            <th>{{t "common.browser"}}</th>
+            <th>{{t "common.os"}}</th>
+            <th class="right">{{t "common.views"}}</th>
+            <th class="right">{{t "common.pages"}}</th>
+            <th>{{t "visualization_visitors.first_seen"}}</th>
+            <th>{{t "visualization_visitors.last_seen"}}</th>
           </tr>
         </thead>
         <tbody>
           {{range .Rows}}
           <tr>
-            <td class="nowrap" data-label="Ip">{{if .ViewsHref}}<a href="{{.ViewsHref}}"><code>{{.Ip}}</code></a>{{else}}<code>{{.Ip}}</code>{{end}}</td>
-            <td data-label="Country"><span class="flag">{{.Flag}}</span> {{.Country}}</td>
-            <td data-label="Device">{{.Device}}</td>
-            <td data-label="Browser">{{.Browser}}</td>
-            <td data-label="Os">{{.Os}}</td>
-            <td class="right num" data-label="Views">{{.Views}}</td>
-            <td class="right num" data-label="Pages">{{.Pages}}</td>
-            <td class="nowrap" data-label="First seen">{{.FirstAt}}</td>
-            <td class="nowrap" data-label="Last seen">{{.LastAt}}</td>
+            <td class="nowrap" data-label="{{t "common.ip"}}">{{if .ViewsHref}}<a href="{{.ViewsHref}}"><code>{{.Ip}}</code></a>{{else}}<code>{{.Ip}}</code>{{end}}</td>
+            <td data-label="{{t "common.country"}}"><span class="flag">{{.Flag}}</span> {{.Country}}</td>
+            <td data-label="{{t "common.device"}}">{{.Device}}</td>
+            <td data-label="{{t "common.browser"}}">{{.Browser}}</td>
+            <td data-label="{{t "common.os"}}">{{.Os}}</td>
+            <td class="right num" data-label="{{t "common.views"}}">{{.Views}}</td>
+            <td class="right num" data-label="{{t "common.pages"}}">{{.Pages}}</td>
+            <td class="nowrap" data-label="{{t "visualization_visitors.first_seen"}}">{{.FirstAt}}</td>
+            <td class="nowrap" data-label="{{t "visualization_visitors.last_seen"}}">{{.LastAt}}</td>
           </tr>
           {{end}}
         </tbody>
       </table>
       {{else}}
-      <p class="empty">No visitor in this period.</p>
+      <p class="empty">{{t "visualization_visitors.no_visitor_this_period"}}</p>
       {{end}}
     </div>
     {{end}}
 
     {{if not .Error}}
-    <nav class="pager" aria-label="Pages">
-      <span class="muted">{{if .Pager.From}}Showing {{.Pager.From}}&ndash;{{.Pager.To}} of {{.Pager.Total}}{{else}}No results{{end}}</span>
+    <nav class="pager" aria-label="{{t "common.pages"}}">
+      <span class="muted">{{if .Pager.From}}{{t "common.showing" .Pager.From .Pager.To .Pager.Total}}{{else}}{{t "common.no_results"}}{{end}}</span>
       <div class="pages">
-        {{if .Pager.HasPrev}}<a class="btn btn-small" href="{{.Pager.PrevHref}}">&larr; Prev</a>{{else}}<span class="btn btn-small disabled">&larr; Prev</span>{{end}}
-        <span class="muted">Page {{.Pager.Page}} of {{.Pager.Pages}}</span>
-        {{if .Pager.HasNext}}<a class="btn btn-small" href="{{.Pager.NextHref}}">Next &rarr;</a>{{else}}<span class="btn btn-small disabled">Next &rarr;</span>{{end}}
+        {{if .Pager.HasPrev}}<a class="btn btn-small" href="{{.Pager.PrevHref}}">{{t "common.prev"}}</a>{{else}}<span class="btn btn-small disabled">{{t "common.prev"}}</span>{{end}}
+        <span class="muted">{{t "common.page" .Pager.Page .Pager.Pages}}</span>
+        {{if .Pager.HasNext}}<a class="btn btn-small" href="{{.Pager.NextHref}}">{{t "common.next"}}</a>{{else}}<span class="btn btn-small disabled">{{t "common.next"}}</span>{{end}}
       </div>
     </nav>
     {{end}}

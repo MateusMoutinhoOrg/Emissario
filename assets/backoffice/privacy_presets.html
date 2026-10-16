@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Privacy presets</title>
+  <title>{{t "privacy_presets.privacy_presets"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -745,6 +745,20 @@
     .checklist li { margin: 0 0 0.6rem 1.1rem; line-height: 1.5; }
     .checklist .ref { display: block; }
     textarea.import { width: 100%; min-height: 9rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -753,77 +767,81 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings" class="active">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings" class="active">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
-    <a class="back" href="{{.PrivacyHref}}">&larr; Privacy</a>
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
+    <a class="back" href="{{.PrivacyHref}}">{{t "common.privacy_2"}}</a>
     <section class="head">
       <div>
-        <h1>Presets</h1>
-        <p class="muted">A preset applies a whole privacy policy in one step — LGPD, GDPR, both, or your company's own — through the same ranges and the same notices as each setting on its own. It says how data is kept, never whether it is collected: the contact requests, the agent and its summaries stay as you set them. It is a shortcut and a proof, not compliance: the checklist lists what is left to you. Nothing records who applied a preset, nor when.</p>
+        <h1>{{t "common.presets"}}</h1>
+        <p class="muted">{{t "privacy_presets.preset_applies_whole_privacy_policy"}}</p>
       </div>
     </section>
 
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
 
     <article class="card">
-      <div class="card-head"><h2>This server</h2></div>
+      <div class="card-head"><h2>{{t "privacy_presets.this_server"}}</h2></div>
       {{if .Active}}
-        {{if .Found}}<p>Preset: <strong>{{.ActiveName}}</strong> <code>{{.Active}}</code> {{if .Conform}}<span class="badge badge-ok">follows it</span>{{else}}<span class="badge badge-failed">{{len .Differences}} settings differ</span>{{end}}</p>
-        {{else}}<p>Preset <code>{{.Active}}</code> <span class="badge badge-failed">no longer exists</span></p>{{end}}
+        {{if .Found}}<p>{{th "privacy_presets.preset" .ActiveName .Active}} {{if .Conform}}<span class="badge badge-ok">{{t "privacy_presets.follows"}}</span>{{else}}<span class="badge badge-failed">{{t "privacy_presets.settings_differ" (len .Differences)}}</span>{{end}}</p>
+        {{else}}<p>{{th "privacy_presets.preset_no_longer_exists" .Active}}</p>{{end}}
         {{if .Differences}}<table>
-          <thead><tr><th>Setting</th><th>Now</th><th>The preset</th></tr></thead>
-          <tbody>{{range .Differences}}<tr><td data-label="Setting"><code>{{.Setting}}</code></td><td data-label="Now">{{.Current}}</td><td data-label="The preset">{{.Preset}}</td></tr>{{end}}</tbody>
+          <thead><tr><th>{{t "common.setting"}}</th><th>{{t "common.now"}}</th><th>{{t "common.preset"}}</th></tr></thead>
+          <tbody>{{range .Differences}}<tr><td data-label="{{t "common.setting"}}"><code>{{.Setting}}</code></td><td data-label="{{t "common.now"}}">{{.Current}}</td><td data-label="{{t "common.preset"}}">{{.Preset}}</td></tr>{{end}}</tbody>
         </table>{{end}}
         <div class="section-links" style="margin-top: 1rem;">
-          {{if .ReapplyHref}}<a class="btn btn-small" href="{{.ReapplyHref}}">Re-apply</a>{{end}}
-          <form action="{{.DetachPath}}" method="POST" data-confirm="Detach the preset? The settings stay as they are; this server becomes Custom."><button type="submit" class="btn btn-small">Detach</button></form>
+          {{if .ReapplyHref}}<a class="btn btn-small" href="{{.ReapplyHref}}">{{t "privacy_presets.re_apply"}}</a>{{end}}
+          <form action="{{.DetachPath}}" method="POST" data-confirm="{{t "privacy_presets.detach_preset_settings_stay_they"}}"><button type="submit" class="btn btn-small">{{t "privacy_presets.detach"}}</button></form>
         </div>
-        {{if .Newer}}<p class="hint"><strong>{{.NewerText}}</strong> Nothing is applied by itself: <a href="{{.NewerHref}}">preview it</a>.</p>{{end}}
-      {{else}}<p>No preset (install defaults, or Custom). Preview one below to apply it.</p>{{end}}
+        {{if .Newer}}<p class="hint">{{th "privacy_presets.nothing_applied_itself" .NewerText}} <a href="{{.NewerHref}}">{{t "privacy_presets.preview"}}</a>.</p>{{end}}
+      {{else}}<p>{{t "privacy_presets.no_preset_install_defaults_custom"}}</p>{{end}}
     </article>
 
     {{if .Active}}<article class="card">
-      <div class="card-head"><h2>Controller checklist</h2></div>
-      <p class="hint">What Emissario cannot do for you under this preset. It is a reminder: Emissario keeps no status for these items, done or not; keep your evidence in your own documents.</p>
-      {{if .Checklist}}<ul class="checklist">{{range .Checklist}}<li>{{.Text}}{{if .Reference}}<span class="ref">{{.Reference}}</span>{{end}}</li>{{end}}</ul>{{else}}<p class="hint">This preset holds no checklist.</p>{{end}}
+      <div class="card-head"><h2>{{t "privacy_presets.controller_checklist"}}</h2></div>
+      <p class="hint">{{t "privacy_presets.what_emissario_cannot_do_you"}}</p>
+      {{if .Checklist}}<ul class="checklist">{{range .Checklist}}<li>{{tr .Text}}{{if .Reference}}<span class="ref">{{.Reference}}</span>{{end}}</li>{{end}}</ul>{{else}}<p class="hint">{{t "privacy_presets.this_preset_holds_no_checklist"}}</p>{{end}}
     </article>{{end}}
 
     <div class="card table-card">
-      <div class="card-head"><h2>Presets</h2></div>
+      <div class="card-head"><h2>{{t "common.presets"}}</h2></div>
       <table>
-        <thead><tr><th>Preset</th><th>For</th><th></th><th></th></tr></thead>
+        <thead><tr><th>{{t "common.preset_2"}}</th><th>{{t "privacy_presets.for"}}</th><th></th><th></th></tr></thead>
         <tbody>
           {{range .Presets}}<tr>
-            <td data-label="Preset"><strong>{{.Name}}</strong> <code>{{.Ref}}</code>{{if .Active}} <span class="badge badge-ok">applied</span>{{end}}<br><span class="ref">{{.Description}}</span></td>
-            <td data-label="For">{{.Jurisdictions}}</td>
-            <td data-label="">{{if .BuiltIn}}<span class="badge">built-in</span>{{else}}<span class="badge">custom</span>{{end}}</td>
+            <td data-label="{{t "common.preset_2"}}"><strong>{{.Name}}</strong> <code>{{.Ref}}</code>{{if .Active}} <span class="badge badge-ok">{{t "privacy_presets.applied"}}</span>{{end}}<br><span class="ref">{{.Description}}</span></td>
+            <td data-label="{{t "privacy_presets.for"}}">{{.Jurisdictions}}</td>
+            <td data-label="">{{if .BuiltIn}}<span class="badge">{{t "privacy_presets.built"}}</span>{{else}}<span class="badge">{{t "privacy_presets.custom"}}</span>{{end}}</td>
             <td data-label=""><div class="row-actions">
-              <a class="btn btn-small" href="{{.PreviewHref}}">Preview</a>
-              <a class="btn btn-small" href="{{.ExportHref}}">Export</a>
-              {{if and (not .BuiltIn) (not .Active)}}<form action="{{$.DeletePath}}" method="POST" data-confirm="Delete the preset {{.Ref}}?"><input type="hidden" name="preset" value="{{.Ref}}"><button type="submit" class="btn btn-small btn-danger">Delete</button></form>{{end}}
+              <a class="btn btn-small" href="{{.PreviewHref}}">{{t "privacy_presets.preview_2"}}</a>
+              <a class="btn btn-small" href="{{.ExportHref}}">{{t "privacy_presets.export"}}</a>
+              {{if and (not .BuiltIn) (not .Active)}}<form action="{{$.DeletePath}}" method="POST" data-confirm="{{t "privacy_presets.delete_preset" .Ref}}"><input type="hidden" name="preset" value="{{.Ref}}"><button type="submit" class="btn btn-small btn-danger">{{t "common.delete"}}</button></form>{{end}}
             </div></td>
           </tr>{{end}}
         </tbody>
@@ -832,17 +850,17 @@
 
     <section class="grid-2">
       <form class="card" action="{{.SavePath}}" method="POST">
-        <div class="card-head"><h2>Save current settings as preset</h2></div>
-        <div class="form-group"><label for="name">Name</label><input type="text" id="name" name="name" maxlength="120" required placeholder="Acme privacy policy"></div>
-        <div class="form-group"><label for="description">Description</label><input type="text" id="description" name="description" maxlength="1000"></div>
-        <p class="hint">Saving under a name already used stores its next version: a version never changes. The checklist is copied from the preset applied; add your own items and references in an export, then import it.</p>
-        <button type="submit" class="btn btn-primary">Save as preset</button>
+        <div class="card-head"><h2>{{t "privacy_presets.save_current_settings_preset"}}</h2></div>
+        <div class="form-group"><label for="name">{{t "common.name"}}</label><input type="text" id="name" name="name" maxlength="120" required placeholder="{{t "privacy_presets.acme_privacy_policy"}}"></div>
+        <div class="form-group"><label for="description">{{t "privacy_presets.description"}}</label><input type="text" id="description" name="description" maxlength="1000"></div>
+        <p class="hint">{{t "privacy_presets.saving_under_name_already_used"}}</p>
+        <button type="submit" class="btn btn-primary">{{t "privacy_presets.save_preset"}}</button>
       </form>
       <form class="card" action="{{.ImportPath}}" method="POST">
-        <div class="card-head"><h2>Import a preset</h2></div>
-        <div class="form-group"><label for="json">Preset JSON</label><textarea class="import" id="json" name="json" required spellcheck="false" placeholder="{&quot;format&quot;: 1, &quot;id&quot;: …}"></textarea></div>
-        <p class="hint">Checked against the format, the ranges and the known drafts, then stored — not applied. A preset with a setting missing, out of range or unknown is refused.</p>
-        <button type="submit" class="btn">Import</button>
+        <div class="card-head"><h2>{{t "privacy_presets.import_preset"}}</h2></div>
+        <div class="form-group"><label for="json">{{t "privacy_presets.preset_json"}}</label><textarea class="import" id="json" name="json" required spellcheck="false" placeholder="{{t "privacy_presets.format_1_id"}}"></textarea></div>
+        <p class="hint">{{t "privacy_presets.checked_against_format_ranges_known"}}</p>
+        <button type="submit" class="btn">{{t "privacy_presets.import"}}</button>
       </form>
     </section>
   </main>

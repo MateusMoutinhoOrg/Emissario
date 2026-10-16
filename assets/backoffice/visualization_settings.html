@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visualization Settings</title>
+  <title>{{t "visualization_settings.visualization_settings"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -626,6 +626,20 @@
     .law-notice code, .facts code { background: rgba(255, 255, 255, 0.08); padding: 0.05rem 0.3rem; border-radius: 5px; font-size: 0.85em; }
     .ack { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem; font-weight: 600; font-size: 0.9rem; color: var(--text); }
     .ack input { width: auto; }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -634,111 +648,115 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization" class="active">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization" class="active">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Settings</h1>
-        <p class="muted">What is recorded and for how long. The ip of a view is personal data: keep it no longer than you need it.</p>
+        <h1>{{t "common.settings"}}</h1>
+        <p class="muted">{{t "visualization_settings.what_recorded_how_long_ip"}}</p>
       </div>
     </section>
 
-    <nav class="tabs" aria-label="Visualization">
-      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
+    <nav class="tabs" aria-label="{{t "common.visualization"}}">
+      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{tr .Label}}</a>
       {{end}}
     </nav>
 
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     <section class="settings">
       <form class="card" action="{{.Action}}" method="POST">
-        <div class="card-head"><h2>Tracking</h2></div>
+        <div class="card-head"><h2>{{t "visualization_settings.tracking"}}</h2></div>
         <div class="form-group">
-          <label class="switch"><input type="checkbox" name="enabled" value="1"{{if .Enabled}} checked{{end}}> Record the page views of the public website</label>
-          <span class="hint">Off, the website is served as ever and nothing is recorded.</span>
+          <label class="switch"><input type="checkbox" name="enabled" value="1"{{if .Enabled}} checked{{end}}> {{t "visualization_settings.record_page_views_public_website"}}</label>
+          <span class="hint">{{t "visualization_settings.off_website_served_ever_nothing"}}</span>
         </div>
         <div class="form-group">
-          <label for="retention-days">Retention (days)</label>
-          <input type="text" inputmode="numeric" id="retention-days" name="retention-days" value="{{.Retention}}" placeholder="Blank keeps the views forever">
-          <span class="hint">90 by default. Every hour the views older than this are removed. Past 760 days (the CNIL's 25 months), or blank to keep them forever, asks for a notice.</span>
+          <label for="retention-days">{{t "visualization_settings.retention_days"}}</label>
+          <input type="text" inputmode="numeric" id="retention-days" name="retention-days" value="{{.Retention}}" placeholder="{{t "visualization_settings.blank_keeps_views_forever"}}">
+          <span class="hint">{{t "visualization_settings.90_default_every_hour_views"}}</span>
         </div>
         <div class="form-group">
-          <label for="ignored-ips">Ignored ips</label>
+          <label for="ignored-ips">{{t "visualization_settings.ignored_ips"}}</label>
           <textarea id="ignored-ips" name="ignored-ips" placeholder="203.0.113.7&#10;198.51.100.0/24" spellcheck="false">{{.IgnoredIps}}</textarea>
-          <span class="hint">One ip or CIDR range per line, 100 at most: your own office, a monitor. Their views are never recorded.</span>
+          <span class="hint">{{t "visualization_settings.one_ip_cidr_range_per"}}</span>
           <div class="ip-row">
-            <span class="muted">Your ip: <code>{{.YourIp}}</code></span>
-            {{if .YourIp}}<button type="button" class="btn btn-small" id="visualization-add-my-ip" data-ip="{{.YourIp}}">Add my ip</button>{{end}}
+            <span class="muted">{{th "visualization_settings.your_ip" .YourIp}}</span>
+            {{if .YourIp}}<button type="button" class="btn btn-small" id="visualization-add-my-ip" data-ip="{{.YourIp}}">{{t "visualization_settings.add_my_ip"}}</button>{{end}}
           </div>
         </div>
         {{if .Notices}}<div class="law-panel" role="alert">
-          <p class="law-lead">Read before you confirm. These notices are product information, not legal advice: you are the controller of this data.</p>
-          {{range .Notices}}<article class="law-notice"><h3>{{.Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> I have read this notice</label></article>{{end}}
+          <p class="law-lead">{{t "common.read_before_you_confirm_these"}}</p>
+          {{range .Notices}}<article class="law-notice"><h3>{{tr .Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> {{t "common.i_have_read_this_notice"}}</label></article>{{end}}
         </div>{{end}}
-        <button type="submit" class="btn btn-primary">{{if .Notices}}Confirm and save{{else}}Save settings{{end}}</button>
+        <button type="submit" class="btn btn-primary">{{if .Notices}}{{t "common.confirm_save"}}{{else}}{{t "common.save_settings"}}{{end}}</button>
       </form>
 
       <article class="card">
-        <div class="card-head"><h2>State</h2></div>
+        <div class="card-head"><h2>{{t "common.state"}}</h2></div>
         <dl class="facts">
-          <dt>Country database</dt>
+          <dt>{{t "visualization_settings.country_database"}}</dt>
           <dd>{{.GeoipSource}}{{if .GeoipKind}} <span class="muted">({{.GeoipKind}})</span>{{end}}</dd>
-          <dt>Built</dt>
+          <dt>{{t "visualization_settings.built"}}</dt>
           <dd>{{.GeoipBuilt}}</dd>
-          <dt>Views stored</dt>
+          <dt>{{t "visualization_settings.views_stored"}}</dt>
           <dd>{{.Stored}}</dd>
-          <dt>Oldest view</dt>
+          <dt>{{t "visualization_settings.oldest_view"}}</dt>
           <dd>{{.Oldest}}</dd>
-          <dt>Dropped</dt>
-          <dd>{{.Dropped}} <span class="muted">since the server started (the queue was full)</span></dd>
-          <dt>Writer</dt>
-          <dd>{{if .Running}}Running{{else}}<span class="muted">Not running in this process: it runs in the one start-server started</span>{{end}}</dd>
-          <dt>Time zone</dt>
+          <dt>{{t "common.dropped"}}</dt>
+          <dd>{{.Dropped}} <span class="muted">{{t "visualization_settings.since_server_started_queue_was"}}</span></dd>
+          <dt>{{t "common.writer"}}</dt>
+          <dd>{{if .Running}}{{t "common.running"}}{{else}}<span class="muted">{{t "common.not_running_this_process_runs"}}</span>{{end}}</dd>
+          <dt>{{t "common.time_zone"}}</dt>
           <dd>{{.Zone}}</dd>
         </dl>
-        <p class="hint">A newer or another country database is passed with <code>start-server --visualization-geoip file.mmdb</code>.</p>
-        {{if .GeoipEmbedded}}<p class="credit"><a href="{{.CreditUrl}}" rel="noopener">IP Geolocation by DB-IP</a></p>{{end}}
+        <p class="hint">{{th "visualization_settings.newer_another_country_database_passed"}}</p>
+        {{if .GeoipEmbedded}}<p class="credit"><a href="{{.CreditUrl}}" rel="noopener">{{t "common.ip_geolocation_db_ip"}}</a></p>{{end}}
       </article>
     </section>
 
     <section class="card danger">
-      <div class="card-head"><h2>Danger zone</h2></div>
-      <p class="muted">Deleted views cannot be brought back, short of restoring a backup.</p>
+      <div class="card-head"><h2>{{t "common.danger_zone"}}</h2></div>
+      <p class="muted">{{t "visualization_settings.deleted_views_cannot_brought_back"}}</p>
       <div class="danger-row">
-        <form action="{{.PurgeAction}}" method="POST" class="danger-row" data-confirm="Delete every view before this date? This cannot be undone.">
+        <form action="{{.PurgeAction}}" method="POST" class="danger-row" data-confirm="{{t "visualization_settings.delete_every_view_before_this"}}">
           <div class="field">
-            <label for="before">Delete every view before</label>
+            <label for="before">{{t "visualization_settings.delete_every_view_before"}}</label>
             <input type="date" id="before" name="before" value="{{.Today}}" required>
           </div>
-          <button type="submit" class="btn btn-danger">Delete views</button>
+          <button type="submit" class="btn btn-danger">{{t "visualization_settings.delete_views"}}</button>
         </form>
-        <form action="{{.PurgeAction}}" method="POST" data-confirm="Delete every view ever recorded? This cannot be undone.">
+        <form action="{{.PurgeAction}}" method="POST" data-confirm="{{t "visualization_settings.delete_every_view_ever_recorded"}}">
           <input type="hidden" name="all" value="1">
-          <button type="submit" class="btn btn-danger">Delete every view</button>
+          <button type="submit" class="btn btn-danger">{{t "visualization_settings.delete_every_view"}}</button>
         </form>
       </div>
     </section>

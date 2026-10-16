@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent Settings</title>
+  <title>{{t "agent_settings.agent_settings"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -687,6 +687,20 @@
     .privacy-hint a { text-decoration: underline; }
     .transfer { margin: -0.5rem 0 1.25rem; }
     .transfer strong { color: #FCD34D; }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -695,133 +709,137 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent" class="active">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent" class="active">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Settings</h1>
-        <p class="muted">The provider the agent talks to, the limits it holds to, and the summaries visitors may ask for. Every conversation is sent to this provider: say so to your visitors.</p>
+        <h1>{{t "common.settings"}}</h1>
+        <p class="muted">{{t "agent_settings.provider_agent_talks_limits_holds"}}</p>
       </div>
     </section>
 
-    <nav class="tabs" aria-label="Agent">
-      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
+    <nav class="tabs" aria-label="{{t "common.agent"}}">
+      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{tr .Label}}</a>
       {{end}}
     </nav>
 
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     <section class="settings">
       <form class="card" action="{{.Action}}" method="POST">
-        <div class="card-head"><h2>Provider</h2></div>
+        <div class="card-head"><h2>{{t "agent_settings.provider"}}</h2></div>
         <div class="form-group">
-          <label class="switch"><input type="checkbox" name="enabled" value="1"{{if .Form.Enabled}} checked{{end}}> The chat answers</label>
-          <span class="hint">Off — the default — /api/agent/* answers 503 disabled. Turning it on asks for a notice on the provider and on telling visitors they talk to an AI.</span>
+          <label class="switch"><input type="checkbox" name="enabled" value="1"{{if .Form.Enabled}} checked{{end}}> {{t "agent_settings.chat_answers"}}</label>
+          <span class="hint">{{t "agent_settings.off_default_api_agent_answers"}}</span>
         </div>
         <div class="form-group">
-          <label for="base-url">Base URL</label>
+          <label for="base-url">{{t "agent_settings.base_url"}}</label>
           <input type="text" id="base-url" name="base-url" value="{{.Form.BaseUrl}}" maxlength="2048" autocomplete="off" spellcheck="false" placeholder="https://api.openai.com/v1">
-          <span class="hint">An OpenAI-compatible Chat Completions api: OpenAI, OpenRouter (https://openrouter.ai/api/v1), Groq (https://api.groq.com/openai/v1), Ollama (http://localhost:11434/v1)… <code>/chat/completions</code> is added to it.</span>
+          <span class="hint">{{th "agent_settings.openai_compatible_chat_completions_api"}}</span>
         </div>
         <div class="form-group">
-          <label for="api-key">API key</label>
-          <input type="password" id="api-key" name="api-key" value="" maxlength="4096" autocomplete="new-password" spellcheck="false" placeholder="{{if .KeySaved}}Saved — leave blank to keep it{{else}}sk-…{{end}}">
-          <span class="hint">Write-only: it is never shown, nor written to a log. {{if .KeyFromEnv}}<strong>{{.KeyEnv}}</strong> is set: it wins over this one.{{else}}<code>{{.KeyEnv}}</code>, when set, wins over it.{{end}} It is kept in the database, so in every backup.</span>
-          {{if .KeySaved}}<label class="switch" style="margin-top: 0.6rem;"><input type="checkbox" name="clear-api-key" value="1"> Remove the key saved</label>{{end}}
+          <label for="api-key">{{t "agent_settings.api_key"}}</label>
+          <input type="password" id="api-key" name="api-key" value="" maxlength="4096" autocomplete="new-password" spellcheck="false" placeholder="{{if .KeySaved}}{{t "agent_settings.saved_leave_blank_keep"}}{{else}}sk-…{{end}}">
+          <span class="hint">{{t "agent_settings.write_only_never_shown_nor"}} {{if .KeyFromEnv}}{{th "agent_settings.set_wins_over_this_one" .KeyEnv}}{{else}}{{th "agent_settings.when_set_wins_over" .KeyEnv}}{{end}} {{t "agent_settings.kept_database_so_every_backup"}}</span>
+          {{if .KeySaved}}<label class="switch" style="margin-top: 0.6rem;"><input type="checkbox" name="clear-api-key" value="1"> {{t "agent_settings.remove_key_saved"}}</label>{{end}}
         </div>
         <div class="form-group">
-          <label for="model">Model</label>
+          <label for="model">{{t "common.model"}}</label>
           <input type="text" id="model" name="model" value="{{.Form.Model}}" maxlength="200" autocomplete="off" spellcheck="false" placeholder="gpt-4o-mini">
-          <span class="hint">A model that supports tool calling.</span>
+          <span class="hint">{{t "agent_settings.model_that_supports_tool_calling"}}</span>
         </div>
-        {{if .ProviderHost}}<p class="hint transfer">Every message is sent to <code>{{.ProviderHost}}</code>.{{if not .ProviderLocal}} <strong>This is a transfer to a third party:</strong> choose terms under which the provider does not use the conversations to train its models or for its own purposes.{{end}}</p>{{end}}
-        <div class="card-head"><h2>Limits</h2></div>
+        {{if .ProviderHost}}<p class="hint transfer">{{th "agent_settings.every_message_sent" .ProviderHost}}{{if not .ProviderLocal}} {{th "agent_settings.this_transfer_third_party_choose"}}{{end}}</p>{{end}}
+        <div class="card-head"><h2>{{t "agent_settings.limits"}}</h2></div>
         <div class="form-group">
-          <label for="max-tokens">Max tokens</label>
+          <label for="max-tokens">{{t "agent_settings.max_tokens"}}</label>
           <input type="text" inputmode="numeric" id="max-tokens" name="max-tokens" value="{{.Form.MaxTokens}}" placeholder="1024">
-          <span class="hint">Output tokens of one provider call. Blank is 1024.</span>
+          <span class="hint">{{t "agent_settings.output_tokens_one_provider_call"}}</span>
         </div>
         <div class="form-group">
-          <label for="daily-limit">Daily limit</label>
-          <input type="text" inputmode="numeric" id="daily-limit" name="daily-limit" value="{{.Form.DailyLimit}}" placeholder="No limit">
-          <span class="hint">Tokens a day, input and output, of every visitor together. Blank is no limit.</span>
+          <label for="daily-limit">{{t "agent_settings.daily_limit"}}</label>
+          <input type="text" inputmode="numeric" id="daily-limit" name="daily-limit" value="{{.Form.DailyLimit}}" placeholder="{{t "common.no_limit"}}">
+          <span class="hint">{{t "agent_settings.tokens_day_input_output_every"}}</span>
         </div>
         <div class="form-group">
-          <label for="ip-daily-limit">Daily limit per ip</label>
-          <input type="text" inputmode="numeric" id="ip-daily-limit" name="ip-daily-limit" value="{{.Form.IpDailyLimit}}" placeholder="No limit">
-          <span class="hint">Tokens a day of one ip; an IPv6 one counts by its /64. Blank is no limit.</span>
+          <label for="ip-daily-limit">{{t "agent_settings.daily_limit_per_ip"}}</label>
+          <input type="text" inputmode="numeric" id="ip-daily-limit" name="ip-daily-limit" value="{{.Form.IpDailyLimit}}" placeholder="{{t "common.no_limit"}}">
+          <span class="hint">{{t "agent_settings.tokens_day_one_ip_ipv6"}}</span>
         </div>
         <div class="form-group">
-          <label for="rate-per-minute">Requests per minute per ip</label>
+          <label for="rate-per-minute">{{t "agent_settings.requests_per_minute_per_ip"}}</label>
           <input type="text" inputmode="numeric" id="rate-per-minute" name="rate-per-minute" value="{{.Form.RatePerMinute}}" placeholder="10">
-          <span class="hint">Blank is 10. Behind a reverse proxy, run with <code>--allow-x-forwarded-for</code>, or every visitor shares one ip.</span>
+          <span class="hint">{{th "agent_settings.blank_10_behind_reverse_proxy"}}</span>
         </div>
-        <div class="card-head"><h2>Summaries</h2></div>
+        <div class="card-head"><h2>{{t "common.summaries"}}</h2></div>
         <div class="form-group">
-          <label class="switch"><input type="checkbox" name="summaries-enabled" value="1"{{if .Form.SummariesEnabled}} checked{{end}}> Visitors may ask for a summary</label>
-          <span class="hint">Off — the default — /api/agent/summaries answers 503 summaries-disabled. Turning it on asks for a notice: a summary written by a model can still hold personal data.</span>
+          <label class="switch"><input type="checkbox" name="summaries-enabled" value="1"{{if .Form.SummariesEnabled}} checked{{end}}> {{t "agent_settings.visitors_may_ask_summary"}}</label>
+          <span class="hint">{{t "agent_settings.off_default_api_agent_summaries"}}</span>
         </div>
         <div class="form-group">
-          <label for="summary-retention-days">Keep each summary (days)</label>
-          <input type="text" inputmode="numeric" id="summary-retention-days" name="summary-retention-days" value="{{.Form.SummaryRetentionDays}}" placeholder="Until a root deletes it">
-          <span class="hint">Older summaries are deleted every hour. 90 by default; past 365 days, or blank to keep them until a root deletes them, asks for a notice (LGPD arts. 15–16; GDPR art. 5(1)(e)).</span>
+          <label for="summary-retention-days">{{t "agent_settings.keep_each_summary_days"}}</label>
+          <input type="text" inputmode="numeric" id="summary-retention-days" name="summary-retention-days" value="{{.Form.SummaryRetentionDays}}" placeholder="{{t "common.until_root_deletes"}}">
+          <span class="hint">{{t "agent_settings.older_summaries_are_deleted_every"}}</span>
         </div>
-        <p class="hint privacy-hint">Your website must tell visitors, before the chat starts, that they talk to an AI (EU AI Act art. 50(1)), and say in its privacy notice where the conversations go and what the summaries keep. <a href="{{.DraftHref}}">Start from the draft</a>.</p>
+        <p class="hint privacy-hint">{{t "agent_settings.your_website_must_tell_visitors"}} <a href="{{.DraftHref}}">{{t "common.start_from_draft"}}</a>.</p>
         {{if .Form.Notices}}<div class="law-panel" role="alert">
-          <p class="law-lead">Read before you confirm. These notices are product information, not legal advice: you are the controller of this data.</p>
-          {{if .Form.RetypeKey}}<p class="law-lead"><strong>Type the API key again before you confirm:</strong> it is never sent back to the page.</p>{{end}}
-          {{range .Form.Notices}}<article class="law-notice"><h3>{{.Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> I have read this notice</label></article>{{end}}
+          <p class="law-lead">{{t "common.read_before_you_confirm_these"}}</p>
+          {{if .Form.RetypeKey}}<p class="law-lead">{{th "agent_settings.type_api_key_again_before"}}</p>{{end}}
+          {{range .Form.Notices}}<article class="law-notice"><h3>{{tr .Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> {{t "common.i_have_read_this_notice"}}</label></article>{{end}}
         </div>{{end}}
-        <button type="submit" class="btn btn-primary">{{if .Form.Notices}}Confirm and save{{else}}Save settings{{end}}</button>
+        <button type="submit" class="btn btn-primary">{{if .Form.Notices}}{{t "common.confirm_save"}}{{else}}{{t "common.save_settings"}}{{end}}</button>
       </form>
 
       <article class="card">
-        <div class="card-head"><h2>State</h2></div>
+        <div class="card-head"><h2>{{t "common.state"}}</h2></div>
         <dl class="facts">
-          <dt>Chat</dt>
-          <dd>{{if .Answering}}<span class="badge badge-ok">answering</span>{{else}}<span class="badge badge-failed">503</span> {{.Problem}}{{end}}</dd>
-          <dt>Endpoint</dt>
-          <dd>{{if .Endpoint}}<code>{{.Endpoint}}</code>{{else}}<span class="muted">not set</span>{{end}}</dd>
-          <dt>API key</dt>
-          <dd>{{if .KeyHint}}<code>{{.KeyHint}}</code>{{if .KeyFromEnv}} <span class="muted">from {{.KeyEnv}}</span>{{end}}{{else}}<span class="muted">none</span>{{end}}</dd>
-          <dt>README.md</dt>
-          <dd>{{if .Readme}}<span class="badge badge-ok">found</span>{{else}}<span class="badge badge-failed">missing</span>{{end}}</dd>
-          <dt>SUMMARY.md</dt>
-          <dd>{{if .Summary}}<span class="badge badge-ok">found</span>{{else}}<span class="badge">none</span>{{end}}</dd>
-          <dt>Writer</dt>
-          <dd>{{if .Running}}Running{{else}}<span class="muted">Not running in this process: it runs in the one start-server started</span>{{end}}</dd>
-          <dt>Dropped</dt>
-          <dd>{{.Dropped}} <span class="muted">writes since the server started</span></dd>
-          <dt>Days</dt>
-          <dd>counted in {{.Zone}}</dd>
-          <dt>Usage kept</dt>
-          <dd>{{.Retention}} days</dd>
+          <dt>{{t "common.chat"}}</dt>
+          <dd>{{if .Answering}}<span class="badge badge-ok">{{t "common.answering"}}</span>{{else}}<span class="badge badge-failed">503</span> {{tr .Problem}}{{end}}</dd>
+          <dt>{{t "common.endpoint"}}</dt>
+          <dd>{{if .Endpoint}}<code>{{.Endpoint}}</code>{{else}}<span class="muted">{{t "common.not_set"}}</span>{{end}}</dd>
+          <dt>{{t "agent_settings.api_key"}}</dt>
+          <dd>{{if .KeyHint}}<code>{{tr .KeyHint}}</code>{{if .KeyFromEnv}} <span class="muted">{{t "agent_settings.from" .KeyEnv}}</span>{{end}}{{else}}<span class="muted">{{t "common.none"}}</span>{{end}}</dd>
+          <dt>{{t "common.readme_md"}}</dt>
+          <dd>{{if .Readme}}<span class="badge badge-ok">{{t "common.found"}}</span>{{else}}<span class="badge badge-failed">{{t "common.missing"}}</span>{{end}}</dd>
+          <dt>{{t "common.summary_md"}}</dt>
+          <dd>{{if .Summary}}<span class="badge badge-ok">{{t "common.found"}}</span>{{else}}<span class="badge">{{t "common.none"}}</span>{{end}}</dd>
+          <dt>{{t "common.writer"}}</dt>
+          <dd>{{if .Running}}{{t "common.running"}}{{else}}<span class="muted">{{t "common.not_running_this_process_runs"}}</span>{{end}}</dd>
+          <dt>{{t "common.dropped"}}</dt>
+          <dd>{{.Dropped}} <span class="muted">{{t "common.writes_since_server_started"}}</span></dd>
+          <dt>{{t "agent_settings.days"}}</dt>
+          <dd>{{t "agent_settings.counted" .Zone}}</dd>
+          <dt>{{t "agent_settings.usage_kept"}}</dt>
+          <dd>{{t "agent_settings.days_2" .Retention}}</dd>
         </dl>
-        <p class="hint">Sent to the provider at every message: the conversation, the instructions and what every tool answered. Never stored: the conversation, and the ip with a summary. A summary is stored only while summaries are on, encrypted, until its retention ends.</p>
+        <p class="hint">{{t "agent_settings.sent_provider_every_message_conversation"}}</p>
       </article>
     </section>
   </main>

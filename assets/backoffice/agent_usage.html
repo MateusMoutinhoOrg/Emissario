@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent Usage</title>
+  <title>{{t "agent_usage.agent_usage"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -667,6 +667,20 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -675,100 +689,104 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent" class="active">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent" class="active">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Usage</h1>
-        <p class="muted">Tokens the provider counted, input and output, of every message and every summary.{{if not .Viewer.IsRoot}} Ips are masked: a root reads them whole.{{end}}</p>
+        <h1>{{t "agent_usage.usage"}}</h1>
+        <p class="muted">{{t "agent_usage.tokens_provider_counted_input_output"}}{{if not .Viewer.IsRoot}} {{t "common.ips_are_masked_root_reads"}}{{end}}</p>
       </div>
     </section>
 
-    <nav class="tabs" aria-label="Agent">
-      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
+    <nav class="tabs" aria-label="{{t "common.agent"}}">
+      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{tr .Label}}</a>
       {{end}}
     </nav>
 
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     <form class="card filters" action="{{.Bar.Action}}" method="GET">
       <div class="field">
-        <label for="from">From</label>
+        <label for="from">{{t "common.from"}}</label>
         <input type="date" id="from" name="from" value="{{.Bar.From}}">
       </div>
       <div class="field">
-        <label for="to">To</label>
+        <label for="to">{{t "common.to"}}</label>
         <input type="date" id="to" name="to" value="{{.Bar.To}}">
       </div>
       {{if .Bar.ShowSearch}}
       <div class="field grow">
-        <label for="q">Search</label>
-        <input type="text" id="q" name="q" value="{{.Bar.Search}}" placeholder="A word of the summary, or its id">
+        <label for="q">{{t "common.search"}}</label>
+        <input type="text" id="q" name="q" value="{{.Bar.Search}}" placeholder="{{t "common.word_summary_id"}}">
       </div>
       {{end}}
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Apply</button>
-        <a class="btn" href="{{.Bar.Action}}">Clear</a>
+        <button type="submit" class="btn btn-primary">{{t "common.apply"}}</button>
+        <a class="btn" href="{{.Bar.Action}}">{{t "common.clear"}}</a>
       </div>
     </form>
 
     <div class="period">
       <div class="quick">
-        {{range .Bar.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{.Label}}</a>
+        {{range .Bar.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{tr .Label}}</a>
         {{end}}
       </div>
-      <span class="muted">days counted in {{.Bar.Zone}}</span>
+      <span class="muted">{{t "common.days_counted" .Bar.Zone}}</span>
     </div>
 
     {{if not .Error}}
     <section class="stats">
       <article class="card stat">
-        <span class="stat-label">Tokens today</span>
+        <span class="stat-label">{{t "common.tokens_today"}}</span>
         <span class="stat-value">{{.TodayTokens}}</span>
-        <span class="stat-note">{{if .HasLimit}}{{.Percent}}% of {{.DailyLimit}}{{else}}No daily limit{{end}}</span>
+        <span class="stat-note">{{if .HasLimit}}{{t "common.of" .Percent .DailyLimit}}{{else}}{{t "common.no_daily_limit"}}{{end}}</span>
         {{if .HasLimit}}<div class="bar meter"><span class="fill" style="width: {{.Percent}}%"></span></div>{{end}}
       </article>
       <article class="card stat">
-        <span class="stat-label">Limit per ip</span>
+        <span class="stat-label">{{t "agent_usage.limit_per_ip"}}</span>
         <span class="stat-value">{{.IpDailyLimit}}</span>
-        <span class="stat-note">tokens a day</span>
+        <span class="stat-note">{{t "agent_usage.tokens_day"}}</span>
       </article>
       <article class="card stat">
-        <span class="stat-label">In this period</span>
+        <span class="stat-label">{{t "agent_usage.this_period"}}</span>
         <span class="stat-value">{{.PeriodTotal}}</span>
-        <span class="stat-note">tokens</span>
+        <span class="stat-note">{{t "agent_usage.tokens"}}</span>
       </article>
     </section>
 
     {{if .AtLimit}}
     <section class="card top">
-      <div class="card-head"><h2>Ips at their limit today</h2></div>
+      <div class="card-head"><h2>{{t "agent_usage.ips_their_limit_today"}}</h2></div>
       <table>
         <tbody>
-          {{range .AtLimit}}<tr><td data-label="Ip"><code>{{.Ip}}</code></td><td class="num" data-label="Tokens">{{.Total}}</td></tr>
+          {{range .AtLimit}}<tr><td data-label="{{t "common.ip"}}"><code>{{.Ip}}</code></td><td class="num" data-label="{{t "common.tokens"}}">{{.Total}}</td></tr>
           {{end}}
         </tbody>
       </table>
@@ -777,18 +795,18 @@
 
     <section class="tops">
       <article class="card top">
-        <div class="card-head"><h2>By day</h2></div>
+        <div class="card-head"><h2>{{t "agent_usage.day"}}</h2></div>
         <table>
-          <thead><tr><th>Day</th><th>Messages</th><th>Summaries</th><th>Input</th><th>Output</th><th class="share">Total</th></tr></thead>
+          <thead><tr><th>{{t "agent_usage.day_2"}}</th><th>{{t "common.messages"}}</th><th>{{t "common.summaries"}}</th><th>{{t "agent_usage.input"}}</th><th>{{t "agent_usage.output"}}</th><th class="share">{{t "agent_usage.total"}}</th></tr></thead>
           <tbody>
             {{range .Days}}
             <tr>
-              <td class="nowrap" data-label="Day">{{.Day}}</td>
-              <td class="num" data-label="Messages">{{.Messages}}</td>
-              <td class="num" data-label="Summaries">{{.Summaries}}</td>
-              <td class="num" data-label="Input">{{.Input}}</td>
-              <td class="num" data-label="Output">{{.Output}}</td>
-              <td class="share" data-label="Total"><div class="share-inner"><div class="bar"><span class="fill" style="width: {{.Share}}%"></span></div><span class="pct">{{.Total}}</span></div></td>
+              <td class="nowrap" data-label="{{t "agent_usage.day_2"}}">{{.Day}}</td>
+              <td class="num" data-label="{{t "common.messages"}}">{{.Messages}}</td>
+              <td class="num" data-label="{{t "common.summaries"}}">{{.Summaries}}</td>
+              <td class="num" data-label="{{t "agent_usage.input"}}">{{.Input}}</td>
+              <td class="num" data-label="{{t "agent_usage.output"}}">{{.Output}}</td>
+              <td class="share" data-label="{{t "agent_usage.total"}}"><div class="share-inner"><div class="bar"><span class="fill" style="width: {{.Share}}%"></span></div><span class="pct">{{.Total}}</span></div></td>
             </tr>
             {{end}}
           </tbody>
@@ -796,25 +814,25 @@
       </article>
 
       <article class="card top">
-        <div class="card-head"><h2>By ip</h2></div>
+        <div class="card-head"><h2>{{t "agent_usage.ip"}}</h2></div>
         {{if .Ips}}
         <table>
-          <thead><tr><th>Ip</th><th>Calls</th><th>Input</th><th>Output</th><th>Total</th></tr></thead>
+          <thead><tr><th>{{t "common.ip"}}</th><th>{{t "agent_usage.calls"}}</th><th>{{t "agent_usage.input"}}</th><th>{{t "agent_usage.output"}}</th><th>{{t "agent_usage.total"}}</th></tr></thead>
           <tbody>
             {{range .Ips}}
             <tr>
-              <td class="nowrap" data-label="Ip"><code>{{.Ip}}</code>{{if .AtLimit}} <span class="badge badge-failed">at limit</span>{{end}}</td>
-              <td class="num" data-label="Calls">{{.Calls}}</td>
-              <td class="num" data-label="Input">{{.Input}}</td>
-              <td class="num" data-label="Output">{{.Output}}</td>
-              <td class="num" data-label="Total">{{.Total}}</td>
+              <td class="nowrap" data-label="{{t "common.ip"}}"><code>{{.Ip}}</code>{{if .AtLimit}} <span class="badge badge-failed">{{t "agent_usage.limit"}}</span>{{end}}</td>
+              <td class="num" data-label="{{t "agent_usage.calls"}}">{{.Calls}}</td>
+              <td class="num" data-label="{{t "agent_usage.input"}}">{{.Input}}</td>
+              <td class="num" data-label="{{t "agent_usage.output"}}">{{.Output}}</td>
+              <td class="num" data-label="{{t "agent_usage.total"}}">{{.Total}}</td>
             </tr>
             {{end}}
           </tbody>
         </table>
-        <p class="hint" style="padding: 0 1.5rem 1rem;">An IPv6 ip counts by its /64. Summaries hold no ip and are not listed here. Usage is kept 90 days.</p>
+        <p class="hint" style="padding: 0 1.5rem 1rem;">{{t "agent_usage.ipv6_ip_counts_64_summaries"}}</p>
         {{else}}
-        <p class="empty">No message in this period.</p>
+        <p class="empty">{{t "agent_usage.no_message_this_period"}}</p>
         {{end}}
       </article>
     </section>

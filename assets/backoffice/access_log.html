@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Access log</title>
+  <title>{{t "common.access_log"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -722,6 +722,20 @@
     .hold-fields { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: end; margin-top: 0.5rem; }
     .hold-fields label { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--text-muted); gap: 0.25rem; }
     select { background: rgba(17, 24, 39, 0.6); color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 0.55rem 0.7rem; }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -730,107 +744,111 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log" class="active">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log" class="active">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Access log</h1>
-        <p class="muted">Every page view and call to the public APIs, with the full IP, the source port and the time — the access log of the Marco Civil (art. 15). <strong>Disclose it only on a court order</strong> (Marco Civil art. 10 §1). Every list and export you make here is inventoried (Decreto 8.771/2016 art. 13 III).</p>
+        <h1>{{t "common.access_log"}}</h1>
+        <p class="muted">{{th "access_log.every_page_view_call_public"}}</p>
       </div>
     </section>
 
-    {{if not .AccessLog}}<div class="notice notice-error" role="status">The access log is off: nothing new is written. The rows kept stay until their retention ends. Turn it on at <a href="/admin/root/set-privacy-settings">Privacy</a>.</div>{{end}}
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if not .AccessLog}}<div class="notice notice-error" role="status">{{th "access_log.access_log_off_nothing_new"}}</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     {{if .Notices}}
     <form class="card" action="{{.DeleteAction}}" method="POST">
-      <div class="card-head"><h2>Delete {{len .Confirm}} rows kept by law?</h2></div>
+      <div class="card-head"><h2>{{t "access_log.delete_rows_kept_law" (len .Confirm)}}</h2></div>
       <input type="hidden" name="ip" value="{{.Ip}}"><input type="hidden" name="from" value="{{.From}}"><input type="hidden" name="to" value="{{.To}}"><input type="hidden" name="kind" value="{{.Kind}}">
       {{range .Confirm}}<input type="hidden" name="ids" value="{{.}}">{{end}}
       {{if .Notices}}<div class="law-panel" role="alert">
-        <p class="law-lead">Read before you confirm. These notices are product information, not legal advice: you are the controller of this data.</p>
-        {{range .Notices}}<article class="law-notice"><h3>{{.Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> I have read this notice</label></article>{{end}}
+        <p class="law-lead">{{t "common.read_before_you_confirm_these"}}</p>
+        {{range .Notices}}<article class="law-notice"><h3>{{tr .Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> {{t "common.i_have_read_this_notice"}}</label></article>{{end}}
       </div>{{end}}
-      <button type="submit" class="btn btn-danger">Confirm and delete</button>
-      <a class="btn" href="{{.Action}}">Cancel</a>
+      <button type="submit" class="btn btn-danger">{{t "common.confirm_delete"}}</button>
+      <a class="btn" href="{{.Action}}">{{t "common.cancel"}}</a>
     </form>
     {{end}}
 
     <form class="card filters" action="{{.Action}}" method="GET">
       <div class="field">
-        <label for="from">From</label>
+        <label for="from">{{t "common.from"}}</label>
         <input type="date" id="from" name="from" value="{{.From}}">
       </div>
       <div class="field">
-        <label for="to">To</label>
+        <label for="to">{{t "common.to"}}</label>
         <input type="date" id="to" name="to" value="{{.To}}">
       </div>
       <div class="field grow">
-        <label for="ip">Ip</label>
-        <input type="text" id="ip" name="ip" value="{{.Ip}}" maxlength="64" placeholder="203.0.113.7 or 203.0.113.0/24" autocomplete="off" spellcheck="false">
+        <label for="ip">{{t "common.ip"}}</label>
+        <input type="text" id="ip" name="ip" value="{{.Ip}}" maxlength="64" placeholder="{{t "access_log.203_0_113_7_203"}}" autocomplete="off" spellcheck="false">
       </div>
       <div class="field small">
-        <label for="kind">Kind</label>
+        <label for="kind">{{t "access_log.kind"}}</label>
         <select id="kind" name="kind">
-          <option value="">Any</option>
+          <option value="">{{t "access_log.any"}}</option>
           {{$kind := .Kind}}{{range .Kinds}}<option value="{{.}}"{{if eq . $kind}} selected{{end}}>{{.}}</option>{{end}}
         </select>
       </div>
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Apply</button>
-        <a class="btn" href="{{.Action}}">Clear</a>
+        <button type="submit" class="btn btn-primary">{{t "common.apply"}}</button>
+        <a class="btn" href="{{.Action}}">{{t "common.clear"}}</a>
       </div>
     </form>
 
     {{if .ExportJson}}
     <div class="exports">
-      <span class="muted">Export every row of this filter:</span>
-      <a class="btn btn-small" href="{{.ExportJson}}">JSON</a>
-      <a class="btn btn-small" href="{{.ExportCsv}}">CSV</a>
-      <span class="muted">Times are in UTC, and in the server's time zone ({{.Zone}}).</span>
+      <span class="muted">{{t "access_log.export_every_row_this_filter"}}</span>
+      <a class="btn btn-small" href="{{.ExportJson}}">{{t "common.json"}}</a>
+      <a class="btn btn-small" href="{{.ExportCsv}}">{{t "access_log.csv"}}</a>
+      <span class="muted">{{t "access_log.times_are_utc_servers_time" .Zone}}</span>
     </div>
     {{end}}
 
     <div class="card table-card">
       {{if .Rows}}
-      <form id="selection" action="{{.DeleteAction}}" method="POST">
+      <form id="selection" action="{{.DeleteAction}}" method="POST" data-empty="{{t "access_log.select_least_one"}}">
         <input type="hidden" name="ip" value="{{.Ip}}"><input type="hidden" name="from" value="{{.From}}"><input type="hidden" name="to" value="{{.To}}"><input type="hidden" name="kind" value="{{.Kind}}">
         <div class="bulk">
-          <span class="muted">Select rows, then</span>
-          <button type="submit" class="btn btn-small btn-danger" data-confirm="Delete the access log rows selected? Rows on a legal hold are kept. This cannot be undone.">Delete</button>
+          <span class="muted">{{t "access_log.select_rows_then"}}</span>
+          <button type="submit" class="btn btn-small btn-danger" data-confirm="{{t "access_log.delete_access_log_rows_selected"}}">{{t "common.delete"}}</button>
           <details class="hold">
-            <summary class="btn btn-small">Hold…</summary>
+            <summary class="btn btn-small">{{t "common.hold"}}</summary>
             <div class="hold-fields">
               <input type="hidden" name="table" value="access-log">
               <input type="hidden" name="back" value="{{.Action}}">
-              <label>Reason <input type="text" name="reason" maxlength="500" placeholder="Ofício nº 123/2026, a court order, a lawsuit"></label>
-              <label>Until <input type="date" name="until" value="{{.HoldUntil}}"></label>
-              <button type="submit" class="btn btn-small" formaction="{{.HoldAction}}">Hold the rows selected</button>
-              <span class="hint">Held rows are skipped by the cleanup and by Find and erase until the end date. A Marco Civil art. 15 §2 request lapses unless a court is asked within 60 days (art. 13 §3): keep the request confidential (art. 13 §4).</span>
+              <label>{{t "common.reason"}} <input type="text" name="reason" maxlength="500" placeholder="{{t "common.cio_n_123_2026_court"}}"></label>
+              <label>{{t "common.until"}} <input type="date" name="until" value="{{.HoldUntil}}"></label>
+              <button type="submit" class="btn btn-small" formaction="{{.HoldAction}}">{{t "access_log.hold_rows_selected"}}</button>
+              <span class="hint">{{t "access_log.held_rows_are_skipped_cleanup"}}</span>
             </div>
           </details>
         </div>
@@ -838,40 +856,40 @@
       <table>
         <thead>
           <tr>
-            <th class="check"><input type="checkbox" id="select-all" aria-label="Select every row shown"></th>
-            <th>Time (UTC)</th>
-            <th>Local</th>
-            <th>Ip</th>
-            <th class="right">Port</th>
-            <th>Kind</th>
-            <th>Record</th>
+            <th class="check"><input type="checkbox" id="select-all" aria-label="{{t "access_log.select_every_row_shown"}}"></th>
+            <th>{{t "access_log.time_utc"}}</th>
+            <th>{{t "access_log.local"}}</th>
+            <th>{{t "common.ip"}}</th>
+            <th class="right">{{t "access_log.port"}}</th>
+            <th>{{t "access_log.kind"}}</th>
+            <th>{{t "access_log.record"}}</th>
           </tr>
         </thead>
         <tbody>
           {{range .Rows}}
           <tr>
-            <td class="check" data-label="Select"><input type="checkbox" name="ids" value="{{.Id}}" form="selection" aria-label="Select the row {{.Id}}"></td>
-            <td class="nowrap" data-label="Time (UTC)"><code>{{.AtUtc}}</code></td>
-            <td class="nowrap" data-label="Local">{{.AtLocal}}</td>
-            <td class="nowrap" data-label="Ip"><code>{{.Ip}}</code></td>
-            <td class="num nowrap" data-label="Port">{{if .Port}}{{.Port}}{{else}}<span class="muted">—</span>{{end}}</td>
-            <td data-label="Kind">{{.Kind}}</td>
-            <td data-label="Record">{{if .RefHref}}<a href="{{.RefHref}}"><code>{{.Ref}}</code></a>{{else if .Ref}}<code>{{.Ref}}</code>{{else}}<span class="muted">—</span>{{end}}</td>
+            <td class="check" data-label="{{t "common.select"}}"><input type="checkbox" name="ids" value="{{.Id}}" form="selection" aria-label="{{t "access_log.select_row" .Id}}"></td>
+            <td class="nowrap" data-label="{{t "access_log.time_utc"}}"><code>{{.AtUtc}}</code></td>
+            <td class="nowrap" data-label="{{t "access_log.local"}}">{{.AtLocal}}</td>
+            <td class="nowrap" data-label="{{t "common.ip"}}"><code>{{.Ip}}</code></td>
+            <td class="num nowrap" data-label="{{t "access_log.port"}}">{{if .Port}}{{.Port}}{{else}}<span class="muted">—</span>{{end}}</td>
+            <td data-label="{{t "access_log.kind"}}">{{tr .Kind}}</td>
+            <td data-label="{{t "access_log.record"}}">{{if .RefHref}}<a href="{{.RefHref}}"><code>{{.Ref}}</code></a>{{else if .Ref}}<code>{{.Ref}}</code>{{else}}<span class="muted">—</span>{{end}}</td>
           </tr>
           {{end}}
         </tbody>
       </table>
       {{else}}
-      <p class="empty">No access log row in this period.</p>
+      <p class="empty">{{t "access_log.no_access_log_row_this"}}</p>
       {{end}}
     </div>
 
     <nav class="pager">
-      <span class="muted">{{if .Pager.From}}Showing {{.Pager.From}}&ndash;{{.Pager.To}} of {{.Pager.Total}}{{else}}No results{{end}}</span>
+      <span class="muted">{{if .Pager.From}}{{t "common.showing" .Pager.From .Pager.To .Pager.Total}}{{else}}{{t "common.no_results"}}{{end}}</span>
       <div class="pages">
-        {{if .Pager.HasPrev}}<a class="btn btn-small" href="{{.Pager.PrevHref}}">&larr; Prev</a>{{else}}<span class="btn btn-small disabled">&larr; Prev</span>{{end}}
-        <span class="muted">Page {{.Pager.Page}} of {{.Pager.Pages}}</span>
-        {{if .Pager.HasNext}}<a class="btn btn-small" href="{{.Pager.NextHref}}">Next &rarr;</a>{{else}}<span class="btn btn-small disabled">Next &rarr;</span>{{end}}
+        {{if .Pager.HasPrev}}<a class="btn btn-small" href="{{.Pager.PrevHref}}">{{t "common.prev"}}</a>{{else}}<span class="btn btn-small disabled">{{t "common.prev"}}</span>{{end}}
+        <span class="muted">{{t "common.page" .Pager.Page .Pager.Pages}}</span>
+        {{if .Pager.HasNext}}<a class="btn btn-small" href="{{.Pager.NextHref}}">{{t "common.next"}}</a>{{else}}<span class="btn btn-small disabled">{{t "common.next"}}</span>{{end}}
       </div>
     </nav>
   </main>

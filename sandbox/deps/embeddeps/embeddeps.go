@@ -54,4 +54,46 @@ type Contract struct {
 	// escaped for the context it lands in — text, an attribute, a url, a
 	// script — so a value nobody escaped by hand can never become markup.
 	RenderHTMLTemplate func(path string, vars interface{}) ([]byte, error)
+
+	// RenderTranslatedHTMLTemplate is RenderHTMLTemplate for a page whose
+	// text is translated: the template reaches translator through the
+	// functions Translator lists, every value still escaped for its context.
+	RenderTranslatedHTMLTemplate func(path string, vars interface{}, translator Translator) ([]byte, error)
+}
+
+// Translator is the language a translated template is rendered in, and the
+// functions it calls for its text. The adapter turns every argument a
+// template passes into its text form before calling one, and registers them
+// under these names:
+//
+//	{{lang}}                  Lang, for <html lang>
+//	{{languages}}             Languages, for a language picker
+//	{{t "key" .A .B}}         Text: the text of key, its {0}, {1}… filled, escaped like any value
+//	{{th "key" .A .B}}        Markup: the same, its markup kept — only in text, never in an attribute
+//	{{tr .Message}}           Message: the translation of a text built in English, or the text itself
+type Translator struct {
+	// Lang is the code of the language, "en" or "pt-BR".
+	Lang string
+	// Languages are every language a page can be shown in, in the order a
+	// picker lists them.
+	Languages []Language
+	// Text returns the text of key with {0}, {1}… replaced by args.
+	Text func(key string, args []string) string
+	// Markup returns the markup of key with {0}, {1}… replaced by args,
+	// each one escaped: the markup comes from the translation file, never
+	// from a value.
+	Markup func(key string, args []string) string
+	// Message returns the translation of text, a message written in
+	// English, or text itself when none is known.
+	Message func(text string) string
+}
+
+// Language is one language a translated page can be shown in.
+type Language struct {
+	// Code is its code, "en" or "pt-BR".
+	Code string
+	// Name is its name in itself, "English" or "Português (Brasil)".
+	Name string
+	// Current tells whether it is the language of the page.
+	Current bool
 }

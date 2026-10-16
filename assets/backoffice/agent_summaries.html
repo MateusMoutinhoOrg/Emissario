@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Agent Summaries</title>
+  <title>{{t "agent_summaries.agent_summaries"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -667,6 +667,20 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -675,73 +689,77 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent" class="active">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent" class="active">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Summaries</h1>
-        <p class="muted">What visitors handed over of their conversations, anonymous: no summary holds an ip, and the conversation itself is never stored.</p>
+        <h1>{{t "common.summaries"}}</h1>
+        <p class="muted">{{t "agent_summaries.what_visitors_handed_over_their"}}</p>
       </div>
     </section>
 
-    <nav class="tabs" aria-label="Agent">
-      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
+    <nav class="tabs" aria-label="{{t "common.agent"}}">
+      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{tr .Label}}</a>
       {{end}}
     </nav>
 
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     <form class="card filters" action="{{.Bar.Action}}" method="GET">
       <div class="field">
-        <label for="from">From</label>
+        <label for="from">{{t "common.from"}}</label>
         <input type="date" id="from" name="from" value="{{.Bar.From}}">
       </div>
       <div class="field">
-        <label for="to">To</label>
+        <label for="to">{{t "common.to"}}</label>
         <input type="date" id="to" name="to" value="{{.Bar.To}}">
       </div>
       {{if .Bar.ShowSearch}}
       <div class="field grow">
-        <label for="q">Search</label>
-        <input type="text" id="q" name="q" value="{{.Bar.Search}}" placeholder="A word of the summary, or its id">
+        <label for="q">{{t "common.search"}}</label>
+        <input type="text" id="q" name="q" value="{{.Bar.Search}}" placeholder="{{t "common.word_summary_id"}}">
       </div>
       {{end}}
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Apply</button>
-        <a class="btn" href="{{.Bar.Action}}">Clear</a>
+        <button type="submit" class="btn btn-primary">{{t "common.apply"}}</button>
+        <a class="btn" href="{{.Bar.Action}}">{{t "common.clear"}}</a>
       </div>
     </form>
 
     <div class="period">
       <div class="quick">
-        {{range .Bar.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{.Label}}</a>
+        {{range .Bar.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{tr .Label}}</a>
         {{end}}
       </div>
-      <span class="muted">days counted in {{.Bar.Zone}}</span>
+      <span class="muted">{{t "common.days_counted" .Bar.Zone}}</span>
     </div>
 
     {{if not .Error}}
@@ -750,48 +768,48 @@
       <table>
         <thead>
           <tr>
-            <th>Time</th>
-            <th>Summary</th>
-            <th>Messages</th>
-            <th>Tokens</th>
+            <th>{{t "common.time"}}</th>
+            <th>{{t "common.summary"}}</th>
+            <th>{{t "common.messages"}}</th>
+            <th>{{t "common.tokens"}}</th>
           </tr>
         </thead>
         <tbody>
           {{range .Rows}}
           <tr>
-            <td class="nowrap" data-label="Time"><a href="{{.Href}}">{{.At}}</a><br><code class="id">{{.Id}}</code></td>
-            <td class="preview" data-label="Summary"><a href="{{.Href}}">{{.Preview}}</a></td>
-            <td class="num" data-label="Messages">{{.Messages}}</td>
-            <td class="num" data-label="Tokens">{{.Tokens}}</td>
+            <td class="nowrap" data-label="{{t "common.time"}}"><a href="{{.Href}}">{{.At}}</a><br><code class="id">{{.Id}}</code></td>
+            <td class="preview" data-label="{{t "common.summary"}}"><a href="{{.Href}}">{{.Preview}}</a></td>
+            <td class="num" data-label="{{t "common.messages"}}">{{.Messages}}</td>
+            <td class="num" data-label="{{t "common.tokens"}}">{{.Tokens}}</td>
           </tr>
           {{end}}
         </tbody>
       </table>
       {{else}}
-      <p class="empty">No summary in this period.</p>
+      <p class="empty">{{t "agent_summaries.no_summary_this_period"}}</p>
       {{end}}
     </div>
 
-    <nav class="pager" aria-label="Pages">
-      <span class="muted">{{if .Pager.From}}Showing {{.Pager.From}}&ndash;{{.Pager.To}} of {{.Pager.Total}}{{else}}No results{{end}}</span>
+    <nav class="pager" aria-label="{{t "common.pages"}}">
+      <span class="muted">{{if .Pager.From}}{{t "common.showing" .Pager.From .Pager.To .Pager.Total}}{{else}}{{t "common.no_results"}}{{end}}</span>
       <div class="pages">
-        {{if .Pager.HasPrev}}<a class="btn btn-small" href="{{.Pager.PrevHref}}">&larr; Prev</a>{{else}}<span class="btn btn-small disabled">&larr; Prev</span>{{end}}
-        <span class="muted">Page {{.Pager.Page}} of {{.Pager.Pages}}</span>
-        {{if .Pager.HasNext}}<a class="btn btn-small" href="{{.Pager.NextHref}}">Next &rarr;</a>{{else}}<span class="btn btn-small disabled">Next &rarr;</span>{{end}}
+        {{if .Pager.HasPrev}}<a class="btn btn-small" href="{{.Pager.PrevHref}}">{{t "common.prev"}}</a>{{else}}<span class="btn btn-small disabled">{{t "common.prev"}}</span>{{end}}
+        <span class="muted">{{t "common.page" .Pager.Page .Pager.Pages}}</span>
+        {{if .Pager.HasNext}}<a class="btn btn-small" href="{{.Pager.NextHref}}">{{t "common.next"}}</a>{{else}}<span class="btn btn-small disabled">{{t "common.next"}}</span>{{end}}
       </div>
     </nav>
     {{end}}
 
     {{if .RemoveAction}}
     <section class="card danger">
-      <div class="card-head"><h2>Danger zone</h2></div>
-      <p class="muted">Deleted summaries cannot be brought back, short of restoring a backup.</p>
-      <form action="{{.RemoveAction}}" method="POST" class="danger-row" data-confirm="Delete every summary before this date? This cannot be undone.">
+      <div class="card-head"><h2>{{t "common.danger_zone"}}</h2></div>
+      <p class="muted">{{t "agent_summaries.deleted_summaries_cannot_brought_back"}}</p>
+      <form action="{{.RemoveAction}}" method="POST" class="danger-row" data-confirm="{{t "agent_summaries.delete_every_summary_before_this"}}">
         <div class="field">
-          <label for="before">Delete every summary before</label>
+          <label for="before">{{t "agent_summaries.delete_every_summary_before"}}</label>
           <input type="date" id="before" name="before" value="{{.Today}}" required>
         </div>
-        <button type="submit" class="btn btn-danger">Delete summaries</button>
+        <button type="submit" class="btn btn-danger">{{t "agent_summaries.delete_summaries"}}</button>
       </form>
     </section>
     {{end}}

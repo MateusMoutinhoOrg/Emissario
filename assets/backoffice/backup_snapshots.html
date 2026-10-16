@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Backups</title>
+  <title>{{t "common.backups"}}</title>
   {{if .Refresh}}<meta http-equiv="refresh" content="5" />{{end}}
   <style>
     :root {
@@ -502,6 +502,20 @@
     }
     .retention-note { margin: 0 0 1rem; font-size: 0.88rem; }
     .retention-note a { text-decoration: underline; }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -510,69 +524,73 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        <a href="/admin/root/list-backups" class="active">Backups</a>
-        <a href="/admin/root/set-website-source">Website source</a>
-        <a href="/admin/root/set-privacy-settings">Privacy</a>
-        <a href="/admin/root/access-log">Access log</a>
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        <a href="/admin/root/list-backups" class="active">{{t "common.backups"}}</a>
+        <a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>
+        <a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>
+        <a href="/admin/root/access-log">{{t "common.access_log"}}</a>
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Backups</h1>
-        <p class="muted">Snapshots of every database of the project. A snapshot is taken in the background; download one as a zip, upload a zip back, restore one over the current data or delete it. A content shared by several snapshots is stored once: deleting a snapshot frees the contents only it held once you optimize the backups size.</p>
+        <h1>{{t "common.backups"}}</h1>
+        <p class="muted">{{t "backup_snapshots.snapshots_every_database_project_snapshot"}}</p>
       </div>
       <div class="actions">
         <form action="/admin/root/optimize-backup-storage" method="POST">
-          <button type="submit" class="btn" title="Remove every stored content no snapshot holds anymore"{{if .Busy}} disabled{{end}}>Optimize backups size</button>
+          <button type="submit" class="btn" title="{{t "backup_snapshots.remove_every_stored_content_no"}}"{{if .Busy}} disabled{{end}}>{{t "backup_snapshots.optimize_backups_size"}}</button>
         </form>
         <form class="create" action="/admin/root/create-backup" method="POST">
-          <input type="text" name="name" maxlength="100" pattern="[A-Za-z0-9][A-Za-z0-9._\-]*" placeholder="Name (optional)" aria-label="Snapshot name" title="Letters, digits, '.', '_' or '-', starting with a letter or a digit. Empty names it after the current time."{{if .Busy}} disabled{{end}}>
-          <button type="submit" class="btn btn-primary"{{if .Busy}} disabled{{end}}>+ Create snapshot</button>
+          <input type="text" name="name" maxlength="100" pattern="[A-Za-z0-9][A-Za-z0-9._\-]*" placeholder="{{t "backup_snapshots.name_optional"}}" aria-label="{{t "backup_snapshots.snapshot_name"}}" title="{{t "backup_snapshots.letters_digits_starting_with_letter"}}"{{if .Busy}} disabled{{end}}>
+          <button type="submit" class="btn btn-primary"{{if .Busy}} disabled{{end}}>{{t "backup_snapshots.create_snapshot"}}</button>
         </form>
       </div>
     </section>
 
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{html .Notice.Text}}</div>{{end}}
-    <p class="muted retention-note">Snapshots are encrypted like the databases. Data a retention deletes from the databases lives on in the snapshots taken before: {{if .PastRetention}}<strong>{{.PastRetention}} {{if eq .PastRetention 1}}snapshot is{{else}}snapshots are{{end}} older than the shortest retention ({{html .Shortest}})</strong> and hold data the databases already deleted — marked below.{{else}}none is older than the shortest retention ({{html .Shortest}}).{{end}} {{if .BackupForever}}Snapshots are kept until a root deletes them — set a backup retention on the <a href="{{.PrivacyHref}}">Privacy</a> page.{{else}}Snapshots are kept {{html .BackupRetention}}, then deleted by the hourly cleanup.{{end}}</p>
-    {{if .Busy}}<div class="notice notice-ok" role="status">A backup job is running. This page refreshes until it ends.</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
+    <p class="muted retention-note">{{t "backup_snapshots.snapshots_are_encrypted_like_databases"}} {{if .PastRetention}}{{if eq .PastRetention 1}}{{th "backup_snapshots.past_retention_one" .Shortest}}{{else}}{{th "backup_snapshots.past_retention_many" .PastRetention .Shortest}}{{end}}{{else}}{{t "backup_snapshots.none_older_than_shortest_retention" .Shortest}}{{end}} {{if .BackupForever}}{{t "backup_snapshots.snapshots_are_kept_until_root"}} <a href="{{.PrivacyHref}}">{{t "common.privacy"}}</a> {{t "backup_snapshots.page"}}{{else}}{{t "backup_snapshots.snapshots_are_kept_then_deleted" .BackupRetention}}{{end}}</p>
+    {{if .Busy}}<div class="notice notice-ok" role="status">{{t "backup_snapshots.backup_job_running_this_page"}}</div>{{end}}
 
-    <form class="card upload" id="snapshot-upload" action="/admin/root/upload-backup" method="POST">
+    <form class="card upload" id="snapshot-upload" action="/admin/root/upload-backup" method="POST" data-uploading="{{t "backup_snapshots.uploading"}}" data-refused="{{t "backup_snapshots.upload_refused"}}" data-refused-status="{{t "backup_snapshots.upload_refused_status"}}" data-unreachable="{{t "backup_snapshots.upload_unreachable"}}">
       <div class="grow">
-        <label for="snapshot-file">Upload a snapshot</label>
+        <label for="snapshot-file">{{t "backup_snapshots.upload_snapshot"}}</label>
         <input type="file" id="snapshot-file" accept=".zip,application/zip" required>
       </div>
-      <button type="submit" class="btn" id="snapshot-upload-button">Upload</button>
-      <p class="muted hint">A zip a download of this page built, up to {{.MaxUploadMegabytes}} MB. It is stored as a new snapshot; nothing is restored until you ask.</p>
+      <button type="submit" class="btn" id="snapshot-upload-button">{{t "backup_snapshots.upload"}}</button>
+      <p class="muted hint">{{t "backup_snapshots.zip_download_this_page_built" .MaxUploadMegabytes}}</p>
       <div class="notice notice-error" id="upload-error" role="status" hidden></div>
     </form>
 
     <form class="card filters" action="/admin/root/list-backups" method="GET">
       <div class="field grow">
-        <label for="prefix">Search by name prefix</label>
-        <input type="search" id="prefix" name="prefix" value="{{html .Prefix}}" maxlength="100" placeholder="daily-, pre-restore-, upload-…">
+        <label for="prefix">{{t "backup_snapshots.search_name_prefix"}}</label>
+        <input type="search" id="prefix" name="prefix" value="{{html .Prefix}}" maxlength="100" placeholder="{{t "backup_snapshots.daily_pre_restore_upload"}}">
       </div>
       <div class="actions">
-        <button type="submit" class="btn btn-primary">Search</button>
-        <a class="btn" href="/admin/root/list-backups">Clear</a>
+        <button type="submit" class="btn btn-primary">{{t "common.search"}}</button>
+        <a class="btn" href="/admin/root/list-backups">{{t "common.clear"}}</a>
       </div>
     </form>
 
@@ -581,32 +599,32 @@
       <table>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Taken</th>
-            <th>Status</th>
-            <th class="right">Actions</th>
+            <th>{{t "common.name"}}</th>
+            <th>{{t "backup_snapshots.taken"}}</th>
+            <th>{{t "common.status"}}</th>
+            <th class="right">{{t "common.actions"}}</th>
           </tr>
         </thead>
         <tbody>
           {{range .Snapshots}}
           <tr>
-            <td data-label="Name"><span class="mono">{{html .Name}}</span>{{if .PastRetention}} <span class="badge badge-failed" title="Older than the shortest retention: it holds data the databases already deleted">past retention</span>{{end}}</td>
-            <td data-label="Taken">{{html .Date}}</td>
-            <td data-label="Status"><span class="badge badge-{{html .Status}}">{{html .Status}}</span></td>
-            <td data-label="Actions">
+            <td data-label="{{t "common.name"}}"><span class="mono">{{html .Name}}</span>{{if .PastRetention}} <span class="badge badge-failed" title="{{t "backup_snapshots.older_than_shortest_retention_holds"}}">{{t "backup_snapshots.past_retention"}}</span>{{end}}</td>
+            <td data-label="{{t "backup_snapshots.taken"}}">{{html .Date}}</td>
+            <td data-label="{{t "common.status"}}"><span class="badge badge-{{html .Status}}">{{tr .Status}}</span></td>
+            <td data-label="{{t "common.actions"}}">
               <div class="row-actions">
                 {{if .IsReady}}
-                <a class="btn btn-small" href="/admin/root/download-backup/{{.Id}}">Download</a>
-                <form action="/admin/root/restore-backup/{{.Id}}" method="POST" data-confirm="Restore the snapshot {{html .Name}}? Every database is replaced by it, after a pre-restore snapshot of the current data, and the site answers 503 until it ends. Backoffice users and API tokens, and privacy-db — the privacy settings, the access log and the legal holds — are kept as they are unless you ticked the box: restoring them brings back revoked tokens, removed users and old passwords, and loses the access log rows and holds made since.">
-                  <label class="muted"><input type="checkbox" name="include-backoffice" value="true"> users, tokens &amp; privacy</label>
-                  <button type="submit" class="btn btn-small btn-danger"{{if $.Busy}} disabled{{end}}>Restore</button>
+                <a class="btn btn-small" href="/admin/root/download-backup/{{.Id}}">{{t "backup_snapshots.download"}}</a>
+                <form action="/admin/root/restore-backup/{{.Id}}" method="POST" data-confirm="{{t "backup_snapshots.restore_snapshot_every_database_replaced" .Name}}">
+                  <label class="muted"><input type="checkbox" name="include-backoffice" value="true"> {{t "backup_snapshots.users_tokens_privacy"}}</label>
+                  <button type="submit" class="btn btn-small btn-danger"{{if $.Busy}} disabled{{end}}>{{t "backup_snapshots.restore"}}</button>
                 </form>
                 {{else}}
-                <span class="btn btn-small disabled">Download</span>
-                <span class="btn btn-small btn-danger disabled">Restore</span>
+                <span class="btn btn-small disabled">{{t "backup_snapshots.download"}}</span>
+                <span class="btn btn-small btn-danger disabled">{{t "backup_snapshots.restore"}}</span>
                 {{end}}
-                <form action="/admin/root/remove-backup/{{.Id}}" method="POST" data-confirm="Delete the snapshot {{html .Name}}? It cannot be restored or downloaded afterwards.">
-                  <button type="submit" class="btn btn-small btn-danger"{{if $.Busy}} disabled{{end}}>Delete</button>
+                <form action="/admin/root/remove-backup/{{.Id}}" method="POST" data-confirm="{{t "backup_snapshots.delete_snapshot_cannot_restored_downloaded" .Name}}">
+                  <button type="submit" class="btn btn-small btn-danger"{{if $.Busy}} disabled{{end}}>{{t "common.delete"}}</button>
                 </form>
               </div>
             </td>
@@ -615,9 +633,9 @@
         </tbody>
       </table>
       {{else if .Prefix}}
-      <p class="empty">No snapshot name starts with <span class="mono">{{html .Prefix}}</span>. Names are case-sensitive.</p>
+      <p class="empty">{{th "backup_snapshots.no_snapshot_name_starts_with" .Prefix}}</p>
       {{else}}
-      <p class="empty">No snapshots yet. Create one to back up every database.</p>
+      <p class="empty">{{t "backup_snapshots.no_snapshots_yet_create_one"}}</p>
       {{end}}
     </div>
   </main>

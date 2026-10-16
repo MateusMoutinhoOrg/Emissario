@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preview preset</title>
+  <title>{{t "privacy_preset_preview.preview_preset"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -745,6 +745,20 @@
     .checklist li { margin: 0 0 0.6rem 1.1rem; line-height: 1.5; }
     .checklist .ref { display: block; }
     textarea.import { width: 100%; min-height: 9rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -753,58 +767,62 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings" class="active">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings" class="active">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
-    <a class="back" href="{{.PresetsHref}}">&larr; Presets</a>
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
+    <a class="back" href="{{.PresetsHref}}">{{t "privacy_preset_preview.presets"}}</a>
     <section class="head">
       <div>
         <h1>{{.Name}} <code>{{.Ref}}</code></h1>
         <p class="muted">{{.Description}}{{if .Changes}} — {{.Changes}}{{end}}</p>
       </div>
     </section>
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     <div class="card table-card">
-      <div class="card-head"><h2>Settings</h2></div>
+      <div class="card-head"><h2>{{t "common.settings"}}</h2></div>
       <table>
-        <thead><tr><th>Setting</th><th>Now</th><th>The preset</th><th>Reference</th></tr></thead>
-        <tbody>{{range .Lines}}<tr{{if not .Differs}} class="same"{{end}}><td data-label="Setting"><code>{{.Setting}}</code></td><td data-label="Now">{{.Current}}</td><td data-label="The preset">{{if .Differs}}<strong>{{.Preset}}</strong>{{else}}{{.Preset}}{{end}}</td><td data-label="Reference"><span class="ref">{{.Reference}}</span></td></tr>{{end}}</tbody>
+        <thead><tr><th>{{t "common.setting"}}</th><th>{{t "common.now"}}</th><th>{{t "common.preset"}}</th><th>{{t "privacy_preset_preview.reference"}}</th></tr></thead>
+        <tbody>{{range .Lines}}<tr{{if not .Differs}} class="same"{{end}}><td data-label="{{t "common.setting"}}"><code>{{.Setting}}</code></td><td data-label="{{t "common.now"}}">{{.Current}}</td><td data-label="{{t "common.preset"}}">{{if .Differs}}<strong>{{.Preset}}</strong>{{else}}{{.Preset}}{{end}}</td><td data-label="{{t "privacy_preset_preview.reference"}}"><span class="ref">{{.Reference}}</span></td></tr>{{end}}</tbody>
       </table>
     </div>
 
-    <form class="card" action="{{.ApplyAction}}" method="POST"{{if .Deletes}} data-confirm="Applying this preset deletes data at the next cleanup. Apply it?"{{end}}>
-      <div class="card-head"><h2>Apply</h2></div>
+    <form class="card" action="{{.ApplyAction}}" method="POST"{{if .Deletes}} data-confirm="{{t "privacy_preset_preview.applying_this_preset_deletes_data"}}"{{end}}>
+      <div class="card-head"><h2>{{t "common.apply"}}</h2></div>
       <input type="hidden" name="preset" value="{{.Ref}}">
-      {{if .Effects}}<ul class="checklist">{{range .Effects}}<li>{{.}}</li>{{end}}</ul>{{else}}<p class="hint">Nothing stored changes.</p>{{end}}
-      <p class="hint">Who sees full IPs, the access log readers, its two-factor and its inventory, and whether contact requests, the agent and its summaries are on, stay as they are.</p>
+      {{if .Effects}}<ul class="checklist">{{range .Effects}}<li>{{.}}</li>{{end}}</ul>{{else}}<p class="hint">{{t "privacy_preset_preview.nothing_stored_changes"}}</p>{{end}}
+      <p class="hint">{{t "privacy_preset_preview.who_sees_full_ips_access"}}</p>
       {{if .Notices}}<div class="law-panel" role="alert">
-        <p class="law-lead">Read before you confirm. These notices are product information, not legal advice: you are the controller of this data.</p>
-        {{range .Notices}}<article class="law-notice"><h3>{{.Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> I have read this notice</label></article>{{end}}
+        <p class="law-lead">{{t "common.read_before_you_confirm_these"}}</p>
+        {{range .Notices}}<article class="law-notice"><h3>{{tr .Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> {{t "common.i_have_read_this_notice"}}</label></article>{{end}}
       </div>{{end}}
-      <button type="submit" class="btn btn-primary">{{if .Notices}}Confirm and apply{{else}}Apply{{end}}</button>
+      <button type="submit" class="btn btn-primary">{{if .Notices}}{{t "privacy_preset_preview.confirm_apply"}}{{else}}{{t "common.apply"}}{{end}}</button>
     </form>
   </main>
   <script src="/backoffice/backoffice.js" defer></script>

@@ -1,0 +1,26 @@
+category: Middleware
+methods:
+    - ANY
+parameters:
+    - description: the language a page is asked in, pt-BR — kept in the backoffice_language cookie for the next pages
+      sources:
+        - query
+      id: Lang
+      key: lang
+      type: string
+    - description: the language chosen before, set by ?lang=
+      sources:
+        - cookie
+      id: LangCookie
+      key: backoffice_language
+      type: string
+paths:
+    - end: -1
+      id: Admin
+      start: 0
+      trigger:
+        type: prefix
+        value: /admin
+priority: 5
+response-type: text/html
+summary: Picks the language of the backoffice pages, from ?lang= or the cookie that keeps it

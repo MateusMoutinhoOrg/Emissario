@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Backoffice Login</title>
+  <title>{{t "login.backoffice_login"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -171,6 +171,25 @@
       margin-bottom: 1.5rem;
     }
     .hint { color: var(--text-muted, #9CA3AF); font-size: 0.85rem; margin: -0.5rem 0 1.25rem; }
+    .login-container > .lang-picker {
+      display: flex;
+      justify-content: flex-end;
+      margin: -1.5rem -1.5rem 1rem 0;
+    }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -178,39 +197,44 @@
   <div class="blob blob-2"></div>
   
   <div class="login-container">
+    <form class="lang-picker" method="GET">
+      <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+      <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+    </form>
     <div class="login-header">
-      <h1>Welcome Back</h1>
-      <p>Sign in to your backoffice account</p>
+      <h1>{{t "login.welcome_back"}}</h1>
+      <p>{{t "login.sign_your_backoffice_account"}}</p>
     </div>
     
-    {{if .Error}}<div class="alert" role="alert">{{html .Error}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     {{if .Pending}}
     <form id="codeForm" action="/admin/login" method="POST">
       <input type="hidden" name="pending" value="{{.Pending}}">
       <div class="form-group">
-        <label for="code" class="form-label">Two-factor code</label>
+        <label for="code" class="form-label">{{t "login.two_factor_code"}}</label>
         <input type="text" id="code" name="code" class="form-control" inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" placeholder="123456" required autocomplete="one-time-code" autofocus>
       </div>
-      <p class="hint">Type the 6-digit code your authenticator app shows for this account.</p>
-      <button type="submit" class="btn-submit">Verify</button>
+      <p class="hint">{{t "login.type_6_digit_code_your"}}</p>
+      <button type="submit" class="btn-submit">{{t "login.verify"}}</button>
     </form>
     {{else}}
     <form id="loginForm" action="/admin/login" method="POST">
       <div class="form-group">
-        <label for="username" class="form-label">Email or Username</label>
-        <input type="text" id="username" name="username" class="form-control" value="{{html .Username}}" placeholder="Enter your email or username" required autocomplete="username">
+        <label for="username" class="form-label">{{t "login.email_username"}}</label>
+        <input type="text" id="username" name="username" class="form-control" value="{{html .Username}}" placeholder="{{t "login.enter_your_email_username"}}" required autocomplete="username">
       </div>
       
       <div class="form-group">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label">{{t "common.password"}}</label>
         <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
       </div>
       
-      <button type="submit" class="btn-submit">Sign In</button>
+      <button type="submit" class="btn-submit">{{t "login.sign"}}</button>
     </form>
     {{end}}
   </div>
 
+  <script src="/backoffice/backoffice.js" defer></script>
 </body>
 </html>

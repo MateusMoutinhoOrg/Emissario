@@ -112,6 +112,7 @@ it prints the address it took. Change it to wherever your server runs.
 | [`ANY /api/admin/root/*`](backoffice_api_root_guard.md) | Lets only root users reach /api/admin/root |
 | [`ANY /api/admin/*`](backoffice_api_token_auth.md) | Requires a valid API token on every /api/admin route |
 | [`ANY /*`](backoffice_client_ip.md) | Works out the client ip every route after it reads, from the connection or the reverse proxy in front |
+| [`ANY /admin/*`](backoffice_language.md) | Picks the language of the backoffice pages, from ?lang= or the cookie that keeps it |
 | [`ANY /*`](backoffice_maintenance.md) | Answers 503 to every request while a restore writes the databases, and to every write while a snapshot reads them |
 | [`ANY /admin/root/*`](backoffice_root_guard.md) | Lets only root users reach /admin/root |
 | [`ANY /admin/*`](backoffice_same_origin.md) | Refuses a request to /admin another site's page sent |

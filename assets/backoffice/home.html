@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Backoffice Home</title>
+  <title>{{t "home.backoffice_home"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -280,6 +280,20 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -288,138 +302,142 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home" class="active">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests">Contacts</a>
-        {{if .IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home" class="active">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests">{{t "common.contacts"}}</a>
+        {{if .IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Username}}</span>
       <div class="avatar">{{html .Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="hero">
-      <h1>Welcome, {{html .Username}}</h1>
-      <p>You are signed in to the backoffice.</p>
+      <h1>{{t "home.welcome" .Username}}</h1>
+      <p>{{t "home.you_are_signed_backoffice"}}</p>
     </section>
 
     <section class="grid">
       <article class="card">
-        <h2>Account</h2>
+        <h2>{{t "home.account"}}</h2>
         <dl>
-          <dt>Username</dt>
+          <dt>{{t "common.username"}}</dt>
           <dd>{{html .Username}}</dd>
-          <dt>Email</dt>
+          <dt>{{t "common.email"}}</dt>
           <dd>{{html .Email}}</dd>
-          <dt>Role</dt>
-          <dd><span class="badge">{{html .Role}}</span></dd>
-          <dt>User id</dt>
+          <dt>{{t "common.role"}}</dt>
+          <dd><span class="badge">{{tr .Role}}</span></dd>
+          <dt>{{t "home.user_id"}}</dt>
           <dd>{{html .Id}}</dd>
         </dl>
       </article>
 
       <article class="card">
-        <h2>Session</h2>
-        <div class="status"><span class="dot"></span> Active</div>
+        <h2>{{t "home.session"}}</h2>
+        <div class="status"><span class="dot"></span>{{t "home.active"}}</div>
         <p class="muted">
-          Your session lasts {{.SessionMinutes}} minutes from sign-in.
-          After that you will be asked to sign in again.
+          {{t "home.your_session_lasts_minutes_from" .SessionMinutes}}
         </p>
       </article>
 
       <article class="card">
-        <h2>Users</h2>
+        <h2>{{t "common.users"}}</h2>
         <p class="muted">
-          {{if .IsRoot}}See, add, edit and remove the backoffice users.{{else}}See who can sign in to the backoffice.{{end}}
+          {{if .IsRoot}}{{t "home.see_add_edit_remove_backoffice"}}{{else}}{{t "home.see_who_can_sign_backoffice"}}{{end}}
         </p>
         <div class="links">
-          <a class="btn btn-primary" href="/admin/list-backoffice-users">View users</a>
-          {{if .IsRoot}}<a class="btn" href="/admin/root/add-backoffice-user">Add user</a>{{end}}
+          <a class="btn btn-primary" href="/admin/list-backoffice-users">{{t "home.view_users"}}</a>
+          {{if .IsRoot}}<a class="btn" href="/admin/root/add-backoffice-user">{{t "home.add_user"}}</a>{{end}}
         </div>
       </article>
 
       <article class="card">
-        <h2>API tokens</h2>
+        <h2>{{t "common.api_tokens"}}</h2>
         <p class="muted">
-          Tokens let scripts call /api/admin as you. {{if .IsRoot}}As root you also see and revoke everyone's.{{else}}Create, see and revoke your own.{{end}}
+          {{t "home.tokens_let_scripts_call_api"}} {{if .IsRoot}}{{t "home.root_you_also_see_revoke"}}{{else}}{{t "home.create_see_revoke_your_own"}}{{end}}
         </p>
         <div class="links">
-          <a class="btn btn-primary" href="/admin/list-backoffice-api-tokens">View tokens</a>
-          <a class="btn" href="/admin/add-backoffice-api-token">New token</a>
+          <a class="btn btn-primary" href="/admin/list-backoffice-api-tokens">{{t "home.view_tokens"}}</a>
+          <a class="btn" href="/admin/add-backoffice-api-token">{{t "home.new_token"}}</a>
         </div>
       </article>
 
       <article class="card">
-        <h2>Visualization</h2>
+        <h2>{{t "common.visualization"}}</h2>
         <dl>
-          <dt>Views today</dt>
+          <dt>{{t "home.views_today"}}</dt>
           <dd>{{.VisualizationToday}}</dd>
-          <dt>Last 7 days</dt>
+          <dt>{{t "home.last_7_days"}}</dt>
           <dd>{{.VisualizationWeek}}</dd>
         </dl>
         <p class="muted" style="margin-top: 1rem;">
-          Every page of the public website viewed, bots left out: which page, when and from where.
+          {{t "home.every_page_public_website_viewed"}}
         </p>
         <div class="links">
-          <a class="btn btn-primary" href="/admin/visualization">Open dashboard</a>
-          {{if .IsRoot}}<a class="btn" href="/admin/root/set-visualization-settings">Settings</a>{{end}}
+          <a class="btn btn-primary" href="/admin/visualization">{{t "home.open_dashboard"}}</a>
+          {{if .IsRoot}}<a class="btn" href="/admin/root/set-visualization-settings">{{t "common.settings"}}</a>{{end}}
         </div>
       </article>
 
       <article class="card">
-        <h2>Contacts</h2>
+        <h2>{{t "common.contacts"}}</h2>
         <dl>
-          <dt>In the inbox</dt>
+          <dt>{{t "home.inbox"}}</dt>
           <dd>{{.ContactInbox}}</dd>
-          <dt>Received today</dt>
+          <dt>{{t "home.received_today"}}</dt>
           <dd>{{.ContactToday}}</dd>
         </dl>
         <p class="muted" style="margin-top: 1rem;">
-          What the website sent to /api/contact-requests: any JSON, with its time, ip and country.
+          {{t "home.what_website_sent_api_contact"}}
         </p>
         <div class="links">
-          <a class="btn btn-primary" href="/admin/list-contact-requests">Open contacts</a>
-          {{if .IsRoot}}<a class="btn" href="/admin/root/set-contact-settings">Settings</a>{{end}}
+          <a class="btn btn-primary" href="/admin/list-contact-requests">{{t "home.open_contacts"}}</a>
+          {{if .IsRoot}}<a class="btn" href="/admin/root/set-contact-settings">{{t "common.settings"}}</a>{{end}}
         </div>
       </article>
 
       {{if .IsRoot}}
       <article class="card">
-        <h2>Backups</h2>
+        <h2>{{t "common.backups"}}</h2>
         <p class="muted">
-          Snapshot every database, download a snapshot as a zip, upload one back or restore one over the current data.
+          {{t "home.snapshot_every_database_download_snapshot"}}
         </p>
         <div class="links">
-          <a class="btn btn-primary" href="/admin/root/list-backups">View backups</a>
+          <a class="btn btn-primary" href="/admin/root/list-backups">{{t "home.view_backups"}}</a>
         </div>
       </article>
 
       <article class="card">
-        <h2>Website source</h2>
+        <h2>{{t "common.website_source"}}</h2>
         <p class="muted">
-          Pick the git repository and branch the public website is served from, and how often it is pulled.
+          {{t "home.pick_git_repository_branch_public"}}
         </p>
         <div class="links">
-          <a class="btn btn-primary" href="/admin/root/set-website-source">Set website source</a>
+          <a class="btn btn-primary" href="/admin/root/set-website-source">{{t "home.set_website_source"}}</a>
         </div>
       </article>
       {{end}}
     </section>
   </main>
+  <script src="/backoffice/backoffice.js" defer></script>
 </body>
 </html>

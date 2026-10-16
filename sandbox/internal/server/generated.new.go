@@ -102,6 +102,7 @@ import (
 	routes_list_visualization_views_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/list_visualization_views_page"
 	routes_list_visualization_visitors_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/list_visualization_visitors_page"
 	routes_backoffice_client_ip "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/middleware/backoffice_client_ip"
+	routes_backoffice_language "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/middleware/backoffice_language"
 	routes_backoffice_maintenance "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/middleware/backoffice_maintenance"
 	routes_backoffice_root_guard "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/middleware/backoffice_root_guard"
 	routes_backoffice_same_origin "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/middleware/backoffice_same_origin"
@@ -189,6 +190,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 	server := api.Server{}
 
 	server.Routes = []*api.Route{
+		routes_backoffice_language.NewRoute(sandbox),
 		routes_backoffice_maintenance.NewRoute(sandbox),
 		routes_backoffice_client_ip.NewRoute(sandbox),
 		routes_backoffice_security_headers.NewRoute(sandbox),

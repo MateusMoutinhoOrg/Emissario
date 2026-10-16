@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="{{lang}}">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Contact Settings</title>
+  <title>{{t "contact_settings.contact_settings"}}</title>
   <style>
     :root {
       --primary: #4F46E5;
@@ -713,6 +713,20 @@
     .ack input { width: auto; }
     .privacy-hint { margin: 0.25rem 0 1rem; }
     .privacy-hint a { text-decoration: underline; }
+    .lang-picker select,
+    .lang-picker button {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.6rem;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .lang-picker select:hover,
+    .lang-picker select:focus { color: var(--text); border-color: rgba(255, 255, 255, 0.25); }
+    .lang-picker option { background: var(--bg-dark); color: var(--text); }
   </style>
 </head>
 <body>
@@ -721,98 +735,102 @@
 
   <header class="topbar">
     <div class="left">
-      <div class="brand">Back<span>office</span></div>
+      <div class="brand">{{th "common.back_office"}}</div>
       <nav class="nav">
-        <a href="/admin/home">Home</a>
-        <a href="/admin/list-backoffice-users">Users</a>
-        <a href="/admin/list-backoffice-api-tokens">API tokens</a>
-        <a href="/admin/visualization">Visualization</a>
-        <a href="/admin/agent">Agent</a>
-        <a href="/admin/list-contact-requests" class="active">Contacts</a>
-        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
-        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">Access log</a>{{end}}
+        <a href="/admin/home">{{t "common.home"}}</a>
+        <a href="/admin/list-backoffice-users">{{t "common.users"}}</a>
+        <a href="/admin/list-backoffice-api-tokens">{{t "common.api_tokens"}}</a>
+        <a href="/admin/visualization">{{t "common.visualization"}}</a>
+        <a href="/admin/agent">{{t "common.agent"}}</a>
+        <a href="/admin/list-contact-requests" class="active">{{t "common.contacts"}}</a>
+        {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">{{t "common.backups"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
+      <form class="lang-picker" method="GET">
+        <select name="lang" data-language aria-label="{{t "common.language"}}">{{range languages}}<option value="{{.Code}}"{{if .Current}} selected{{end}}>{{.Name}}</option>{{end}}</select>
+        <noscript><button type="submit">{{t "common.change_language"}}</button></noscript>
+      </form>
       <span class="name">{{html .Viewer.Username}}</span>
       <div class="avatar">{{html .Viewer.Initial}}</div>
       <form class="logout" action="/admin/logout" method="POST">
-        <button type="submit">Log out</button>
+        <button type="submit">{{t "common.log_out"}}</button>
       </form>
     </div>
   </header>
 
   <main>
-    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{tr .Text}}{{if .Href}} <a href="{{.Href}}">{{tr .Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
-        <h1>Contact settings</h1>
-        <p class="muted">What <code>{{.Endpoint}}</code> takes from the website, how often one ip may send, and how long it is kept. Every contact request holds personal data — its JSON and its ip, hashed unless the Privacy page keeps full IPs.</p>
+        <h1>{{t "contact_settings.contact_settings_2"}}</h1>
+        <p class="muted">{{th "contact_settings.what_takes_from_website_how" .Endpoint}}</p>
       </div>
     </section>
 
-    <nav class="tabs" aria-label="Contacts">
-      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
+    <nav class="tabs" aria-label="{{t "common.contacts"}}">
+      {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{tr .Label}}</a>
       {{end}}
     </nav>
 
-    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
-    {{if .Error}}<div class="alert" role="alert">{{.Error}}</div>{{end}}
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{tr .Notice.Text}}</div>{{end}}
+    {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
 
     <section class="settings">
       <form class="card" action="{{.Action}}" method="POST">
-        <div class="card-head"><h2>Route</h2></div>
+        <div class="card-head"><h2>{{t "contact_settings.route"}}</h2></div>
         <div class="form-group">
-          <label class="switch"><input type="checkbox" name="enabled" value="1"{{if .Form.Enabled}} checked{{end}}> The website may send contact requests</label>
-          <span class="hint">Off — the default — {{.Endpoint}} answers 503 disabled. Turning it on asks for a notice on what it makes you responsible for.</span>
+          <label class="switch"><input type="checkbox" name="enabled" value="1"{{if .Form.Enabled}} checked{{end}}> {{t "contact_settings.website_may_send_contact_requests"}}</label>
+          <span class="hint">{{t "contact_settings.off_default_answers_503_disabled" .Endpoint}}</span>
         </div>
         <div class="form-group">
-          <label for="max-bytes">Largest body (bytes)</label>
+          <label for="max-bytes">{{t "contact_settings.largest_body_bytes"}}</label>
           <input type="text" inputmode="numeric" id="max-bytes" name="max-bytes" value="{{.Form.MaxBytes}}" placeholder="16384">
-          <span class="hint">A larger body answers 413 too-large. From 2 to {{.MaxMaxBytes}}; blank is 16384.</span>
+          <span class="hint">{{t "contact_settings.larger_body_answers_413_too" .MaxMaxBytes}}</span>
         </div>
-        <div class="card-head"><h2>Limits per ip</h2></div>
+        <div class="card-head"><h2>{{t "contact_settings.limits_per_ip"}}</h2></div>
         <div class="form-group">
-          <label for="rate-per-minute">Requests per minute</label>
+          <label for="rate-per-minute">{{t "contact_settings.requests_per_minute"}}</label>
           <input type="text" inputmode="numeric" id="rate-per-minute" name="rate-per-minute" value="{{.Form.RatePerMinute}}" placeholder="5">
-          <span class="hint">Past it, 429 rate-limit. Blank is 5. Behind a reverse proxy, run with <code>--allow-x-forwarded-for</code>, or every visitor shares one ip.</span>
+          <span class="hint">{{th "contact_settings.past_429_rate_limit_blank"}}</span>
         </div>
         <div class="form-group">
-          <label for="ip-daily-limit">Requests per day</label>
-          <input type="text" inputmode="numeric" id="ip-daily-limit" name="ip-daily-limit" value="{{.Form.IpDailyLimit}}" placeholder="No limit">
-          <span class="hint">Past it, 429 ip-daily-limit until midnight. An IPv6 ip counts by its /64. Blank is no limit.</span>
+          <label for="ip-daily-limit">{{t "contact_settings.requests_per_day"}}</label>
+          <input type="text" inputmode="numeric" id="ip-daily-limit" name="ip-daily-limit" value="{{.Form.IpDailyLimit}}" placeholder="{{t "common.no_limit"}}">
+          <span class="hint">{{t "contact_settings.past_429_ip_daily_limit"}}</span>
         </div>
-        <div class="card-head"><h2>Retention</h2></div>
+        <div class="card-head"><h2>{{t "common.retention"}}</h2></div>
         <div class="form-group">
-          <label for="retention-days">Keep each contact request (days)</label>
-          <input type="text" inputmode="numeric" id="retention-days" name="retention-days" value="{{.Form.RetentionDays}}" placeholder="Until a root deletes it">
-          <span class="hint">Older requests are deleted every hour. 180 by default; past 365 days, or blank to keep them until a root deletes them, asks for a notice (LGPD arts. 15–16; GDPR art. 5(1)(e)).</span>
+          <label for="retention-days">{{t "contact_settings.keep_each_contact_request_days"}}</label>
+          <input type="text" inputmode="numeric" id="retention-days" name="retention-days" value="{{.Form.RetentionDays}}" placeholder="{{t "common.until_root_deletes"}}">
+          <span class="hint">{{t "contact_settings.older_requests_are_deleted_every"}}</span>
         </div>
-        <p class="hint privacy-hint">Your website must say in its privacy notice what the form keeps, why, for how long, and how to ask for deletion. <a href="{{.DraftHref}}">Start from the draft</a>.</p>
+        <p class="hint privacy-hint">{{t "contact_settings.your_website_must_say_privacy"}} <a href="{{.DraftHref}}">{{t "common.start_from_draft"}}</a>.</p>
         {{if .Form.Notices}}<div class="law-panel" role="alert">
-          <p class="law-lead">Read before you confirm. These notices are product information, not legal advice: you are the controller of this data.</p>
-          {{range .Form.Notices}}<article class="law-notice"><h3>{{.Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> I have read this notice</label></article>{{end}}
+          <p class="law-lead">{{t "common.read_before_you_confirm_these"}}</p>
+          {{range .Form.Notices}}<article class="law-notice"><h3>{{tr .Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{tr .Text}}</strong>{{else if .Italic}}<em>{{tr .Text}}</em>{{else if .Code}}<code>{{tr .Text}}</code>{{else}}{{tr .Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> {{t "common.i_have_read_this_notice"}}</label></article>{{end}}
         </div>{{end}}
-        <button type="submit" class="btn btn-primary">{{if .Form.Notices}}Confirm and save{{else}}Save settings{{end}}</button>
+        <button type="submit" class="btn btn-primary">{{if .Form.Notices}}{{t "common.confirm_save"}}{{else}}{{t "common.save_settings"}}{{end}}</button>
       </form>
 
       <article class="card">
-        <div class="card-head"><h2>State</h2></div>
+        <div class="card-head"><h2>{{t "common.state"}}</h2></div>
         <dl class="facts">
-          <dt>Stored</dt>
-          <dd>{{.Stored}} <span class="muted">contact requests</span></dd>
-          <dt>Inbox</dt>
+          <dt>{{t "contact_settings.stored"}}</dt>
+          <dd>{{.Stored}} <span class="muted">{{t "contact_settings.contact_requests"}}</span></dd>
+          <dt>{{t "common.inbox"}}</dt>
           <dd>{{.Inbox}}</dd>
-          <dt>Writer</dt>
-          <dd>{{if .Running}}Running{{else}}<span class="muted">Not running in this process: it runs in the one start-server started</span>{{end}}</dd>
-          <dt>Dropped</dt>
-          <dd>{{.Dropped}} <span class="muted">requests found the queue full since the server started</span></dd>
-          <dt>Endpoint</dt>
+          <dt>{{t "common.writer"}}</dt>
+          <dd>{{if .Running}}{{t "common.running"}}{{else}}<span class="muted">{{t "common.not_running_this_process_runs"}}</span>{{end}}</dd>
+          <dt>{{t "common.dropped"}}</dt>
+          <dd>{{.Dropped}} <span class="muted">{{t "contact_settings.requests_found_queue_full_since"}}</span></dd>
+          <dt>{{t "common.endpoint"}}</dt>
           <dd><code>POST {{.Endpoint}}</code></dd>
         </dl>
-        <p class="hint">The form of the website sends any JSON — an object, an array, a text — from the same origin:</p>
+        <p class="hint">{{t "contact_settings.form_website_sends_any_json"}}</p>
         <pre class="json example">fetch("{{.Endpoint}}", {
   method: "POST",
   headers: {"Content-Type": "application/json"},
@@ -822,15 +840,15 @@
     </section>
 
     <section class="card danger">
-      <div class="card-head"><h2>Danger zone</h2></div>
-      <p class="muted">Deleted contact requests cannot be brought back, short of restoring a backup.</p>
-      <form action="{{.RemoveAction}}" method="POST" class="danger-row" data-confirm="Delete every contact request before this date? This cannot be undone.">
+      <div class="card-head"><h2>{{t "common.danger_zone"}}</h2></div>
+      <p class="muted">{{t "contact_settings.deleted_contact_requests_cannot_brought"}}</p>
+      <form action="{{.RemoveAction}}" method="POST" class="danger-row" data-confirm="{{t "contact_settings.delete_every_contact_request_before"}}">
         <input type="hidden" name="back" value="{{.Action}}">
         <div class="field">
-          <label for="before">Delete every contact request before</label>
+          <label for="before">{{t "contact_settings.delete_every_contact_request_before_2"}}</label>
           <input type="date" id="before" name="before" value="{{.Today}}" required>
         </div>
-        <button type="submit" class="btn btn-danger">Delete contact requests</button>
+        <button type="submit" class="btn btn-danger">{{t "contact_settings.delete_contact_requests"}}</button>
       </form>
     </section>
   </main>
