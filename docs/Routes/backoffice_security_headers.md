@@ -45,6 +45,7 @@ or `403`, for example — or let it through to this route.
 | Route | When |
 | --- | --- |
 | [`backoffice-client-ip`](backoffice_client_ip.md) | always |
+| [`backoffice-language`](backoffice_language.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-maintenance`](backoffice_maintenance.md) | always |
 
 ---

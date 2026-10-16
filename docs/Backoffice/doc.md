@@ -39,13 +39,12 @@ secret and both flags onto `sandbox.Config` (`api.BackofficeConfig`,
 | `sandbox/internal/server/backoffice/backofficethrottle/` | login and token rate limits, counted before the check |
 | `sandbox/internal/server/backoffice/backofficehttp/` | client ip, security headers, same-origin |
 | `sandbox/internal/server/backoffice/backofficerender/` | the pages, from `assets/backoffice/*.html` |
-| `sandbox/internal/server/backoffice/backofficetranslation/`, `assets/translations/<lang>.json` | the languages of the pages ([Languages](#languages)) |
 | `sandbox/internal/server/backoffice/backofficeapi/` | the JSON documents of `/api/admin` |
 | `sandbox/internal/databases/backoffice_db/` | `backoffice-user` (+ nested `session`) and `api-token`; the store is `./data/backofficedb` (inside `--database`), gitignored |
 | `sandbox/internal/snapshots/`, `sandbox/internal/databases/backup/`, `sandbox/internal/server/backoffice/backofficesnapshots/` | the [Backups](../Backups/doc.md); the store is `./data/backup`, gitignored |
 | `sandbox/internal/routeprops/backoffice.go` | `props.ClientIp`, `props.User`, `props.Session`, `props.ApiToken` |
 | `sandbox/internal/commands/backoffice/`, `sandbox/internal/commands/middleware/` | `add-backoffice-user`; `backoffice-start-server`, the middleware in front of `start-server` |
-| `assets/backoffice/*.html`, `assets/front/backoffice/backoffice.js` | page templates (`html/template`, through `Deps.EmbedDeps.RenderTranslatedHTMLTemplate`: every value escaped for its context) and their script |
+| `assets/backoffice/*.html`, `assets/front/backoffice/backoffice.js` | page templates (`html/template`, through `Deps.EmbedDeps.RenderHTMLTemplate`: every value escaped for its context) and their script |
 
 ## Routes
 
@@ -53,7 +52,6 @@ Middlewares run lowest priority first; a page answers or the chain goes on.
 
 | Route | Priority | Matches | Does |
 |---|---|---|---|
-| `backoffice-language` | 5 | `/admin` | the language of the page: `?lang=` (kept in the `backoffice_language` cookie), else the cookie, else `en`; sets `Content-Language` |
 | `backoffice-maintenance` | 6 | every path | `503` while a backup is restored, and to writes while one is taken ([Backups](../Backups/doc.md)) |
 | `backoffice-client-ip` | 7 | every path | sets `props.ClientIp` |
 | `backoffice-security-headers` | 8 | every path | `/admin`, `/api/admin`: CSP (no inline script), XFO, nosniff, Referrer-Policy, no-store, HSTS; any other: nosniff, `X-Frame-Options: SAMEORIGIN`, Referrer-Policy, which a route may override |
@@ -78,38 +76,6 @@ JSON (`/api/admin/...`, body `application/json`, every action a `POST`): `me` (G
 many, `403` not root, `404` unknown id, `400` invalid. `agnos explain-route GET /admin/home`
 shows which route answers. Every route above carries `private: true`, so `/openapi.json` leaves
 it out; [Routes](../Routes/doc.md) still lists it.
-
-## Languages
-
-The pages are shown in English by default; every page carries a picker that switches them, and the
-choice is kept for a year in the `backoffice_language` cookie (`Path=/admin`, HttpOnly, SameSite=Lax,
-Secure unless `--insecure-http`). Only the pages are translated: `/api/admin`, the command line and
-the docs stay in English, and so do the privacy notices of `assets/privacy/notices/`.
-
-Each language is one file, `assets/translations/<lang>.json` — `en.json` (the default) and
-`pt-BR.json` ship. Adding one is adding its file, nothing else:
-
-```json
-{
-  "language": "Português (Brasil)",
-  "text": { "common": { "log_out": "Sair" }, "home": { "welcome": "Bem-vindo(a), {0}" } },
-  "messages": { "Settings saved.": "Configurações salvas." }
-}
-```
-
-| Key | What |
-|---|---|
-| `language` | the name of the language in itself, shown by the picker |
-| `text` | the text of the templates, nested by page (`common` for what several share), read as dotted keys. A key a language lacks is taken from `en.json`; one both lack shows as the key |
-| `messages` | the texts the server builds in English — a notice, an error, a label — by their English text. One it does not list, or one built around a value (`Roots without two-factor sign-in: admin.`), stays in English |
-
-In a template, `{{t "home.welcome" .Username}}` is the text of the key, its `{0}`, `{1}`… filled
-and escaped like any value; `{{th "key" …}}` keeps the markup of the translation (`<strong>`,
-`<code>`) and escapes the values — text only, never an attribute; `{{tr .Notice.Text}}` translates a
-message; `{{lang}}` is the code of the page (`<html lang>`), `{{languages}}` what the picker lists.
-The script of the pages reads the texts it shows from `data-*` attributes the template translated.
-`backoffice-language` is a middleware of `/admin` (priority `5`) that sets `Content-Language`,
-which `backofficerender.RenderHTML` renders in.
 
 ## Rules
 

@@ -31,6 +31,15 @@ curl localhost:3000/ \
 
 Any route may also answer `404`, `405` or `500`: see [when something goes wrong](doc.md#when-something-goes-wrong).
 
+## Runs first
+
+These routes run before this one, on the same request. Any of them may refuse it — with `401`
+or `403`, for example — or let it through to this route.
+
+| Route | When |
+| --- | --- |
+| [`backoffice-language`](backoffice_language.md) | depends on the address — `explain-route` gives the exact answer |
+
 ---
 
 For developers: `sandbox/internal/routes/backoffice_maintenance/` · Middleware · [every route](doc.md) · [RouteYaml](../RouteYaml/doc.md)

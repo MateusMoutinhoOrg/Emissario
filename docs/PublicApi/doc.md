@@ -53,7 +53,7 @@ field is that package's `Sandbox` struct, filled by `adapters/impls/<name>.Bind(
 | [`deps.ArchiveDeps`](deps.archivedeps.md) | `File`, `Contract` |
 | [`deps.ArgvDeps`](deps.argvdeps.md) | `Contract`, `Parser` |
 | [`deps.DatabaseDeps`](deps.databasedeps.md) | `Config`, `Key`, `Int`, `Nested`, `Float`, `String`, `Link`, `Bytes`, `KeyConflict`, `NoValue`, `MissingField`, `InvalidField`, `Internal`, `Removed`, `InvalidSchema`, `InvalidArgument`, `Field`, `Schema`, `Props`, `Error`, `Record`, `Collection`, `Database`, `Databases`, `Info`, `ProjectConfig`, `ProjectSandbox`, `Sandbox` |
-| [`deps.EmbedDeps`](deps.embeddeps.md) | `Contract` |
+| [`deps.EmbedDeps`](deps.embeddeps.md) | `Contract`, `Translator`, `Language` |
 | [`deps.EncryptionDeps`](deps.encryptiondeps.md) | `Contract` |
 | [`deps.EnvDeps`](deps.envdeps.md) | `Contract` |
 | [`deps.GeoipDeps`](deps.geoipdeps.md) | `Contract`, `Database` |

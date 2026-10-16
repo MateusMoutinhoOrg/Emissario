@@ -14,15 +14,15 @@ With every value it reads:
 
 ```bash
 curl 'localhost:3000/admin?lang=my-lang' \
-  -b 'backoffice_language=my-backoffice_language'
+  -b 'backoffice_language=my-backoffice-language'
 ```
 
 ## Query string, headers and cookies
 
 | Name | Sent in | What goes there | Required | Example | Description |
 | --- | --- | --- | --- | --- | --- |
-| `lang` | query | text | no | `my-lang` | the language a page is asked in, pt-BR — kept in the backoffice_language cookie for the next pages |
-| `backoffice_language` | cookie | text | no | `my-backoffice_language` | the language chosen before, set by ?lang= |
+| `lang` | query string | text | no | `my-lang` | the language a page is asked in, pt-BR — kept in the backoffice_language cookie for the next pages |
+| `backoffice_language` | cookie | text | no | `my-backoffice-language` | the language chosen before, set by ?lang= |
 
 ## What comes back
 

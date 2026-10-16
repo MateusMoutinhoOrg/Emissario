@@ -81,6 +81,7 @@ or `403`, for example — or let it through to this route.
 | [`list-visualization-views-page`](list_visualization_views_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-visualization-visitors-page`](list_visualization_visitors_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-client-ip`](backoffice_client_ip.md) | always |
+| [`backoffice-language`](backoffice_language.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-maintenance`](backoffice_maintenance.md) | always |
 | [`backoffice-root-guard`](backoffice_root_guard.md) | depends on the address — `explain-route` gives the exact answer |
 | [`backoffice-same-origin`](backoffice_same_origin.md) | depends on the address — `explain-route` gives the exact answer |

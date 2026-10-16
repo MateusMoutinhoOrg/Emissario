@@ -17,7 +17,7 @@ Contract is the embedded-asset library injected whole as the Deps.EmbedDeps fiel
 
 ## `Translator`
 
-Translator is the language a translated template is rendered in, and the functions it calls for its text. The adapter turns every argument a template passes into its text form before calling one, and registers them as `lang`, `languages`, `t`, `th` and `tr`.
+Translator is the language a translated template is rendered in, and the functions it calls for its text. The adapter turns every argument a template passes into its text form before calling one, and registers them under these names: {{lang}} Lang, for <html lang> {{languages}} Languages, for a language picker {{t "key" .A .B}} Text: the text of key, its {0}, {1}… filled, escaped like any value {{th "key" .A .B}} Markup: the same, its markup kept — only in text, never in an attribute {{tr .Message}} Message: the translation of a text built in English, or the text itself
 
 | Field | Type | Description |
 | --- | --- | --- |
