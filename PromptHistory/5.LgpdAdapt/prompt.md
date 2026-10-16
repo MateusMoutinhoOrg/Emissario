@@ -22,7 +22,7 @@ The one exception is the encryption key, which comes from the environment.
 |---|---|---|
 | Storing contacts / IPs **violates** the law | Storing them is lawful when there is a legal basis, transparency, a limited retention, security and a way for people to exercise their rights. The obligations fall on the operator. | The popups list the **obligations** the root takes on, not "violations". |
 | Warn when retention is **higher than the law** | Neither the LGPD nor the GDPR sets a number of days. They require "no longer than necessary" (LGPD arts. 15–16; GDPR art. 5(1)(e)). The numbers come from regulators' references and from other laws. | Each retention has a default, an allowed range and a **warning threshold** with its source (**§4**). |
-| Hash IPs with a fast hash, "like a password" | IPv4 has 2³² addresses, so an unsalted fast hash is reversed in seconds by hashing every address. A hashed IP is still **pseudonymous** personal data for whoever holds the key (GDPR art. 4(5) and recital 26; EDPB Guidelines 01/2025; CJEU C-413/23 P *SRB*, 4 Sep 2025). | Keyed HMAC with a **daily random salt** that is destroyed after 2 days (**§6**). |
+| Hash IPs with a fast hash, "like a password" (`hash(ip + salt + secret)`) | It holds when the hash is **keyed** with a secret kept outside the readable data: whoever has only the database cannot reverse it. Without a key, IPv4's 2³² addresses are all hashed in seconds. A salt must be global to keep the hash deterministic, so salt + secret amount to one key. Whoever holds the key (the server, or whoever breaks into it) can still hash every address or confirm one IP. A stable value also singles a visitor out over time. So it is **pseudonymous** personal data, with retention and rights like any other (GDPR art. 4(5) and recital 26; EDPB Guidelines 01/2025; CJEU C-413/23 P *SRB*, 4 Sep 2025). | `HMAC-SHA256(ip-key, ip)` with a **fixed random key** stored encrypted in the database. The hash is deterministic, so it counts visitors over any period and can match an abuser later. It cannot be reversed without the key. It is blanked when the IP retention ends (**§6**). |
 | Hashing IPs by default is always the safe side | In Brazil, Marco Civil da Internet (Lei 12.965/2014) **art. 15** *requires* a company that runs an internet application for profit to keep access logs (IP + date/time) for **6 months**, kept confidential and secured, and disclosed only on a court order (art. 10). | `hashed` remains the default. The Privacy page warns Brazilian companies and offers `full` mode with a 6-month default (**§6**). |
 | Summaries: "AI can make mistakes" | That is true, and two more facts apply. The whole conversation goes to the model provider, which is a processor and often an international transfer. Since **2 Aug 2026** the EU AI Act (Reg. 2024/1689) **art. 50(1)** requires that people be told when they are talking to an AI. The 2026 AI omnibus postponed the high-risk rules, not this one. | The summary notice and a new agent notice cover both (**§8**). |
 | Encrypt "on start server" | `add-backoffice-user` and every other command that opens a database writes to it too. | The key is required by **every command that touches a database** (**§3**). |
@@ -149,14 +149,13 @@ server, which holds the key in memory. Say this in the doc.
 | Data | Default | Allowed | Warning (needs acknowledgement) | Reference for the threshold |
 |---|---|---|---|---|
 | Contact request | **180 days** | 1–1825 | > 365 | No legal number. Keep it while you answer it and while the relationship lasts (LGPD 15–16; GDPR 5(1)(e)). CNIL: prospects ≤ 3 years after the last contact. 5 years ≈ the Brazilian consumer limitation period (CDC art. 27), as the outer bound for a legal defence (LGPD art. 7 VI) |
-| Full IP (mode `full`) | **184 days** (the longest 6-month span) | 1–1095 | < 184 (BR) **and** > 365 (EU) | Marco Civil art. 15: at least 6 months for BR for-profit companies. CNIL 2021-122: 6 months–1 year, up to 3 years only with a documented need |
+| IP, full or hashed (`ip-retention-days`) | **184 days** (the longest 6-month span) | 1–1095 | < 184 in `full` (BR) **and** > 365 (EU) | Marco Civil art. 15: at least 6 months for BR for-profit companies. CNIL 2021-122: 6 months–1 year, up to 3 years only with a documented need. A hash is still personal data (**§1**), so the same limit applies to it |
 | Visualization view | 90 (as today) | 1–3650, blank = forever (as today) | > 760 or blank | CNIL audience measurement: ≤ 25 months |
 | Agent summary | **90 days** | 1–1825 | > 365 | as contact requests |
-| Daily IP salt (mode `hashed`) | 2 days, fixed | – | – | Once the salt is gone, Emissario can no longer link a hash back to an IP |
 | Backup snapshot | blank (kept) | 1–3650 | blank, or longer than the longest retention above | Data that retention removes from the database lives on in the snapshots taken before |
 
-- An `ip` field older than the IP retention is **blanked**, and the record stays until its own retention
-  ends. For example, a contact request kept 180 days with full IPs kept 30 days loses its IP on day 30.
+- An `ip` field older than the IP retention is **blanked**, whether it holds a full IP or a hash. The
+  record stays until its own retention ends. For example, a contact request kept 180 days with full IPs kept 30 days loses its IP on day 30.
 - Retention is counted from `at`, in days of the server's time zone.
 - Above the maximum → `400`. Above the warning → the acknowledgement of **§9** with the reference text.
 
@@ -190,23 +189,43 @@ goroutine.
 ### Modes — `privacy-setting.ip-mode`
 | Mode | Stored in `visualization-view.ip`, `contact-request.ip`, `agent-usage.ip` |
 |---|---|
-| `hashed` (default) | `h:` + hex of the first 16 bytes of `HMAC-SHA256(salt_of_day, ip)`. IPv4 whole, IPv6 by its `/64`, the same grouping as the rate limits |
+| `hashed` (default) | `h:` + hex of the first 16 bytes of `HMAC-SHA256(ip-key, ip)`. IPv4 whole, IPv6 by its `/64`, the same grouping as the rate limits, so an attacker cannot dodge a match by rotating inside their `/64`. Blanked after the IP retention (**§4**) |
 | `full` | the IP, blanked after the IP retention (**§4**) |
 
-- **Daily salt:** 32 random bytes per day, in table `privacy-ip-salt` (`day` key `YYYY-MM-DD`, `salt`
-  bytes), encrypted like everything else. It survives a restart within the day, and the cleanup deletes
-  the salts older than yesterday. Do **not** use a fixed or unsalted hash: it is reversible.
+- **IP key:** 32 random bytes, created on the first start and kept in `privacy-setting.ip-key`. It is
+  encrypted by the storage layer like every value, so a stolen disk or backup without
+  `EMISSARIO_ENCRYPT_KEY` does not reveal it. It is **not derived** from `EMISSARIO_ENCRYPT_KEY`:
+  rotating that key with `encrypt-database` must not change the hashes.
+  - This is the password scheme with its two differences made explicit: the salt is **one for all rows**,
+    so the same IP gives the same value, and it is **secret**, kept apart from the hashes.
+  - **Do not reuse `passworddeps` (`pbkdf2password`).** Its fresh random salt per hash gives the same IP
+    a different value every time, so there is nothing to count or match. Login works only because it
+    knows which row to verify, and an IP has no row. Its 600 000 rounds also cost ~0.3 s of CPU per page
+    view.
+  - The secret is what protects the hash, not the hash function. With the salt readable next to the
+    hashes, a salted SHA-256 IP was recovered in **4.7 s** on a 4-core laptop. The stored country
+    narrowed the search to `177.0.0.0/8`, and the whole of IPv4 took ~20 min. With a global salt, even
+    PBKDF2 is beaten by one table of all 2³² IPs computed once.
+  - Combine the secret with `HMAC-SHA256(ip-key, ip)`, not `sha256(ip + salt + secret)`.
+- **Rotate IP key** (Privacy page, danger zone, confirmed): new random key. Old hashes can no longer be
+  matched to new visits nor confirmed against an IP. This is the way to "forget" linkage early, for
+  example after a server compromise. Hashes and blocks made before it stop matching.
+- **With `--notencrypt`** the IP key sits in clear in `data/`, so the hashes protect nothing. The debug
+  warning says so.
 - **Done before hashing, on the raw IP, in memory:** the country lookup, the ignored IPs, and the rate
   limits per minute and per day (in memory, as today).
-- **What `hashed` changes, documented in Visualization:**
-  - Unique visitors are exact within a day. Over a longer period they are the sum of the days, because
-    the same person on two days counts twice.
-  - The Visitors page groups by hash per day.
-  - The root's `ip` filter matches only the days whose salt is still held (today and yesterday), and
-    the page says so. A CIDR filter is refused in `hashed` mode.
-  - `agent-usage` per-IP daily limits keep working, because a day has one salt.
-  - The full `user-agent` is not stored. Device, browser and os are. Together with a hash and a time, the
-    full string is a quasi-identifier.
+- **What `hashed` gives and changes, documented in Visualization:**
+  - Unique visitors are exact over any period within the retention.
+  - The Visitors page groups by hash, with country, device, browser, os, views and first/last seen as
+    today.
+  - The root's `ip` filter takes a typed IP and filters by its hash over the whole retention. A CIDR
+    filter is refused in `hashed` mode: a range cannot be hashed.
+  - `agent-usage` per-IP daily limits keep working.
+  - The full `user-agent` is not stored. Device, browser and os are. Together with a stable hash, the
+    full string adds fingerprinting without serving any feature.
+- **Blocking:** the hash is stable, so an abuser seen in Visitors, a contact request or agent usage can be
+  matched again later. The blocklist is out of scope here (see **Out of scope**). Volumetric DDoS is
+  stopped before Emissario (reverse proxy, firewall, CDN), not by a lookup per request inside it.
 - **Viewer masking** (`203.0.113.xxx`, IPv6 /48) applies to `full` mode on **every** page and API,
   contact requests included. A viewer sees a hash as `h:3fa9…`.
 - Backoffice users' own IPs (`api-token.last-used-ip`, `ips`) are a security log of staff, not of
@@ -314,8 +333,8 @@ Generated from **§4**: *You set N days. Above T days, the references below ask 
 Linked from the top bar (root) and from the home page.
 
 - **Encryption** (read only): on/off, `key_id`, algorithm.
-- **IP mode** and **IP retention**, with the Brazil note (**§6**). Danger zone: *Hash the IPs already
-  stored* (irreversible, `data-confirm`).
+- **IP mode** and **IP retention**, with the Brazil note (**§6**). Danger zone, each irreversible and
+  confirmed with `data-confirm`: *Hash the IPs already stored* · *Rotate IP key*.
 - **What this server keeps**: one row per table holding personal data, with the fields, the retention,
   the count and the oldest record. This is the base of the records of processing (LGPD art. 37; GDPR art.
   30).
@@ -323,10 +342,10 @@ Linked from the top bar (root) and from the home page.
   long, the model provider's host, that no cookie is set, the rights, and placeholders for the
   controller, the contact and the encarregado/DPO. The root copies it into the website. It is marked
   *draft — review it*.
-- **Find and erase a person** (LGPD art. 18; GDPR arts. 15, 17): an IP (in `full` mode, or `hashed`
-  within the salt window) or a text (email, phone). It shows the matches in contact requests, views and
-  agent usage, with **Export JSON** and **Delete all** (confirmed). In `hashed` mode, past the salt
-  window, the page says the data can no longer be linked to the person (GDPR art. 11).
+- **Find and erase a person** (LGPD art. 18; GDPR arts. 15, 17): an IP (hashed with the current IP key
+  in `hashed` mode) or a text (email, phone). It shows the matches in contact requests, views and agent
+  usage, with **Export JSON** and **Delete all** (confirmed). Hashes made before a *Rotate IP key* no
+  longer match, and the page says so (GDPR art. 11).
 - **History**: the acknowledgements and privacy setting changes, newest first.
 - **Backup retention** (**§4**).
 
@@ -352,8 +371,7 @@ acknowledgement · a retention not set · snapshots holding data past retention.
 ## 11. Database — `privacy-db` (key-prefix `privacydb`)
 | Table | Fields |
 |---|---|
-| `privacy-setting` (one record) | `ip-mode` (`hashed`/`full`), `ip-retention-days`, `backup-retention-days` |
-| `privacy-ip-salt` | `day` (key), `salt` (bytes) |
+| `privacy-setting` (one record) | `ip-mode` (`hashed`/`full`), `ip-key` (bytes, 32), `ip-key-rotated-at`, `ip-retention-days`, `backup-retention-days` |
 | `privacy-acknowledgement` | `at`, `user-id`, `username`, `notice` (`contacts-v1`…), `values` (JSON of what was saved) |
 
 New fields: `contact-setting.retention-days` · `agent-setting.summaries-enabled`,
@@ -364,7 +382,7 @@ New fields: `contact-setting.retention-days` · `agent-setting.summaries-enabled
 ## 12. Where it lives
 | Path | What |
 |---|---|
-| `sandbox/internal/privacy/` | modes, salts, HMAC, retention rules and cleanup, notices and acknowledgements, notice draft, find/erase |
+| `sandbox/internal/privacy/` | modes, IP key and HMAC, retention rules and cleanup, notices and acknowledgements, notice draft, find/erase |
 | `sandbox/internal/encryption/` | key parsing, HKDF, value format, `encryption.json` check |
 | Keep `encryptedstorage`, or `adapters/impls/<encrypted-keep>/` | the storage wrapper (**§3**) |
 | `sandbox/internal/commands/middleware/database_encryption/` | key / `--notencrypt` in front of every command |
@@ -388,8 +406,10 @@ because losing it loses the data.
 - `git` started by the sync has no `EMISSARIO_ENCRYPT_KEY` in its environment.
 - With the default settings: contact requests → `503 disabled`, summaries → `503 summaries-disabled`,
   views hold `h:` hashes and no user agent.
-- The same IP on the same day gives the same hash. On the next day it gives another. After 2 days the
-  salt is gone.
+- The same IP always gives the same hash, also after a restart and after `encrypt-database` rotates
+  `EMISSARIO_ENCRYPT_KEY`. After *Rotate IP key* it gives another. Two IPv6 addresses in one `/64` give
+  one hash. `ip-key` never appears in clear in an encrypted `data/`.
+- An IP hash older than the IP retention is blanked by the cleanup.
 - `set-contact-settings {enabled:true}` without `acknowledge` → `409`. With it → `200` and one
   `privacy-acknowledgement` row.
 - Retention: a record past retention is gone after one cleanup run. A full IP past the IP retention is
@@ -410,6 +430,8 @@ because losing it loses the data.
 ## Out of scope
 - A cookie banner or consent manager: Emissario sets no cookie on visitors.
 - A self-service portal for visitors' requests: the root answers them through **§10**.
+- A blocklist by IP hash (*Block* on a visitor, contact request or usage row → `403` for that hash). The
+  stable hash of **§6** makes it possible later.
 - KMS, HSM or a key server: the key comes from the environment.
 - Automatic per-country configuration, and laws other than BR/EU (UK GDPR, US state laws).
 - Legal advice: the notices inform, and the operator decides.
