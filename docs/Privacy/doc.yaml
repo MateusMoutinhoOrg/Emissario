@@ -1,0 +1,5 @@
+description: "Privacy by default under the LGPD, the Marco Civil da Internet and the GDPR: every database encrypted at rest, IPs hashed, a Marco Civil access log a root turns on, retentions with their references, notices before every risky choice, find and erase, legal holds and presets, at /admin/root/set-privacy-settings"
+name: "Privacy"
+order: 5
+themes:
+  - server-usage
