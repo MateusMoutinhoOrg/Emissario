@@ -13,8 +13,8 @@ import (
 // and its agent-usage holds none either. The conversation itself is never
 // stored.
 
-// summaryPromptAsset is the mandatory part of the summary instructions.
-const summaryPromptAsset = "agent/summary.md"
+// SummaryPromptAsset is the mandatory part of the summary instructions.
+const SummaryPromptAsset = "agent/summary.md"
 
 // refBytes is how many random bytes the id of a summary holds, in hex.
 const refBytes = 8
@@ -33,7 +33,7 @@ func Summarize(sandbox *api.Sandbox, ip string, messages []Message) (string, *Re
 	if !settings.SummariesEnabled {
 		return "", &Refusal{Status: api.StatusServiceUnavailable, Message: CodeSummariesOff}
 	}
-	system, refusal := systemPrompt(sandbox, summaryPromptAsset, SummaryFile, false)
+	system, refusal := systemPrompt(sandbox, SummaryPromptAsset, SummaryFile, false)
 	if refusal != nil {
 		return "", refusal
 	}

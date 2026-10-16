@@ -7,8 +7,8 @@ import (
 )
 
 // Handle runs in front of every command line that may open a database —
-// every one but help, version, generate-encrypt-key and rotate-encrypt-key —
-// right after database-dir has set the folder, and answers nothing. It reads
+// every one but help, version, generate-encrypt-key, rotate-encrypt-key,
+// drop-front-skills and drop-agents-skills — right after database-dir has set the folder, and answers nothing. It reads
 // the key out of the environment, removes it from there, checks it against
 // the folder and arms the store every database is written through
 // (encryption.Open); until it does, every read and write of a database

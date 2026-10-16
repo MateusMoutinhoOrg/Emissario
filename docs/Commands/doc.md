@@ -38,6 +38,13 @@ lists the flags of the middlewares in front of it too.
 | --- | --- |
 | [`start-server`](start-server.md) | Start the http server |
 
+## Skills
+
+| Command | Does |
+| --- | --- |
+| [`drop-agents-skills`](drop-agents-skills.md) | Write the skills that teach a coding agent to write the instructions of the agent of emissario |
+| [`drop-front-skills`](drop-front-skills.md) | Write the skills that teach a coding agent to build the website emissario serves |
+
 ## Middlewares
 
 Run in front of the commands they match, lowest `priority` first; typed by nobody.
@@ -48,7 +55,7 @@ Run in front of the commands they match, lowest `priority` first; typed by nobod
 | [`backoffice-start-server`](backoffice-start-server.md) | `start-server` | 50 | `--addr`, `--allow-x-forwarded-for`, `--insecure-http` |
 | [`contact-start-server`](contact-start-server.md) | `start-server` | 54 | — |
 | [`database-dir`](database-dir.md) | `*` | 6 | `--database` |
-| [`database-encryption`](database-encryption.md) | `* !(help|version|generate-encrypt-key|rotate-encrypt-key)` | 7 | `--notencrypt` |
+| [`database-encryption`](database-encryption.md) | `* !(help|version|generate-encrypt-key|rotate-encrypt-key|drop-front-skills|drop-agents-skills)` | 7 | `--notencrypt` |
 | [`help-flag`](help-flag.md) | `*` | 5 | `--help`, `-h` |
 | [`privacy-start-server`](privacy-start-server.md) | `start-server` | 55 | `--client-port-header` |
 | [`visualization-start-server`](visualization-start-server.md) | `start-server` | 52 | `--visualization-geoip` |

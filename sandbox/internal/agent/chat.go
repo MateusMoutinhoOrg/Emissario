@@ -5,9 +5,9 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 )
 
-// systemPromptAsset is the mandatory part of the system prompt, embedded:
+// SystemPromptAsset is the mandatory part of the system prompt, embedded:
 // what every agent holds to, whatever its README.md says.
-const systemPromptAsset = "agent/system.md"
+const SystemPromptAsset = "agent/system.md"
 
 // Reply answers the next message of the agent in the conversation messages —
 // checked by CheckMessages — for the visitor at ip: the system prompt is the
@@ -24,7 +24,7 @@ func Reply(sandbox *api.Sandbox, ip string, messages []Message) (string, *Refusa
 	if refusal := ready(sandbox, settings); refusal != nil {
 		return "", refusal
 	}
-	system, refusal := systemPrompt(sandbox, systemPromptAsset, ReadmeFile, true)
+	system, refusal := systemPrompt(sandbox, SystemPromptAsset, ReadmeFile, true)
 	if refusal != nil {
 		return "", refusal
 	}

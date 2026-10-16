@@ -83,6 +83,9 @@ a slow clone of one never holds the other. It is cloned into `<fonts>/agent`.
 
 A new commit reaches the agent with the next sync: the files are read at every message.
 
+`emissario drop-agents-skills --path <repo>` writes into that repository the skill a coding agent
+(Claude Code, Codex, Antigravity) loads to write these files: see [Skills](../Skills/doc.md).
+
 ## Settings — `agent-setting`, one record, root only
 
 | Field | Rule |

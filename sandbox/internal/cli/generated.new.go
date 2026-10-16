@@ -24,6 +24,8 @@ import (
 	generate_encrypt_key "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/privacy/generate_encrypt_key"
 	rotate_encrypt_key "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/privacy/rotate_encrypt_key"
 	start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/server/start_server"
+	drop_agents_skills "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/skills/drop_agents_skills"
+	drop_front_skills "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/skills/drop_front_skills"
 )
 
 // NewCli builds the cli surface of the sandbox: Commands, one entry per
@@ -47,6 +49,8 @@ func NewCli(sandbox *api.Sandbox) api.Cli {
 		contact_start_server.NewCommand(sandbox),
 		privacy_start_server.NewCommand(sandbox),
 		add_backoffice_user.NewCommand(sandbox),
+		drop_agents_skills.NewCommand(sandbox),
+		drop_front_skills.NewCommand(sandbox),
 		generate_encrypt_key.NewCommand(sandbox),
 		help.NewCommand(sandbox),
 		remove_ip_blocks.NewCommand(sandbox),

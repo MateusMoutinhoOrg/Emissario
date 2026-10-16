@@ -21,5 +21,7 @@ Runs in front of every command line and answers none of them. It reads --databas
 | [`generate-encrypt-key`](generate-encrypt-key.md) | always |
 | [`rotate-encrypt-key`](rotate-encrypt-key.md) | always |
 | [`start-server`](start-server.md) | always |
+| [`drop-agents-skills`](drop-agents-skills.md) | always |
+| [`drop-front-skills`](drop-front-skills.md) | always |
 
 Middlewares · [every command](doc.md) · [CommandYaml](../CommandYaml/doc.md)

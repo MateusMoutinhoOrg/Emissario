@@ -4,6 +4,9 @@ The public website is a git repository, served from its `frontend/` folder. A ro
 branch and sync time in the backoffice; `start-server` clones it into `<fonts>/frontend` and keeps
 pulling the branch. **Sync** — a button and its JSON twin — pulls it on demand.
 
+`emissario drop-front-skills --path <repo>` writes into the website repository the skill a coding agent
+(Claude Code, Codex, Antigravity) loads to build it: see [Skills](../Skills/doc.md).
+
 ## Run it
 
 ```bash

@@ -1,0 +1,4 @@
+description: 'Skills for coding agents: drop-front-skills and drop-agents-skills write into the website and the agent repositories what Claude Code, Codex and Antigravity need to know of emissario'
+name: Skills
+themes:
+    - cli-usage

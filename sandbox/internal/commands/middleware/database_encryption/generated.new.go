@@ -23,10 +23,10 @@ func NewCommand(sandbox *api.Sandbox) *api.Command {
 	self.Priority = 7
 	self.Segments = 0
 	self.Strict = false
-	self.Pattern = "* !(help|version|generate-encrypt-key|rotate-encrypt-key)"
+	self.Pattern = "* !(help|version|generate-encrypt-key|rotate-encrypt-key|drop-front-skills|drop-agents-skills)"
 	self.Category = "Middleware"
 	self.Summary = "Open every database encrypted with EMISSARIO_ENCRYPT_KEY, or in clear with --notencrypt"
-	self.Description = "Runs in front of every command line that may open a database, and answers none of them. It reads the key every database is encrypted with from the EMISSARIO_ENCRYPT_KEY environment variable — 32 random bytes in base64 or hex, which `emissario generate-encrypt-key` prints — removes it from the process environment, so git and its hooks never inherit it, and checks it against <database>/encryption.json before any record is read. A new database folder is encrypted with that key and gets its encryption.json; a folder encrypted with another key, a key missing, or a folder in clear the command refuses, with exit 1. --notencrypt opens a folder in clear instead, for local debugging only: it warns at every start, and every backoffice page says so. help, version and generate-encrypt-key open no database and skip it; rotate-encrypt-key reads both keys itself."
+	self.Description = "Runs in front of every command line that may open a database, and answers none of them. It reads the key every database is encrypted with from the EMISSARIO_ENCRYPT_KEY environment variable — 32 random bytes in base64 or hex, which `emissario generate-encrypt-key` prints — removes it from the process environment, so git and its hooks never inherit it, and checks it against <database>/encryption.json before any record is read. A new database folder is encrypted with that key and gets its encryption.json; a folder encrypted with another key, a key missing, or a folder in clear the command refuses, with exit 1. --notencrypt opens a folder in clear instead, for local debugging only: it warns at every start, and every backoffice page says so. help, version, generate-encrypt-key, drop-front-skills and drop-agents-skills open no database and skip it; rotate-encrypt-key reads both keys itself."
 	self.Examples = []string{}
 	self.Hidden = false
 
@@ -40,7 +40,7 @@ func NewCommand(sandbox *api.Sandbox) *api.Command {
 			Default:     "",
 			HasDefault:  false,
 			Description: "",
-			Trigger:     api.Trigger{Set: true, Type: api.TriggerOneOf, Value: "", Values: []string{"help", "version", "generate-encrypt-key", "rotate-encrypt-key"}, Negate: true, IgnoreCase: false},
+			Trigger:     api.Trigger{Set: true, Type: api.TriggerOneOf, Value: "", Values: []string{"help", "version", "generate-encrypt-key", "rotate-encrypt-key", "drop-front-skills", "drop-agents-skills"}, Negate: true, IgnoreCase: false},
 		},
 	}
 

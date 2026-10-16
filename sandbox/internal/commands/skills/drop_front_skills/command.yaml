@@ -1,0 +1,18 @@
+args:
+    - end: 0
+      id: Verb
+      start: 0
+      trigger:
+        type: equal
+        value: drop-front-skills
+category: Skills
+description: 'Writes the emissario-website skill into the website repository at --path, once for each coding agent: .claude/skills/ (Claude Code), .agents/skills/ (Codex) and .agent/skills/ (Antigravity). The skill holds the public interface the website needs and nothing else: how its frontend/ folder is served, the paths the server keeps, the contact form at POST /api/contact-requests and the chat of the agent at POST /api/agent/messages. A run removes the emissario-website folder of each agent and writes it again, so a second run changes nothing and a new version leaves no stale file; nothing else of the repository is touched. It opens no database.'
+examples:
+    - drop-front-skills --path .
+    - drop-front-skills --path ../my-site
+flags:
+    - default: .
+      description: the website repository to write the skills into (defaults to the current directory)
+      id: Path
+priority: 100
+summary: Write the skills that teach a coding agent to build the website emissario serves

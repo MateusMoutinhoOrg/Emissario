@@ -21,6 +21,7 @@ nothing to an analytics service and installs no runtime. The only thing the host
 | **Privacy by default** | Every database encrypted at rest, visitor IPs hashed, contact requests and summaries off until turned on, retentions deleted every hour, a Marco Civil access log, find and erase, legal holds, and LGPD/GDPR presets — each risky choice behind a notice that names the law. [Privacy](docs/Privacy/doc.md) |
 | **IP blocks** | A root blocks one ip, a CIDR range, a hashed ip or a whole country; their requests are answered `403` before the website, the contact form, the agent or the sign-in reads them. [IP Blocks](docs/IpBlocks/doc.md) |
 | **Backups** | Snapshots of every database, taken in the background, then downloaded, uploaded and restored from the backoffice. [Backups](docs/Backups/doc.md) |
+| **Skills for coding agents** | `drop-front-skills` and `drop-agents-skills` write into the website and the agent repositories the skills Claude Code, Codex and Antigravity load: the public routes the site calls, and the files the agent reads. [Skills](docs/Skills/doc.md) |
 
 Every database is embedded and lives in one folder, `./data` by default.
 

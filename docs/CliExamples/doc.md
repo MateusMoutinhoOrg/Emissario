@@ -14,5 +14,6 @@ remove one; the lib side is [LibExamples](../LibExamples/doc.md).
 
 | Example | Description | Source |
 |---|---|---|
+| `drop-skills` |  | [example.sh](../../examples/cli/drop-skills/example.sh) |
 | `encryption-startup` |  | [example.sh](../../examples/cli/encryption-startup/example.sh) |
 
