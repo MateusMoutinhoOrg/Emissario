@@ -214,3 +214,15 @@ func splitLines(sandbox *api.Sandbox, text string) []string {
 	}
 	return lines
 }
+
+// SaveRetention writes days as the retention of the views, leaving every
+// other setting as it is: a privacy preset applies it, after the notices of
+// the whole preset were acknowledged together.
+func SaveRetention(sandbox *api.Sandbox, days int64) error {
+	settings, err := ReadSettings(sandbox)
+	if err != nil {
+		return err
+	}
+	settings.RetentionDays = days
+	return SaveSettings(sandbox, settings)
+}

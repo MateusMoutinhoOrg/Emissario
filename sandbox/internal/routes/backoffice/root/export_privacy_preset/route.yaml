@@ -1,0 +1,23 @@
+category: Privacy
+description: Root only. The preset document of preset, <id>@<version>, as a JSON download, to import and apply on another server.
+methods:
+    - GET
+parameters:
+    - description: the preset, <id>@<version>
+      id: Preset
+      key: preset
+      required: true
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootExportPrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/export-privacy-preset
+priority: 100
+private: true
+response-type: application/json
+summary: Downloads a privacy preset as JSON

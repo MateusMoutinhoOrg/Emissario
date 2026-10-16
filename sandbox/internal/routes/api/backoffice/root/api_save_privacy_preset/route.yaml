@@ -1,0 +1,31 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            description:
+                maxLength: 1000
+                type: string
+            name:
+                maxLength: 120
+                type: string
+        required:
+            - name
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only. {name, description?}: stores the current settings as a custom preset, not applied. Answers 201 {preset}.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootSavePrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/save-privacy-preset
+priority: 100
+private: true
+response-type: application/json
+summary: Saves the current privacy settings as a custom preset

@@ -1,0 +1,29 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            description:
+                maxLength: 1000
+                type: string
+            name:
+                maxLength: 120
+                type: string
+        type: object
+    max-bytes: 262144
+    required: true
+    type: form
+category: Privacy
+description: Root only. Stores the current settings as a custom preset named name — its next version when one has that name, a version never changes — with the checklist of the preset applied (lgpd-gdpr when none). Not applied. A built-in name is refused. Answers 303 to the Presets page.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSavePrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/save-privacy-preset
+priority: 100
+private: true
+response-type: text/html
+summary: Saves the current privacy settings as a custom preset

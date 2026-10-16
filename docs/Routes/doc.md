@@ -141,19 +141,28 @@ it prints the address it took. Change it to wherever your server runs.
 
 | Route | What it does |
 | --- | --- |
+| [`POST /api/admin/root/apply-privacy-preset`](api_apply_privacy_preset.md) | Applies a privacy preset, after the notices it needs |
+| [`POST /api/admin/root/check-privacy-preset`](api_check_privacy_preset.md) | Answers whether this server still follows its privacy preset |
 | [`POST /api/admin/root/delete-access-log`](api_delete_access_log.md) | Deletes access log rows, to its readers |
+| [`POST /api/admin/root/delete-privacy-preset`](api_delete_privacy_preset.md) | Deletes a custom privacy preset that is not applied |
+| [`POST /api/admin/root/detach-privacy-preset`](api_detach_privacy_preset.md) | Forgets the privacy preset applied, keeping the settings |
 | [`POST /api/admin/root/erase-privacy-subject`](api_erase_privacy_subject.md) | Deletes every record of a person but those the law or a hold keeps |
 | [`POST /api/admin/root/export-access-log`](api_export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`POST /api/admin/root/export-privacy-preset`](api_export_privacy_preset.md) | Answers a privacy preset as its JSON document |
 | [`POST /api/admin/root/find-privacy-subject`](api_find_privacy_subject.md) | Finds every record of a person, by IP or by a text they sent |
 | [`POST /api/admin/root/get-privacy-notice-draft`](api_get_privacy_notice_draft.md) | Answers the privacy notice draft of the settings in use |
 | [`POST /api/admin/root/get-privacy-settings`](api_get_privacy_settings.md) | Answers the privacy settings, the encryption and what this server keeps |
 | [`POST /api/admin/root/hash-privacy-ips`](api_hash_privacy_ips.md) | Turns every full IP the records keep into its hash |
 | [`POST /api/admin/root/hold-privacy-records`](api_hold_privacy_records.md) | Puts rows on a legal hold |
+| [`POST /api/admin/root/import-privacy-preset`](api_import_privacy_preset.md) | Checks and stores a privacy preset, without applying it |
 | [`POST /api/admin/root/list-access-log`](api_list_access_log.md) | Lists the access log rows a filter keeps, to its readers |
 | [`POST /api/admin/root/list-privacy-access`](api_list_privacy_access.md) | Lists the inventory of the access log reads |
 | [`POST /api/admin/root/list-privacy-holds`](api_list_privacy_holds.md) | Lists the legal holds |
+| [`POST /api/admin/root/list-privacy-presets`](api_list_privacy_presets.md) | Lists the privacy presets |
+| [`POST /api/admin/root/preview-privacy-preset`](api_preview_privacy_preset.md) | Answers what applying a privacy preset would change |
 | [`POST /api/admin/root/release-privacy-hold`](api_release_privacy_hold.md) | Releases a legal hold |
 | [`POST /api/admin/root/rotate-privacy-ip-key`](api_rotate_privacy_ip_key.md) | Replaces the key the IPs are hashed under with a new random one |
+| [`POST /api/admin/root/save-privacy-preset`](api_save_privacy_preset.md) | Saves the current privacy settings as a custom preset |
 | [`POST /api/admin/root/set-access-log-readers`](api_set_access_log_readers.md) | Names the roots who read the access log |
 | [`POST /api/admin/root/set-privacy-settings`](api_set_privacy_settings.md) | Saves the privacy settings, after the notices they need |
 
@@ -225,15 +234,23 @@ it prints the address it took. Change it to wherever your server runs.
 | Route | What it does |
 | --- | --- |
 | [`GET /admin/root/access-log`](access_log_page.md) | Shows the access log of the Marco Civil, to its readers |
+| [`POST /admin/root/apply-privacy-preset`](apply_privacy_preset_form.md) | Applies a privacy preset, after the notices it needs |
 | [`POST /admin/root/delete-access-log`](delete_access_log_form.md) | Deletes access log rows, to its readers |
+| [`POST /admin/root/delete-privacy-preset`](delete_privacy_preset_form.md) | Deletes a custom privacy preset that is not applied |
+| [`POST /admin/root/detach-privacy-preset`](detach_privacy_preset_form.md) | Forgets the privacy preset applied, keeping the settings |
 | [`POST /admin/root/erase-privacy-subject`](erase_privacy_subject_form.md) | Deletes every record of a person but those the law or a hold keeps |
 | [`GET /admin/root/export-access-log`](export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`GET /admin/root/export-privacy-preset`](export_privacy_preset.md) | Downloads a privacy preset as JSON |
 | [`GET /admin/root/export-privacy-subject`](export_privacy_subject.md) | Downloads every record of a person as JSON |
 | [`GET /admin/root/find-privacy-subject`](find_privacy_subject_page.md) | Finds every record of a person, by IP or by a text they sent |
 | [`POST /admin/root/hash-privacy-ips`](hash_privacy_ips_form.md) | Turns every full IP the records keep into its hash |
 | [`POST /admin/root/hold-privacy-records`](hold_privacy_records_form.md) | Puts rows on a legal hold |
+| [`POST /admin/root/import-privacy-preset`](import_privacy_preset_form.md) | Checks and stores a privacy preset, without applying it |
+| [`GET /admin/root/preview-privacy-preset`](preview_privacy_preset_page.md) | Shows what applying a privacy preset would change, before applying it |
+| [`GET /admin/root/privacy-presets`](privacy_presets_page.md) | Shows the privacy presets, the one applied, its drift and its checklist |
 | [`POST /admin/root/release-privacy-hold`](release_privacy_hold_form.md) | Releases a legal hold |
 | [`POST /admin/root/rotate-privacy-ip-key`](rotate_privacy_ip_key_form.md) | Replaces the key the IPs are hashed under with a new random one |
+| [`POST /admin/root/save-privacy-preset`](save_privacy_preset_form.md) | Saves the current privacy settings as a custom preset |
 | [`POST /admin/root/set-access-log-readers`](set_access_log_readers_form.md) | Names the roots who read the access log |
 | [`POST /admin/root/set-privacy-settings`](set_privacy_settings_form.md) | Saves the privacy settings, after the notices they need |
 | [`GET /admin/root/set-privacy-settings`](set_privacy_settings_page.md) | Shows the Privacy page: the privacy settings, what this server keeps, the legal holds and the notices |

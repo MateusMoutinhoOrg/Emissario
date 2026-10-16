@@ -1,0 +1,117 @@
+{
+  "format": 1,
+  "id": "gdpr",
+  "version": 1,
+  "name": "GDPR — EU",
+  "description": "For a website under the GDPR: IPs hashed, no access log, the shortest retentions that serve their purpose.",
+  "jurisdictions": [
+    "EU"
+  ],
+  "values": {
+    "ip-mode": {
+      "value": "hashed",
+      "reference": "Data minimisation and data protection by default (GDPR arts. 5(1)(c), 25)."
+    },
+    "access-log": {
+      "value": false,
+      "reference": "No general duty to keep IPs in the EU: minimisation and privacy by default (GDPR arts. 5(1)(c), 25)."
+    },
+    "access-log-retention-days": {
+      "value": 184,
+      "reference": "Used if a root turns the access log on for security: the CNIL (rec. 2021-122) keeps security logs 6 months to 1 year."
+    },
+    "ip-retention-days": {
+      "value": 184,
+      "reference": "CNIL rec. 2021-122: security logs 6 months to 1 year. A hashed IP is still pseudonymous personal data (GDPR art. 4(5); CJEU C-413/23 P), so it has a limit like any other."
+    },
+    "contact-retention-days": {
+      "value": 180,
+      "reference": "No law sets a number of days: keep a request while you answer it (LGPD arts. 15–16; GDPR art. 5(1)(e)); the CNIL keeps prospects' data at most 3 years after the last contact."
+    },
+    "view-retention-days": {
+      "value": 90,
+      "reference": "Audience statistics: the CNIL keeps them at most 25 months; 90 days serves the statistics with the least data (LGPD art. 6 III; GDPR art. 5(1)(c))."
+    },
+    "summary-retention-days": {
+      "value": 90,
+      "reference": "As contact requests: only while needed (LGPD arts. 15–16; GDPR art. 5(1)(e))."
+    },
+    "backup-retention-days": {
+      "value": 90,
+      "reference": "Data in a snapshot lives up to its retention + 90 days: 184 + 90 stays under one year."
+    },
+    "notice-draft": {
+      "value": "eu",
+      "reference": "The privacy notice draft in English for the EU."
+    }
+  },
+  "checklist": [
+    {
+      "id": "privacy-notice",
+      "text": "Publish a privacy notice on the website (start from the draft on the Privacy page).",
+      "reference": "GDPR art. 13",
+      "when": "always"
+    },
+    {
+      "id": "encarregado",
+      "text": "Name an encarregado / DPO and publish their identity and contact.",
+      "reference": "GDPR arts. 37–39, when required",
+      "when": "always"
+    },
+    {
+      "id": "records",
+      "text": "Keep records of processing (start from What this server keeps).",
+      "reference": "GDPR art. 30",
+      "when": "always"
+    },
+    {
+      "id": "balancing",
+      "text": "Document a legitimate interest balancing test for the analytics and the IP hashes.",
+      "reference": "GDPR art. 6(1)(f)",
+      "when": "always"
+    },
+    {
+      "id": "impact",
+      "text": "Write an impact report for the agent, a new technology.",
+      "reference": "DPIA, GDPR art. 35",
+      "when": "agent"
+    },
+    {
+      "id": "requests",
+      "text": "Offer a channel for data subjects' requests and answer in time.",
+      "reference": "GDPR arts. 12(3), 15–22 (one month)",
+      "when": "always"
+    },
+    {
+      "id": "incidents",
+      "text": "Keep an incident response plan and a register of every incident.",
+      "reference": "Authority within 72 h; every breach documented (GDPR arts. 33, 34)",
+      "when": "always"
+    },
+    {
+      "id": "sensitive",
+      "text": "Check the form and the chat for sensitive data and minors.",
+      "reference": "GDPR arts. 8, 9",
+      "when": "always"
+    },
+    {
+      "id": "eu-representative",
+      "text": "Appoint an EU representative, if established outside the EU.",
+      "reference": "GDPR art. 27",
+      "when": "always"
+    },
+    {
+      "id": "processor",
+      "text": "Sign processing terms with the model provider — no training on the conversations — and check the transfer.",
+      "reference": "GDPR arts. 28, 44–49 (Brazil is adequate)",
+      "when": "agent"
+    },
+    {
+      "id": "ai-disclosure",
+      "text": "Tell visitors in the chat UI that they are talking to an AI.",
+      "reference": "EU AI Act art. 50(1)",
+      "when": "agent"
+    }
+  ],
+  "changes": "First version."
+}

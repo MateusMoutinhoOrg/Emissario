@@ -1,0 +1,28 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            json:
+                maxLength: 200000
+                type: string
+        required:
+            - json
+        type: object
+    max-bytes: 262144
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only. {json}: json is a preset document as a string; checked whole and stored, not applied. 400 names the part refused, 409 a version already stored. Answers 201 {preset}.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootImportPrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/import-privacy-preset
+priority: 100
+private: true
+response-type: application/json
+summary: Checks and stores a privacy preset, without applying it

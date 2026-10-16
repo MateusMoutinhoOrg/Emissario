@@ -515,3 +515,15 @@ func InputOfForm(sandbox *api.Sandbox, form SettingsForm) (SettingsInput, *Refus
 	}
 	return input, nil
 }
+
+// SaveSummaryRetention writes days as the retention of the summaries,
+// leaving every other setting as it is: a privacy preset applies it, after
+// the notices of the whole preset were acknowledged together.
+func SaveSummaryRetention(sandbox *api.Sandbox, days int64) error {
+	settings, err := ReadSettings(sandbox)
+	if err != nil {
+		return err
+	}
+	settings.SummaryRetentionDays = days
+	return saveSettings(sandbox, settings)
+}

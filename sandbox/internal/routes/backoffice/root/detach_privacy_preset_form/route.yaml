@@ -1,0 +1,15 @@
+category: Privacy
+description: 'Root only. Forgets the preset applied: the settings stay as they are and the server is Custom. Answers 303 to the Presets page.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootDetachPrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/detach-privacy-preset
+priority: 100
+private: true
+response-type: text/html
+summary: Forgets the privacy preset applied, keeping the settings

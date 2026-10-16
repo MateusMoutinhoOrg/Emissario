@@ -1,0 +1,26 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            json:
+                maxLength: 200000
+                type: string
+        type: object
+    max-bytes: 262144
+    required: true
+    type: form
+category: Privacy
+description: 'Root only. json is a preset document as an export answers it: checked against the format, the ranges and the known drafts — a setting missing, out of range or unknown is refused, and nothing is written — then stored, not applied. A built-in id or a version already stored is refused. Answers 303 to the Presets page.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootImportPrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/import-privacy-preset
+priority: 100
+private: true
+response-type: text/html
+summary: Checks and stores a privacy preset, without applying it

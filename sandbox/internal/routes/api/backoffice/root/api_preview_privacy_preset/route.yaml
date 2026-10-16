@@ -1,0 +1,28 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            preset:
+                maxLength: 64
+                type: string
+        required:
+            - preset
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only. {preset}: answers {preset, differences: [{setting, preset, current}], notices, deletes: {contact_requests, views, agent_summaries, access_log, snapshots, ips}, effects}, writing nothing; a retention of null keeps the data until a root deletes it. 404 for a preset no one is named.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootPreviewPrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/preview-privacy-preset
+priority: 100
+private: true
+response-type: application/json
+summary: Answers what applying a privacy preset would change

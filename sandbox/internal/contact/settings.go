@@ -284,3 +284,15 @@ func CurrentState(sandbox *api.Sandbox) (State, error) {
 	}
 	return State{Stored: stored, Inbox: inbox, Running: Running(sandbox), Dropped: Dropped(sandbox)}, nil
 }
+
+// SaveRetention writes days as the retention of the contact requests,
+// leaving every other setting as it is: a privacy preset applies it, after
+// the notices of the whole preset were acknowledged together.
+func SaveRetention(sandbox *api.Sandbox, days int64) error {
+	settings, err := ReadSettings(sandbox)
+	if err != nil {
+		return err
+	}
+	settings.RetentionDays = days
+	return saveSettings(sandbox, settings)
+}

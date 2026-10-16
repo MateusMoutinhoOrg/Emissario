@@ -1,0 +1,28 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            preset:
+                maxLength: 64
+                type: string
+        required:
+            - preset
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only. {preset}: deletes the custom preset; a built-in one or the one applied is refused 400, one no one is named 404. Answers {removed}.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootDeletePrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/delete-privacy-preset
+priority: 100
+private: true
+response-type: application/json
+summary: Deletes a custom privacy preset that is not applied

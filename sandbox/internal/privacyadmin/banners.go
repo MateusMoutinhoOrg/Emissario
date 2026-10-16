@@ -72,6 +72,7 @@ func Banners(sandbox *api.Sandbox, user *backoffice_db.BackofficeUserRecord) []B
 // are shown.
 var bannerChecks = []func(sandbox *api.Sandbox) []Banner{
 	notEncryptedBanner,
+	presetBanners,
 	pastRetentionBanner,
 	accessLogBanners,
 	rootsWithoutTotpBanner,
@@ -95,6 +96,36 @@ func notEncryptedBanner(sandbox *api.Sandbox) []Banner {
 		Kind: BannerDanger,
 		Text: "Database not encrypted — debug only. This server runs with --notencrypt: every IP, email, contact request and summary, the access log and the key that hashes the IPs sit in clear on the disk and in every backup.",
 	}}
+}
+
+// presetBanners says when the settings differ from the preset applied, when
+// that preset is gone, and when a newer version of it is available — which
+// is never applied by itself: the law changes, and the root decides.
+func presetBanners(sandbox *api.Sandbox) []Banner {
+	state, err := CheckPreset(sandbox)
+	if err != nil || state.Preset == "" {
+		return nil
+	}
+	if !state.Found {
+		return []Banner{{Kind: BannerWarn, Text: "The preset applied, " + state.Preset + ", no longer exists: apply another one or detach it.", Href: privacy.PresetsPath, Link: "Presets"}}
+	}
+	banners := []Banner{}
+	if !state.Conform {
+		names := []string{}
+		for _, difference := range state.Differences {
+			names = append(names, difference.Setting)
+		}
+		count := sandbox.Deps.StringsDeps.FormatInt(int64(len(names)), 10)
+		text := count + " settings differ from " + state.Preset + ": " + sandbox.Deps.StringsDeps.Join(names, ", ") + "."
+		if len(names) == 1 {
+			text = "1 setting differs from " + state.Preset + ": " + names[0] + "."
+		}
+		banners = append(banners, Banner{Kind: BannerWarn, Text: text, Href: privacy.PresetsPath, Link: "Re-apply or detach"})
+	}
+	if state.Newer != nil {
+		banners = append(banners, Banner{Kind: BannerWarn, Text: state.Newer.Name + " v" + sandbox.Deps.StringsDeps.FormatInt(state.Newer.Version, 10) + " is available: " + state.Newer.Changes, Href: privacy.PresetPreviewPth + "?preset=" + state.Newer.Ref(), Link: "Preview it"})
+	}
+	return banners
 }
 
 // BackupsPath is the Backups page, which marks the snapshots past retention.

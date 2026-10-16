@@ -1,0 +1,26 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            preset:
+                maxLength: 64
+                type: string
+        type: object
+    max-bytes: 262144
+    required: true
+    type: form
+category: Privacy
+description: Root only. Deletes the custom preset, <id>@<version>; a built-in preset, or the one applied, is refused. Answers 303 to the Presets page.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootDeletePrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/delete-privacy-preset
+priority: 100
+private: true
+response-type: text/html
+summary: Deletes a custom privacy preset that is not applied

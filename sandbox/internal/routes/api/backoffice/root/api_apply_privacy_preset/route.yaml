@@ -1,0 +1,32 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            acknowledge:
+                items:
+                    type: string
+                type: array
+            preset:
+                maxLength: 64
+                type: string
+        required:
+            - preset
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only. {preset, acknowledge?}: saves every setting of the preset; until every notice it needs is in acknowledge it answers 409 acknowledgement-required with all of them in notices and writes nothing. Never changes whether data is collected. Answers {preset}; 404 for a preset no one is named. For provisioning many servers with a root API token: {"preset":"lgpd@1","acknowledge":["access-log-v1"]}.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootApplyPrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/apply-privacy-preset
+priority: 100
+private: true
+response-type: application/json
+summary: Applies a privacy preset, after the notices it needs

@@ -1,0 +1,34 @@
+category: Privacy
+description: Root only. The preset applied — or none — with the settings that differ from it, Re-apply and Detach, a newer version of it when there is one (never applied by itself), its controller checklist (the items about the agent only while it is on; nothing records whether one is done), every preset with Preview, Export and Delete, and the forms that save the current settings as a preset and import one. notice, preset and reason tell the outcome of the last action.
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last action
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - description: the preset the last action was about
+      id: Preset
+      key: preset
+      sources:
+        - query
+      type: string
+    - description: why the last action was refused
+      id: Reason
+      key: reason
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootPrivacyPresets
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/privacy-presets
+priority: 100
+private: true
+response-type: text/html
+summary: Shows the privacy presets, the one applied, its drift and its checklist

@@ -1,0 +1,23 @@
+category: Privacy
+description: Root only. Every setting of the preset, now and in the preset, with its reference — equal ones greyed — what happens to the data stored (what the next cleanup deletes, counted now by its rules; the access log turned on or off; the IP mode changed), and the notices applying it asks for, each to tick, beside Apply. Nothing is written. preset is <id>@<version>, or <id> for its latest version.
+methods:
+    - GET
+parameters:
+    - description: the preset, <id>@<version>, or <id> for its latest version
+      id: Preset
+      key: preset
+      required: true
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootPreviewPrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/preview-privacy-preset
+priority: 100
+private: true
+response-type: text/html
+summary: Shows what applying a privacy preset would change, before applying it

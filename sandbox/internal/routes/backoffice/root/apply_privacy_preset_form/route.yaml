@@ -1,0 +1,30 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            acknowledge:
+                items:
+                    type: string
+                type: array
+            preset:
+                maxLength: 64
+                type: string
+        type: object
+    max-bytes: 262144
+    required: true
+    type: form
+category: Privacy
+description: Root only. Saves every setting the preset holds — the IP mode, the access log and its retention, the IP, contact request, view, summary and backup retentions, the notice draft — after the notices they need; until each is sent as acknowledge the preview answers again under a 409 and nothing is written. Whether contact requests, the agent and its summaries are on, who sees full IPs, the access log readers, its two-factor and its inventory are never changed. Keeps privacy-setting.preset = <id>@<version>, nothing about who applied it nor when. Answers 303 to the Presets page.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootApplyPrivacyPreset
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/apply-privacy-preset
+priority: 100
+private: true
+response-type: text/html
+summary: Applies a privacy preset, after the notices it needs
