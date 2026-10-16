@@ -22,15 +22,18 @@ type Input struct {
 // Body is one object of this route's declared json-schema, as the
 // generated ReadBody hands it over.
 type Body struct {
-	ApiKey        string
-	BaseUrl       string
-	ClearApiKey   bool
-	DailyLimit    int
-	Enabled       bool
-	IpDailyLimit  int
-	MaxTokens     int
-	Model         string
-	RatePerMinute int
+	Acknowledge          []string
+	ApiKey               string
+	BaseUrl              string
+	ClearApiKey          bool
+	DailyLimit           int
+	Enabled              bool
+	IpDailyLimit         int
+	MaxTokens            int
+	Model                string
+	RatePerMinute        int
+	SummariesEnabled     bool
+	SummaryRetentionDays int
 }
 
 // MaxBodyBytes is the largest request body this route reads, from the
@@ -39,7 +42,7 @@ const MaxBodyBytes = 65536
 
 // BodySchema is this route's declared json-schema in canonical form — the text
 // Deps.OpinionatedAgnosServer.ValidateSchema checks a request body against.
-const BodySchema = "{\"properties\":{\"api_key\":{\"maxLength\":4096,\"type\":\"string\"},\"base_url\":{\"maxLength\":2048,\"type\":\"string\"},\"clear_api_key\":{\"type\":\"boolean\"},\"daily_limit\":{\"minimum\":0,\"type\":\"integer\"},\"enabled\":{\"type\":\"boolean\"},\"ip_daily_limit\":{\"minimum\":0,\"type\":\"integer\"},\"max_tokens\":{\"maximum\":1000000,\"minimum\":1,\"type\":\"integer\"},\"model\":{\"maxLength\":200,\"type\":\"string\"},\"rate_per_minute\":{\"maximum\":10000,\"minimum\":1,\"type\":\"integer\"}},\"required\":[\"base_url\",\"daily_limit\",\"enabled\",\"ip_daily_limit\",\"max_tokens\",\"model\",\"rate_per_minute\"],\"type\":\"object\"}"
+const BodySchema = "{\"properties\":{\"acknowledge\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"},\"api_key\":{\"maxLength\":4096,\"type\":\"string\"},\"base_url\":{\"maxLength\":2048,\"type\":\"string\"},\"clear_api_key\":{\"type\":\"boolean\"},\"daily_limit\":{\"minimum\":0,\"type\":\"integer\"},\"enabled\":{\"type\":\"boolean\"},\"ip_daily_limit\":{\"minimum\":0,\"type\":\"integer\"},\"max_tokens\":{\"maximum\":1000000,\"minimum\":1,\"type\":\"integer\"},\"model\":{\"maxLength\":200,\"type\":\"string\"},\"rate_per_minute\":{\"maximum\":10000,\"minimum\":1,\"type\":\"integer\"},\"summaries_enabled\":{\"type\":\"boolean\"},\"summary_retention_days\":{\"maximum\":36500,\"minimum\":1,\"nullable\":true,\"type\":\"integer\"}},\"required\":[\"base_url\",\"daily_limit\",\"enabled\",\"ip_daily_limit\",\"max_tokens\",\"model\",\"rate_per_minute\",\"summaries_enabled\"],\"type\":\"object\"}"
 
 // ReadBody reads, validates and converts the request body of one bound route.
 // The generic Run calls it — through the ReadBody generated.new.go closes over
@@ -80,6 +83,9 @@ func ReadBody(sandbox *api.Sandbox, route *api.Route) (Body, error) {
 // optional and comes back as its zero value.
 func bindBody(sandbox *api.Sandbox, document *serializabledeps.SerializableObject) Body {
 	value := Body{}
+	for _, item := range sandbox.Deps.OpinionatedAgnosServer.ReadItems(document, "acknowledge") {
+		value.Acknowledge = append(value.Acknowledge, sandbox.Deps.OpinionatedAgnosServer.ItemString(item))
+	}
 	value.ApiKey = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "api_key")
 	value.BaseUrl = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "base_url")
 	value.ClearApiKey = sandbox.Deps.OpinionatedAgnosServer.ReadBool(document, "clear_api_key")
@@ -89,5 +95,7 @@ func bindBody(sandbox *api.Sandbox, document *serializabledeps.SerializableObjec
 	value.MaxTokens = sandbox.Deps.OpinionatedAgnosServer.ReadInt(document, "max_tokens")
 	value.Model = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "model")
 	value.RatePerMinute = sandbox.Deps.OpinionatedAgnosServer.ReadInt(document, "rate_per_minute")
+	value.SummariesEnabled = sandbox.Deps.OpinionatedAgnosServer.ReadBool(document, "summaries_enabled")
+	value.SummaryRetentionDays = sandbox.Deps.OpinionatedAgnosServer.ReadInt(document, "summary_retention_days")
 	return value
 }

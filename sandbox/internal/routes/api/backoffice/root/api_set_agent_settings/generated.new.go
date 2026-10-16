@@ -27,7 +27,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Pattern = "/api/admin/root/set-agent-settings"
 	self.Category = "Agent API"
 	self.Summary = "Saves the provider and the limits of the public agent"
-	self.Description = "Root only. A blank or absent api_key keeps the one saved, clear_api_key removes it; a limit of 0 is no limit. Answers {settings} as get-agent-settings does; 400 for a value refused, with the field."
+	self.Description = "Root only. A blank or absent api_key keeps the one saved, clear_api_key removes it; a limit of 0 is no limit; summary_retention_days null or absent keeps the summaries until a root deletes them. Turning enabled on asks for the agent-v1 notice, summaries_enabled for summaries-v1, and a summary retention past 365 days or null for retention-summary-v1: until every id is in acknowledge it answers 409 {\"error\":\"acknowledgement-required\",\"field\":\"acknowledge\",\"notice\",\"notices\"} and writes nothing; nothing records that a notice was acknowledged. Answers {settings} as get-agent-settings does; 400 for a value refused, with the field."
 	self.Examples = []string{"curl -X POST localhost:3000/api/admin/root/set-agent-settings -H \"Authorization: Bearer $TOKEN\" -H 'Content-Type: application/json' -d '{\"enabled\":true,\"base_url\":\"https://api.openai.com/v1\",\"api_key\":\"sk-...\",\"model\":\"gpt-4o-mini\",\"max_tokens\":1024,\"daily_limit\":200000,\"ip_daily_limit\":20000,\"rate_per_minute\":10}'"}
 	self.Hidden = false
 

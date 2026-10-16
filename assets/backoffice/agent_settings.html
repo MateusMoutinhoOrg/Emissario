@@ -667,6 +667,26 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .law-panel {
+      margin: 0.5rem 0 1.25rem;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.08);
+    }
+    .law-lead { font-size: 0.85rem; color: #FCD34D; margin-bottom: 0.75rem; }
+    .law-notice h3, .law-notice summary { font-size: 0.98rem; margin-bottom: 0.5rem; color: #FDE68A; cursor: default; }
+    details.law-notice summary { cursor: pointer; }
+    .law-notice + .law-notice { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .law-notice p, .law-notice li { font-size: 0.88rem; line-height: 1.55; color: #E5E7EB; margin-bottom: 0.5rem; }
+    .law-notice ul { margin: 0.25rem 0 0.75rem 1.25rem; }
+    .law-notice code, .facts code { background: rgba(255, 255, 255, 0.08); padding: 0.05rem 0.3rem; border-radius: 5px; font-size: 0.85em; }
+    .ack { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem; font-weight: 600; font-size: 0.9rem; color: var(--text); }
+    .ack input { width: auto; }
+    .privacy-hint { margin: 0.25rem 0 1rem; }
+    .privacy-hint a { text-decoration: underline; }
+    .transfer { margin: -0.5rem 0 1.25rem; }
+    .transfer strong { color: #FCD34D; }
   </style>
 </head>
 <body>
@@ -702,7 +722,7 @@
     <section class="head">
       <div>
         <h1>Settings</h1>
-        <p class="muted">The provider the agent talks to and the limits it holds to. Every conversation is sent to this provider, a third party: say so to your visitors.</p>
+        <p class="muted">The provider the agent talks to, the limits it holds to, and the summaries visitors may ask for. Every conversation is sent to this provider: say so to your visitors.</p>
       </div>
     </section>
 
@@ -719,7 +739,7 @@
         <div class="card-head"><h2>Provider</h2></div>
         <div class="form-group">
           <label class="switch"><input type="checkbox" name="enabled" value="1"{{if .Form.Enabled}} checked{{end}}> The chat answers</label>
-          <span class="hint">Off, /api/agent/* answers 503.</span>
+          <span class="hint">Off — the default — /api/agent/* answers 503 disabled. Turning it on asks for a notice on the provider and on telling visitors they talk to an AI.</span>
         </div>
         <div class="form-group">
           <label for="base-url">Base URL</label>
@@ -737,6 +757,7 @@
           <input type="text" id="model" name="model" value="{{.Form.Model}}" maxlength="200" autocomplete="off" spellcheck="false" placeholder="gpt-4o-mini">
           <span class="hint">A model that supports tool calling.</span>
         </div>
+        {{if .ProviderHost}}<p class="hint transfer">Every message is sent to <code>{{.ProviderHost}}</code>.{{if not .ProviderLocal}} <strong>This is a transfer to a third party:</strong> choose terms under which the provider does not use the conversations to train its models or for its own purposes.{{end}}</p>{{end}}
         <div class="card-head"><h2>Limits</h2></div>
         <div class="form-group">
           <label for="max-tokens">Max tokens</label>
@@ -758,7 +779,23 @@
           <input type="text" inputmode="numeric" id="rate-per-minute" name="rate-per-minute" value="{{.Form.RatePerMinute}}" placeholder="10">
           <span class="hint">Blank is 10. Behind a reverse proxy, run with <code>--allow-x-forwarded-for</code>, or every visitor shares one ip.</span>
         </div>
-        <button type="submit" class="btn btn-primary">Save settings</button>
+        <div class="card-head"><h2>Summaries</h2></div>
+        <div class="form-group">
+          <label class="switch"><input type="checkbox" name="summaries-enabled" value="1"{{if .Form.SummariesEnabled}} checked{{end}}> Visitors may ask for a summary</label>
+          <span class="hint">Off — the default — /api/agent/summaries answers 503 summaries-disabled. Turning it on asks for a notice: a summary written by a model can still hold personal data.</span>
+        </div>
+        <div class="form-group">
+          <label for="summary-retention-days">Keep each summary (days)</label>
+          <input type="text" inputmode="numeric" id="summary-retention-days" name="summary-retention-days" value="{{.Form.SummaryRetentionDays}}" placeholder="Until a root deletes it">
+          <span class="hint">Older summaries are deleted every hour. 90 by default; past 365 days, or blank to keep them until a root deletes them, asks for a notice (LGPD arts. 15–16; GDPR art. 5(1)(e)).</span>
+        </div>
+        <p class="hint privacy-hint">Your website must tell visitors, before the chat starts, that they talk to an AI (EU AI Act art. 50(1)), and say in its privacy notice where the conversations go and what the summaries keep. <a href="{{.DraftHref}}">Start from the draft</a>.</p>
+        {{if .Form.Notices}}<div class="law-panel" role="alert">
+          <p class="law-lead">Read before you confirm. These notices are product information, not legal advice: you are the controller of this data.</p>
+          {{if .Form.RetypeKey}}<p class="law-lead"><strong>Type the API key again before you confirm:</strong> it is never sent back to the page.</p>{{end}}
+          {{range .Form.Notices}}<article class="law-notice"><h3>{{.Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> I have read this notice</label></article>{{end}}
+        </div>{{end}}
+        <button type="submit" class="btn btn-primary">{{if .Form.Notices}}Confirm and save{{else}}Save settings{{end}}</button>
       </form>
 
       <article class="card">
@@ -783,7 +820,7 @@
           <dt>Usage kept</dt>
           <dd>{{.Retention}} days</dd>
         </dl>
-        <p class="hint">Sent to the provider at every message: the conversation, the instructions and what every tool answered. Never stored: the conversation, and the ip with a summary.</p>
+        <p class="hint">Sent to the provider at every message: the conversation, the instructions and what every tool answered. Never stored: the conversation, and the ip with a summary. A summary is stored only while summaries are on, encrypted, until its retention ends.</p>
       </article>
     </section>
   </main>

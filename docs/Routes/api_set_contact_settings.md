@@ -2,7 +2,7 @@
 
 Saves the settings of the contact requests
 
-Root only. Send every field: enabled; max_bytes, the largest body, 2 to 1048576; rate_per_minute, 1 to 10000; ip_daily_limit, requests a day per ip, 0 for no limit. Answers {settings}.
+Root only. Send every field: enabled; max_bytes, the largest body, 2 to 1048576; rate_per_minute, 1 to 10000; ip_daily_limit, requests a day per ip, 0 for no limit; retention_days, 1 to 36500, null or absent to keep the requests until a root deletes them. Turning enabled on asks for the contacts-v1 notice, and a retention past 365 days or null for retention-contact-v1: until every id is in acknowledge it answers 409 acknowledgement-required with the notices and writes nothing. Answers {settings}.
 
 ## Try it
 
@@ -11,7 +11,7 @@ Only what is required:
 ```bash
 curl -X POST localhost:3000/api/admin/root/set-contact-settings \
   -H 'Content-Type: application/json' \
-  -d '{"enabled":true,"ip_daily_limit":1,"max_bytes":2,"rate_per_minute":1,"retention_days":1}'
+  -d '{"enabled":true,"ip_daily_limit":1,"max_bytes":2,"rate_per_minute":1}'
 ```
 
 With every value it reads:
@@ -54,7 +54,7 @@ Send JSON with the header `Content-Type: application/json`, up to 64 KB. The bod
 | `ip_daily_limit` | whole number | yes | from 0 to 1000000 |
 | `max_bytes` | whole number | yes | from 2 to 1048576 |
 | `rate_per_minute` | whole number | yes | from 1 to 10000 |
-| `retention_days` | whole number | yes | from 1 to 36500; may be `null` |
+| `retention_days` | whole number | no | from 1 to 36500; may be `null` |
 
 Example:
 

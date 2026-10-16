@@ -3,6 +3,8 @@ package agent
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/agent_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficehttp"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/websitesource"
 )
 
@@ -31,35 +33,45 @@ const (
 )
 
 // Settings is the one agent-setting record: whether the chat answers, the
-// provider it talks to, and the limits it holds to. A limit of 0 is no limit.
+// provider it talks to, the limits it holds to, whether a visitor may ask for
+// a summary and how many days one is kept. A limit of 0 is no limit; a
+// retention of privacy.Forever keeps the summaries until a root deletes them.
 type Settings struct {
-	Enabled       bool
-	BaseUrl       string
-	ApiKey        string
-	Model         string
-	MaxTokens     int64
-	DailyLimit    int64
-	IpDailyLimit  int64
-	RatePerMinute int64
+	Enabled              bool
+	BaseUrl              string
+	ApiKey               string
+	Model                string
+	MaxTokens            int64
+	DailyLimit           int64
+	IpDailyLimit         int64
+	RatePerMinute        int64
+	SummariesEnabled     bool
+	SummaryRetentionDays int64
 }
 
-// SettingsInput is what a form or a JSON body sends to change the settings.
-// The api key is write-only: "" keeps the one saved, ClearApiKey removes it.
+// SettingsInput is what a form or a JSON body sends to change the settings,
+// with the ids of the notices it acknowledged. The api key is write-only: ""
+// keeps the one saved, ClearApiKey removes it.
 type SettingsInput struct {
-	Enabled       bool
-	BaseUrl       string
-	ApiKey        string
-	ClearApiKey   bool
-	Model         string
-	MaxTokens     int64
-	DailyLimit    int64
-	IpDailyLimit  int64
-	RatePerMinute int64
+	Enabled              bool
+	BaseUrl              string
+	ApiKey               string
+	ClearApiKey          bool
+	Model                string
+	MaxTokens            int64
+	DailyLimit           int64
+	IpDailyLimit         int64
+	RatePerMinute        int64
+	SummariesEnabled     bool
+	SummaryRetentionDays int64
+	Acknowledge          []string
 }
 
-// DefaultSettings are the settings before a root saved any: the chat off.
+// DefaultSettings are the settings before a root saved any: the chat and the
+// summaries off — private by default, as the GDPR art. 25 and the LGPD art.
+// 46 §2 ask — and the summaries kept 90 days once a root turns them on.
 func DefaultSettings(sandbox *api.Sandbox) Settings {
-	return Settings{MaxTokens: DefaultMaxTokens, RatePerMinute: DefaultRatePerMinute}
+	return Settings{MaxTokens: DefaultMaxTokens, RatePerMinute: DefaultRatePerMinute, SummaryRetentionDays: privacy.Rule(privacy.DataSummary).Default}
 }
 
 // settingsLock is held while the agent-setting record is read or written.
@@ -74,14 +86,19 @@ func ReadSettings(sandbox *api.Sandbox) (Settings, error) {
 		return DefaultSettings(sandbox), err
 	}
 	settings := Settings{
-		Enabled:       record.Enabled == 1,
-		BaseUrl:       record.BaseUrl,
-		ApiKey:        record.ApiKey,
-		Model:         record.Model,
-		MaxTokens:     record.MaxTokens,
-		DailyLimit:    record.DailyLimit,
-		IpDailyLimit:  record.IpDailyLimit,
-		RatePerMinute: record.RatePerMinute,
+		Enabled:              record.Enabled == 1,
+		BaseUrl:              record.BaseUrl,
+		ApiKey:               record.ApiKey,
+		Model:                record.Model,
+		MaxTokens:            record.MaxTokens,
+		DailyLimit:           record.DailyLimit,
+		IpDailyLimit:         record.IpDailyLimit,
+		RatePerMinute:        record.RatePerMinute,
+		SummariesEnabled:     record.SummariesEnabled == 1,
+		SummaryRetentionDays: record.SummaryRetentionDays,
+	}
+	if settings.SummaryRetentionDays < 0 || settings.SummaryRetentionDays > privacy.MaxRetentionDays {
+		settings.SummaryRetentionDays = privacy.Forever
 	}
 	if settings.MaxTokens < 1 {
 		settings.MaxTokens = DefaultMaxTokens
@@ -107,7 +124,11 @@ func findSetting(sandbox *api.Sandbox) (agent_db.AgentSettingRecord, bool, error
 
 // ApplySettings checks input and saves it, keeping the saved api key unless
 // input sends a new one or clears it. A refused value comes back as the
-// refusal, and nothing is written.
+// refusal, and nothing is written. Turning the chat on asks for the agent-v1
+// notice, turning the summaries on for summaries-v1, and a summary retention
+// past its warning for the retention notice: until input acknowledges them
+// the refusal is a 409 listing them. Nothing records that a notice was
+// acknowledged.
 func ApplySettings(sandbox *api.Sandbox, input SettingsInput) (Settings, *Refusal, error) {
 	current, err := ReadSettings(sandbox)
 	if err != nil {
@@ -117,7 +138,22 @@ func ApplySettings(sandbox *api.Sandbox, input SettingsInput) (Settings, *Refusa
 	if refusal != nil {
 		return settings, refusal, nil
 	}
+	if missing := privacy.NeedsAcknowledgement(RequiredNotices(current, settings), input.Acknowledge); missing != nil {
+		return settings, &Refusal{Status: missing.Status, Field: missing.Field, Message: missing.Message, Notices: missing.Notices}, nil
+	}
 	return settings, nil, saveSettings(sandbox, settings)
+}
+
+// RequiredNotices is every notice turning before into after asks for.
+func RequiredNotices(before Settings, after Settings) []string {
+	notices := []string{}
+	if after.Enabled && !before.Enabled {
+		notices = append(notices, privacy.NoticeAgent)
+	}
+	if after.SummariesEnabled && !before.SummariesEnabled {
+		notices = append(notices, privacy.NoticeSummaries)
+	}
+	return privacy.RetentionNotice(notices, privacy.DataSummary, before.SummaryRetentionDays, after.SummaryRetentionDays, 0)
 }
 
 // CheckSettings answers input as the settings to save over current, trimmed,
@@ -125,14 +161,16 @@ func ApplySettings(sandbox *api.Sandbox, input SettingsInput) (Settings, *Refusa
 func CheckSettings(sandbox *api.Sandbox, input SettingsInput, current Settings) (Settings, *Refusal) {
 	strings := sandbox.Deps.StringsDeps
 	settings := Settings{
-		Enabled:       input.Enabled,
-		BaseUrl:       strings.TrimSpace(input.BaseUrl),
-		ApiKey:        current.ApiKey,
-		Model:         strings.TrimSpace(input.Model),
-		MaxTokens:     input.MaxTokens,
-		DailyLimit:    input.DailyLimit,
-		IpDailyLimit:  input.IpDailyLimit,
-		RatePerMinute: input.RatePerMinute,
+		Enabled:              input.Enabled,
+		BaseUrl:              strings.TrimSpace(input.BaseUrl),
+		ApiKey:               current.ApiKey,
+		Model:                strings.TrimSpace(input.Model),
+		MaxTokens:            input.MaxTokens,
+		DailyLimit:           input.DailyLimit,
+		IpDailyLimit:         input.IpDailyLimit,
+		RatePerMinute:        input.RatePerMinute,
+		SummariesEnabled:     input.SummariesEnabled,
+		SummaryRetentionDays: input.SummaryRetentionDays,
 	}
 	if key := strings.TrimSpace(input.ApiKey); key != "" {
 		settings.ApiKey = key
@@ -166,6 +204,9 @@ func CheckSettings(sandbox *api.Sandbox, input SettingsInput, current Settings) 
 	if settings.RatePerMinute < 1 || settings.RatePerMinute > MaxRatePerMinute {
 		return settings, refuse("rate_per_minute", "The rate per minute is a number of requests from 1 to 10000.")
 	}
+	if refusal := privacy.CheckRetention(sandbox, "summary_retention_days", settings.SummaryRetentionDays); refusal != nil {
+		return settings, refuse(refusal.Field, refusal.Message)
+	}
 	if settings.Enabled && (settings.BaseUrl == "" || settings.Model == "") {
 		return settings, refuse("enabled", "Set the base URL and the model before turning the agent on.")
 	}
@@ -181,6 +222,10 @@ func saveSettings(sandbox *api.Sandbox, settings Settings) error {
 	if settings.Enabled {
 		enabled = 1
 	}
+	summaries := int64(0)
+	if settings.SummariesEnabled {
+		summaries = 1
+	}
 	db := agent_db.New(sandbox)
 	record, ok, err := findSetting(sandbox)
 	if err != nil {
@@ -188,14 +233,16 @@ func saveSettings(sandbox *api.Sandbox, settings Settings) error {
 	}
 	if !ok {
 		_, err := db.AddAgentSetting(agent_db.AgentSettingInput{
-			Enabled:       enabled,
-			BaseUrl:       settings.BaseUrl,
-			ApiKey:        settings.ApiKey,
-			Model:         settings.Model,
-			MaxTokens:     settings.MaxTokens,
-			DailyLimit:    settings.DailyLimit,
-			IpDailyLimit:  settings.IpDailyLimit,
-			RatePerMinute: settings.RatePerMinute,
+			Enabled:              enabled,
+			BaseUrl:              settings.BaseUrl,
+			ApiKey:               settings.ApiKey,
+			Model:                settings.Model,
+			MaxTokens:            settings.MaxTokens,
+			DailyLimit:           settings.DailyLimit,
+			IpDailyLimit:         settings.IpDailyLimit,
+			RatePerMinute:        settings.RatePerMinute,
+			SummariesEnabled:     summaries,
+			SummaryRetentionDays: settings.SummaryRetentionDays,
 		})
 		return err
 	}
@@ -208,6 +255,8 @@ func saveSettings(sandbox *api.Sandbox, settings Settings) error {
 		func() error { return db.SetAgentSettingDailyLimit(record.Id, settings.DailyLimit) },
 		func() error { return db.SetAgentSettingIpDailyLimit(record.Id, settings.IpDailyLimit) },
 		func() error { return db.SetAgentSettingRatePerMinute(record.Id, settings.RatePerMinute) },
+		func() error { return db.SetAgentSettingSummariesEnabled(record.Id, summaries) },
+		func() error { return db.SetAgentSettingSummaryRetentionDays(record.Id, settings.SummaryRetentionDays) },
 	} {
 		if err := write(); err != nil {
 			return err
@@ -248,6 +297,51 @@ func KeyHint(sandbox *api.Sandbox, key string) string {
 		return "…"
 	}
 	return "…" + key[len(key)-4:]
+}
+
+// localRanges are the addresses of this machine and of private networks: a
+// provider there keeps the conversations on the root's own infrastructure.
+var localRanges = []string{
+	"127.0.0.0/8", "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16", "169.254.0.0/16",
+	"::1/128", "fc00::/7", "fe80::/10",
+}
+
+// ProviderHost is the host of the base url of settings, with its port as the
+// url spells it, "" while none is set.
+func ProviderHost(sandbox *api.Sandbox, settings Settings) string {
+	strings := sandbox.Deps.StringsDeps
+	host := strings.TrimPrefix(strings.TrimPrefix(settings.BaseUrl, "https://"), "http://")
+	return strings.Split(host, "/")[0]
+}
+
+// ProviderIsLocal tells whether host — as ProviderHost answers it — is this
+// machine or a private network: localhost, a name under .localhost, a name
+// of one label (a container or a machine of the local network, which no
+// public DNS answers), or a loopback, private or link-local address. Any
+// other host is a third party the conversations are transferred to.
+func ProviderIsLocal(sandbox *api.Sandbox, host string) bool {
+	strings := sandbox.Deps.StringsDeps
+	name := strings.ToLower(host)
+	if strings.HasPrefix(name, "[") {
+		name = strings.TrimPrefix(strings.Split(name, "]")[0], "[")
+	} else if index := strings.LastIndex(name, ":"); index >= 0 {
+		name = name[:index]
+	}
+	if name == "" {
+		return false
+	}
+	if name == "localhost" || strings.HasSuffix(name, ".localhost") {
+		return true
+	}
+	if _, ok := backofficehttp.ParseIp(sandbox, name); ok {
+		for _, entry := range localRanges {
+			if backofficehttp.IpMatches(sandbox, entry, name) {
+				return true
+			}
+		}
+		return false
+	}
+	return !strings.Contains(strings.TrimSuffix(name, "."), ".")
 }
 
 // CompletionsUrl is the endpoint the provider answers on.
@@ -359,31 +453,43 @@ func ready(sandbox *api.Sandbox, settings Settings) *Refusal {
 	return nil
 }
 
-// SettingsForm is the settings form as it was posted, every field text.
+// SettingsForm is the settings form as it was posted, every field text, and
+// the notices it acknowledged.
 type SettingsForm struct {
-	Enabled       string
-	BaseUrl       string
-	ApiKey        string
-	ClearApiKey   string
-	Model         string
-	MaxTokens     string
-	DailyLimit    string
-	IpDailyLimit  string
-	RatePerMinute string
+	Enabled              string
+	BaseUrl              string
+	ApiKey               string
+	ClearApiKey          string
+	Model                string
+	MaxTokens            string
+	DailyLimit           string
+	IpDailyLimit         string
+	RatePerMinute        string
+	SummariesEnabled     string
+	SummaryRetentionDays string
+	Acknowledge          []string
 }
 
 // InputOfForm reads form as a SettingsInput: a checkbox is on as 1 or on; a
-// blank max tokens is DefaultMaxTokens, a blank rate DefaultRatePerMinute and
-// a blank limit no limit. A number that does not read is refused.
+// blank max tokens is DefaultMaxTokens, a blank rate DefaultRatePerMinute, a
+// blank limit no limit and a blank summary retention privacy.Forever. A
+// number that does not read is refused.
 func InputOfForm(sandbox *api.Sandbox, form SettingsForm) (SettingsInput, *Refusal) {
 	checked := func(value string) bool { return value == "1" || value == "on" }
 	input := SettingsInput{
-		Enabled:     checked(form.Enabled),
-		BaseUrl:     form.BaseUrl,
-		ApiKey:      form.ApiKey,
-		ClearApiKey: checked(form.ClearApiKey),
-		Model:       form.Model,
+		Enabled:          checked(form.Enabled),
+		BaseUrl:          form.BaseUrl,
+		ApiKey:           form.ApiKey,
+		ClearApiKey:      checked(form.ClearApiKey),
+		Model:            form.Model,
+		SummariesEnabled: checked(form.SummariesEnabled),
+		Acknowledge:      form.Acknowledge,
 	}
+	retention, refusal := privacy.ParseRetention(sandbox, "summary_retention_days", form.SummaryRetentionDays)
+	if refusal != nil {
+		return input, refuse(refusal.Field, refusal.Message)
+	}
+	input.SummaryRetentionDays = retention
 	for _, number := range []struct {
 		text     string
 		fallback int64

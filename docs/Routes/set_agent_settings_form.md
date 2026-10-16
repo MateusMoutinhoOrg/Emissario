@@ -2,7 +2,7 @@
 
 Saves the provider and the limits of the public agent
 
-Root only. enabled=1 turns the chat on, its absence off; a blank api-key keeps the one saved, clear-api-key=1 removes it; a blank max-tokens is 1024, a blank rate-per-minute 10, a blank daily limit no limit. A refused value answers the form again under a 400; a save answers 303 back to the page with ?notice=saved.
+Root only. enabled=1 turns the chat on, its absence off; a blank api-key keeps the one saved, clear-api-key=1 removes it; a blank max-tokens is 1024, a blank rate-per-minute 10, a blank daily limit no limit; summaries-enabled=1 lets visitors ask for summaries, kept summary-retention-days days, blank until a root deletes them. A refused value answers the form again under a 400; a save that needs notices (agent-v1, summaries-v1, retention-summary-v1) answers it under a 409 with them inside, until each id is sent back as acknowledge; a save answers 303 back to the page with ?notice=saved.
 
 ## Try it
 
@@ -25,7 +25,7 @@ curl -X POST localhost:3000/admin/root/set-agent-settings \
   -H 'origin: my-origin' \
   -H 'host: my-host' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'api-key=text&base-url=text&clear-api-key=text&daily-limit=text&enabled=text&ip-daily-limit=text&max-tokens=text&model=text&rate-per-minute=text'
+  -d 'acknowledge=text&api-key=text&base-url=text&clear-api-key=text&daily-limit=text&enabled=text&ip-daily-limit=text&max-tokens=text&model=text&rate-per-minute=text&summaries-enabled=text&summary-retention-days=text'
 ```
 
 More examples:
@@ -51,6 +51,7 @@ Send form fields, like `name=value&other=value` with the header `Content-Type: a
 
 | Field | What goes there | Required | Rules |
 | --- | --- | --- | --- |
+| `acknowledge` | list of texts | no |  |
 | `api-key` | text | no | at most 4096 characters |
 | `base-url` | text | no | at most 2048 characters |
 | `clear-api-key` | text | no | at most 8 characters |
@@ -60,11 +61,13 @@ Send form fields, like `name=value&other=value` with the header `Content-Type: a
 | `max-tokens` | text | no | at most 16 characters |
 | `model` | text | no | at most 200 characters |
 | `rate-per-minute` | text | no | at most 16 characters |
+| `summaries-enabled` | text | no | at most 8 characters |
+| `summary-retention-days` | text | no | at most 16 characters |
 
 Example:
 
 ```text
-api-key=text&base-url=text&clear-api-key=text&daily-limit=text&enabled=text&ip-daily-limit=text&max-tokens=text&model=text&rate-per-minute=text
+acknowledge=text&api-key=text&base-url=text&clear-api-key=text&daily-limit=text&enabled=text&ip-daily-limit=text&max-tokens=text&model=text&rate-per-minute=text&summaries-enabled=text&summary-retention-days=text
 ```
 
 ## What comes back

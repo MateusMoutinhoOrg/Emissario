@@ -30,6 +30,9 @@ func Summarize(sandbox *api.Sandbox, ip string, messages []Message) (string, *Re
 	if refusal := ready(sandbox, settings); refusal != nil {
 		return "", refusal
 	}
+	if !settings.SummariesEnabled {
+		return "", &Refusal{Status: api.StatusServiceUnavailable, Message: CodeSummariesOff}
+	}
 	system, refusal := systemPrompt(sandbox, summaryPromptAsset, SummaryFile, false)
 	if refusal != nil {
 		return "", refusal

@@ -204,7 +204,7 @@
           "Agent"
         ],
         "summary": "Keeps an anonymous summary of a conversation the server signed, and answers its id",
-        "description": "No authentication, same origin. Send the whole conversation — every message, ending with the last answer of the agent — and the signature that answer carried. The configured model writes a summary under the mandatory instructions (remove names, dates, places, ids, CPF, phones, emails, addresses) and instructions/SUMMARY.md of the agent source, a regex pass then removes what still looks like a CPF, a CNPJ, an email, a phone or a card number, and the summary is kept with no ip; it is answered 201 {\"id\"} and its text is never returned. Its tokens count in the limits. Errors as /api/agent/messages.",
+        "description": "No authentication, same origin. Off by default: until a root turns the summaries on it answers 503 summaries-disabled. Send the whole conversation — every message, ending with the last answer of the agent — and the signature that answer carried. The configured model writes a summary under the mandatory instructions (remove names, dates, places, ids, CPF, phones, emails, addresses) and instructions/SUMMARY.md of the agent source, a regex pass then removes what still looks like a CPF, a CNPJ, an email, a phone or a card number, and the summary is kept with no ip, encrypted, until its retention ends; it is answered 201 {\"id\"} and its text is never returned. Its tokens count in the limits. Errors as /api/agent/messages.",
         "parameters": [
           {
             "name": "Origin",

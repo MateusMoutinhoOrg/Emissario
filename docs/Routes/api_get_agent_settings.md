@@ -2,7 +2,7 @@
 
 Answers the settings of the public agent and its state
 
-Root only. Answers {settings: {enabled, base_url, api_key_hint, api_key_from_env, model, max_tokens, daily_limit, ip_daily_limit, rate_per_minute}, status: {answering, problem, readme, summary, running, dropped}}. The api key is never answered: its last four characters at most.
+Root only. Answers {settings: {enabled, base_url, api_key_hint, api_key_from_env, model, max_tokens, daily_limit, ip_daily_limit, rate_per_minute, summaries_enabled, summary_retention_days}, status: {answering, problem, readme, summary, running, dropped, provider_host, third_party}}; summary_retention_days is null for summaries kept until a root deletes them, and third_party is true when the provider is not this machine nor a private network. The api key is never answered: its last four characters at most.
 
 ## Try it
 

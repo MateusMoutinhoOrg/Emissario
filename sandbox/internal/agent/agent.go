@@ -115,6 +115,7 @@ const (
 	CodeIpDailyLimit     = "ip-daily-limit"
 	CodeDailyLimit       = "daily-limit"
 	CodeDisabled         = "disabled"
+	CodeSummariesOff     = "summaries-disabled"
 	CodeNotConfigured    = "not-configured"
 	CodeNoInstructions   = "no-instructions"
 	CodeNotRunning       = "not-running"
@@ -141,11 +142,14 @@ const (
 // Refusal is why a request is not answered as asked: its status, the field it
 // blames ("" for none), the message — a code of /api/agent/* or a sentence of
 // the backoffice — and, for a 429 or a 503, the Retry-After in seconds.
+// Notices, when it holds any, are the ids of the notices a save has to
+// acknowledge first: it is then a 409.
 type Refusal struct {
 	Status     int
 	Field      string
 	Message    string
 	RetryAfter int64
+	Notices    []string
 }
 
 // refuse is a 400 blaming field.
@@ -236,6 +240,18 @@ func matches(sandbox *api.Sandbox, pattern string, text string) bool {
 // the databases, 403 for a request another site's page sent — there is no
 // CORS — and 429 past the rate per minute of ip, which every request counts in.
 func Admit(sandbox *api.Sandbox, ip string, origin string, host string) *Refusal {
+	return admit(sandbox, ip, origin, host, false)
+}
+
+// AdmitSummary is Admit for POST /api/agent/summaries: it also answers 503
+// summaries-disabled while a root has not turned the summaries on, before the
+// request counts toward the rate of its ip.
+func AdmitSummary(sandbox *api.Sandbox, ip string, origin string, host string) *Refusal {
+	return admit(sandbox, ip, origin, host, true)
+}
+
+// admit is Admit, and AdmitSummary when summary is true.
+func admit(sandbox *api.Sandbox, ip string, origin string, host string, summary bool) *Refusal {
 	if snapshots.Restoring(sandbox) {
 		return &Refusal{Status: api.StatusServiceUnavailable, Message: CodeRestoring, RetryAfter: 5}
 	}
@@ -245,6 +261,9 @@ func Admit(sandbox *api.Sandbox, ip string, origin string, host string) *Refusal
 	settings, err := ReadSettings(sandbox)
 	if err != nil {
 		return failed(sandbox, "the agent settings could not be read", err)
+	}
+	if summary && !settings.SummariesEnabled {
+		return &Refusal{Status: api.StatusServiceUnavailable, Message: CodeSummariesOff}
 	}
 	return CheckRate(sandbox, settings, ip)
 }

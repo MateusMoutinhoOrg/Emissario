@@ -6,6 +6,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/agent"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/agent_db"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/websitesource"
 )
@@ -23,6 +24,16 @@ type AgentSettingsForm struct {
 	DailyLimit    string
 	IpDailyLimit  string
 	RatePerMinute string
+	// SummariesEnabled lets visitors ask for a summary; SummaryRetentionDays
+	// is blank to keep the summaries until a root deletes them.
+	SummariesEnabled     bool
+	SummaryRetentionDays string
+	// Notices are the notices the save asks for, shown inside the form.
+	Notices []privacy.Notice
+	// RetypeKey is true when the form comes back with notices after an api
+	// key was sent: the key is never written back to a page, so it has to
+	// be typed again before confirming.
+	RetypeKey bool
 }
 
 // AgentSettingsFormOf is the form filled with settings; a limit of 0 is blank.
@@ -34,13 +45,15 @@ func AgentSettingsFormOf(sandbox *api.Sandbox, settings agent.Settings) AgentSet
 		return sandbox.Deps.StringsDeps.FormatInt(value, 10)
 	}
 	return AgentSettingsForm{
-		Enabled:       settings.Enabled,
-		BaseUrl:       settings.BaseUrl,
-		Model:         settings.Model,
-		MaxTokens:     blank(settings.MaxTokens),
-		DailyLimit:    blank(settings.DailyLimit),
-		IpDailyLimit:  blank(settings.IpDailyLimit),
-		RatePerMinute: blank(settings.RatePerMinute),
+		Enabled:              settings.Enabled,
+		BaseUrl:              settings.BaseUrl,
+		Model:                settings.Model,
+		MaxTokens:            blank(settings.MaxTokens),
+		DailyLimit:           blank(settings.DailyLimit),
+		IpDailyLimit:         blank(settings.IpDailyLimit),
+		RatePerMinute:        blank(settings.RatePerMinute),
+		SummariesEnabled:     settings.SummariesEnabled,
+		SummaryRetentionDays: privacy.FormatRetention(sandbox, settings.SummaryRetentionDays),
 	}
 }
 
@@ -67,6 +80,14 @@ type AgentSettingsPage struct {
 	Zone       string
 	Endpoint   string
 	Retention  int
+	// ProviderHost is the host every message is sent to, "" while no base
+	// url is set; ProviderLocal is true when it is this machine or a private
+	// network, so not a transfer to a third party.
+	ProviderHost  string
+	ProviderLocal bool
+	// DraftHref is the privacy notice draft the website's notice starts
+	// from.
+	DraftHref string
 }
 
 // RenderAgentSettingsPage answers, under status, the settings form filled with
@@ -96,9 +117,12 @@ func RenderAgentSettingsPage(sandbox *api.Sandbox, response *serverdeps.Response
 		Dropped:    formatCount(sandbox, int(state.Dropped)),
 		Zone:       visualization.ZoneName(sandbox),
 		Retention:  agent.UsageRetentionDays,
+		DraftHref:  privacy.SettingsPath + "#notice-draft",
 	}
 	if settings.BaseUrl != "" {
 		page.Endpoint = agent.CompletionsUrl(sandbox, settings)
+		page.ProviderHost = agent.ProviderHost(sandbox, settings)
+		page.ProviderLocal = agent.ProviderIsLocal(sandbox, page.ProviderHost)
 	}
 	return RenderHTML(sandbox, response, status, "backoffice/agent_settings.html", page)
 }

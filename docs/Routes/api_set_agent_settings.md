@@ -2,7 +2,7 @@
 
 Saves the provider and the limits of the public agent
 
-Root only. A blank or absent api_key keeps the one saved, clear_api_key removes it; a limit of 0 is no limit. Answers {settings} as get-agent-settings does; 400 for a value refused, with the field.
+Root only. A blank or absent api_key keeps the one saved, clear_api_key removes it; a limit of 0 is no limit; summary_retention_days null or absent keeps the summaries until a root deletes them. Turning enabled on asks for the agent-v1 notice, summaries_enabled for summaries-v1, and a summary retention past 365 days or null for retention-summary-v1: until every id is in acknowledge it answers 409 {"error":"acknowledgement-required","field":"acknowledge","notice","notices"} and writes nothing; nothing records that a notice was acknowledged. Answers {settings} as get-agent-settings does; 400 for a value refused, with the field.
 
 ## Try it
 
@@ -11,7 +11,7 @@ Only what is required:
 ```bash
 curl -X POST localhost:3000/api/admin/root/set-agent-settings \
   -H 'Content-Type: application/json' \
-  -d '{"base_url":"text","daily_limit":1,"enabled":true,"ip_daily_limit":1,"max_tokens":1,"model":"text","rate_per_minute":1}'
+  -d '{"base_url":"text","daily_limit":1,"enabled":true,"ip_daily_limit":1,"max_tokens":1,"model":"text","rate_per_minute":1,"summaries_enabled":true}'
 ```
 
 With every value it reads:
@@ -24,7 +24,7 @@ curl -X POST localhost:3000/api/admin/root/set-agent-settings \
   -H 'x-client-port: my-x-client-port' \
   -H 'x-request-method: my-x-request-method' \
   -H 'Content-Type: application/json' \
-  -d '{"api_key":"text","base_url":"text","clear_api_key":true,"daily_limit":1,"enabled":true,"ip_daily_limit":1,"max_tokens":1,"model":"text","rate_per_minute":1}'
+  -d '{"acknowledge":["text"],"api_key":"text","base_url":"text","clear_api_key":true,"daily_limit":1,"enabled":true,"ip_daily_limit":1,"max_tokens":1,"model":"text","rate_per_minute":1,"summaries_enabled":true,"summary_retention_days":1}'
 ```
 
 More examples:
@@ -49,6 +49,7 @@ Send JSON with the header `Content-Type: application/json`, up to 64 KB. The bod
 
 | Field | What goes there | Required | Rules |
 | --- | --- | --- | --- |
+| `acknowledge` | list of texts | no |  |
 | `api_key` | text | no | at most 4096 characters |
 | `base_url` | text | yes | at most 2048 characters |
 | `clear_api_key` | `true` or `false` | no |  |
@@ -58,11 +59,16 @@ Send JSON with the header `Content-Type: application/json`, up to 64 KB. The bod
 | `max_tokens` | whole number | yes | from 1 to 1000000 |
 | `model` | text | yes | at most 200 characters |
 | `rate_per_minute` | whole number | yes | from 1 to 10000 |
+| `summaries_enabled` | `true` or `false` | yes |  |
+| `summary_retention_days` | whole number | no | from 1 to 36500; may be `null` |
 
 Example:
 
 ```json
 {
+  "acknowledge": [
+    "text"
+  ],
   "api_key": "text",
   "base_url": "text",
   "clear_api_key": true,
@@ -71,7 +77,9 @@ Example:
   "ip_daily_limit": 1,
   "max_tokens": 1,
   "model": "text",
-  "rate_per_minute": 1
+  "rate_per_minute": 1,
+  "summaries_enabled": true,
+  "summary_retention_days": 1
 }
 ```
 

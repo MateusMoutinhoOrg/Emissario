@@ -36,7 +36,7 @@ const MaxBodyBytes = 65536
 
 // BodySchema is this route's declared json-schema in canonical form — the text
 // Deps.OpinionatedAgnosServer.ValidateSchema checks a request body against.
-const BodySchema = "{\"properties\":{\"acknowledge\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"},\"enabled\":{\"type\":\"boolean\"},\"ip_daily_limit\":{\"maximum\":1000000,\"minimum\":0,\"type\":\"integer\"},\"max_bytes\":{\"maximum\":1048576,\"minimum\":2,\"type\":\"integer\"},\"rate_per_minute\":{\"maximum\":10000,\"minimum\":1,\"type\":\"integer\"},\"retention_days\":{\"maximum\":36500,\"minimum\":1,\"nullable\":true,\"type\":\"integer\"}},\"required\":[\"enabled\",\"ip_daily_limit\",\"max_bytes\",\"rate_per_minute\",\"retention_days\"],\"type\":\"object\"}"
+const BodySchema = "{\"properties\":{\"acknowledge\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"},\"enabled\":{\"type\":\"boolean\"},\"ip_daily_limit\":{\"maximum\":1000000,\"minimum\":0,\"type\":\"integer\"},\"max_bytes\":{\"maximum\":1048576,\"minimum\":2,\"type\":\"integer\"},\"rate_per_minute\":{\"maximum\":10000,\"minimum\":1,\"type\":\"integer\"},\"retention_days\":{\"maximum\":36500,\"minimum\":1,\"nullable\":true,\"type\":\"integer\"}},\"required\":[\"enabled\",\"ip_daily_limit\",\"max_bytes\",\"rate_per_minute\"],\"type\":\"object\"}"
 
 // ReadBody reads, validates and converts the request body of one bound route.
 // The generic Run calls it — through the ReadBody generated.new.go closes over

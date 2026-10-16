@@ -17,14 +17,37 @@ Ollama… — is a third party. At every message it receives:
 | what every tool answered | the files of `instructions/` the model read, the bodies the urls answered |
 | the summary request | the whole conversation again, with `assets/agent/summary.md` and `instructions/SUMMARY.md` |
 
-What the provider keeps, and for how long, is its own policy. Under the LGPD that makes the provider a
-processor of the visitor's personal data: say so to the visitor before the chat starts (its privacy
-notice, a line above the chat box), and choose a provider whose terms you accept. The api key is sent
-to the provider alone, as `Authorization: Bearer`.
+What the provider keeps, and for how long, is its own policy. It processes the conversations on your
+behalf only under data processing terms you signed (GDPR art. 28; LGPD arts. 39 and 42) under which it
+does not use them to train its models nor for its own purposes; otherwise it is another controller, and
+you are sharing the data with it. A provider in another country is an international transfer (LGPD art.
+33; GDPR arts. 44–49): between Brazil and the EU adequacy covers it (Res. CD/ANPD 32/2026; Commission
+decision of 26 Jan 2026), elsewhere standard clauses do. Visitors may type sensitive data — a clinic's
+patients writing about their health — so your notice and your legal basis must cover it (LGPD art. 11;
+GDPR art. 9). A local model (Ollama) keeps the conversations on your infrastructure: the settings page
+names the host every message goes to, and warns when it is a third party. The api key is sent to the
+provider alone, as `Authorization: Bearer`.
 
-**Never stored by Emissario:** the conversation — it lives in the visitor's browser — and the ip with a
-summary. **Stored:** the usage of every provider call (`agent-usage`: when, the ip, the tokens), kept 90
-days, and the summaries a visitor asked for (`agent-summary`), anonymous, until a root deletes them.
+Turning the agent on asks for the `agent-v1` notice (see [Privacy](../Privacy/doc.md)): it is product
+information, not legal advice, and nothing records that it was confirmed.
+
+### Telling visitors they talk to an AI
+
+Since 2 August 2026 the EU AI Act art. 50(1) requires that people be told when they are talking to an AI.
+It binds whoever designs the system, open source included (art. 2(12) does not exempt art. 50), so the
+disclosure rests on two places:
+
+- **The agent:** `assets/agent/system.md`, embedded and above every website's instructions, tells the
+  model to say it is an AI in its first answer and whenever asked, and never to claim to be a person.
+- **Your chat UI:** it must tell visitors they are talking to an AI **before the chat starts** — a line
+  above the chat box, as in [A client](#a-client). A model can fail to follow its instructions; the line
+  cannot.
+
+**Never stored by Emissario:** the conversation — it lives in the visitor's browser (`localStorage` or
+memory), which is strictly necessary for the chat the visitor asked for (ePrivacy Directive art. 5(3)) —
+and the ip with a summary. **Stored:** the usage of every provider call (`agent-usage`: when, the ip as
+the IP mode keeps it, hashed by default, the tokens), kept 90 days, and — only while a root has turned
+them on — the summaries a visitor asked for (`agent-summary`), encrypted, 90 days by default.
 
 ## Run it
 
@@ -39,7 +62,8 @@ Then, as a root, in the backoffice (**Agent** in the top bar):
 1. **Source** (`/admin/root/set-agent-source`) — the repository holding `instructions/`, its branch and
    sync time, then **Sync**. It may be the same url as the website source.
 2. **Settings** (`/admin/root/set-agent-settings`) — the base url, the api key, the model, the limits;
-   turn it on.
+   turn it on, after the `agent-v1` notice. Turn the summaries on only if you need them, after the
+   `summaries-v1` notice.
 3. **URLs** (`/admin/root/list-agent-urls`) — optional: the endpoints the agent may call.
 
 Behind a proxy, `--allow-x-forwarded-for` is required, or every visitor shares the proxy's ip — and its
@@ -63,7 +87,7 @@ A new commit reaches the agent with the next sync: the files are read at every m
 
 | Field | Rule |
 |---|---|
-| `enabled` | on/off; off, `/api/agent/*` answers `503 disabled`. Turning it on needs the base url and the model |
+| `enabled` | on/off, off by default; off, `/api/agent/*` answers `503 disabled`. Turning it on needs the base url and the model, and the `agent-v1` notice |
 | `base-url` | an OpenAI-compatible endpoint: `<base-url>/chat/completions` is called. `https://api.openai.com/v1`, `https://openrouter.ai/api/v1`, `https://api.groq.com/openai/v1`, `http://localhost:11434/v1` (Ollama) |
 | `api-key` | write-only: a page or a JSON answer shows `…abcd` at most, never to a viewer, never in a log. Blank keeps the one saved; a checkbox (`clear_api_key`) removes it. `EMISSARIO_AGENT_API_KEY` wins over it. It is kept in agent-db, **so in every backup**. A provider that needs none (Ollama) works without |
 | `model` | the model id; it must support tool calling |
@@ -71,6 +95,8 @@ A new commit reaches the agent with the next sync: the files are read at every m
 | `daily-limit` | tokens a day (input + output), every visitor together; blank (`0`) no limit |
 | `ip-daily-limit` | tokens a day (input + output) of one ip, an IPv6 one by its `/64`; blank no limit |
 | `rate-per-minute` | requests a minute of one ip (`ratelimitdeps`), `10` by default |
+| `summaries-enabled` | on/off, **off by default**; off, `/api/agent/summaries` answers `503 summaries-disabled`. Turning it on asks for the `summaries-v1` notice |
+| `summary-retention-days` | days a summary is kept, `90` by default; blank (`null` in JSON) keeps them until a root deletes them. Past 365 days, or blank, asks for the `retention-summary-v1` notice; `0` is refused |
 
 The day is the server's time zone (`TZ`).
 
@@ -128,15 +154,28 @@ every message, this one included, and this signature.
 
 ### `POST /api/agent/summaries`
 
+Off by default: until a root turns the summaries on, it answers `503 summaries-disabled`, before the
+request counts toward the rate of its ip.
+
 `{"messages": [...], "signature": "..."}` — the whole conversation, ending with the last answer of the
 agent, and the signature it carried — answers `201 {"id": "..."}`. The text is never answered. The
 configured model writes it under `assets/agent/summary.md` (remove names, dates, places, ids, CPF, phones,
 emails, addresses) and `SUMMARY.md`; then a regex pass replaces what still looks like a CPF, a CNPJ, an
 email, a phone or a card number with `[cpf]`, `[cnpj]`, `[email]`, `[phone]`, `[card]`. The summary holds
 no ip, and neither does the usage it is recorded with: its tokens count toward the ip's limit of the day
-in memory alone. The id is 16 hex characters, what the backoffice shows and searches.
+in memory alone. The id is 16 hex characters, what the backoffice shows and searches. **A model makes
+mistakes:** a summary can still hold personal data, or details that identify someone read together
+(LGPD art. 12; GDPR recital 26), so it is treated as personal data — encrypted, kept for its retention,
+found and deleted by *Find and erase* on the Privacy page.
 
 ### A client
+
+The chat box starts with the line that tells the visitor they talk to an AI (EU AI Act art. 50(1)):
+
+```html
+<p class="chat-disclosure">You are chatting with an AI assistant.</p>
+<div id="chat"></div>
+```
 
 ```js
 let history = [], signature = "";
@@ -163,7 +202,7 @@ async function send(text) {
 | `413` | the body is over 64 KiB |
 | `429` | `rate-limit` (`Retry-After: 60`), `ip-daily-limit` or `daily-limit` (`Retry-After`: the seconds to midnight) |
 | `502` | `provider-failed` — not reached, an error status, no completion; the reason goes to stderr, never the key |
-| `503` | `disabled`, `not-configured`, `no-instructions`, `not-running` (the process did not run `start-server`), or a restore running (`Retry-After: 5`) |
+| `503` | `disabled`, `summaries-disabled` (`/api/agent/summaries` only), `not-configured`, `no-instructions`, `not-running` (the process did not run `start-server`), or a restore running (`Retry-After: 5`) |
 | `504` | `deadline` — past the 60 s the request has |
 
 ## Limits
@@ -186,10 +225,10 @@ async function send(text) {
 
 | Table | Fields |
 |---|---|
-| `agent-setting` | `enabled`, `base-url`, `api-key`, `model`, `max-tokens`, `daily-limit`, `ip-daily-limit`, `rate-per-minute` |
+| `agent-setting` | `enabled`, `base-url`, `api-key`, `model`, `max-tokens`, `daily-limit`, `ip-daily-limit`, `rate-per-minute`, `summaries-enabled`, `summary-retention-days` |
 | `agent-url` | `name` (key), `description`, `method`, `url`, `headers` |
 | `agent-usage` | `at`, `ip` (empty for a summary), `kind` (`message`/`summary`), `input-tokens`, `output-tokens` — removed after 90 days, every hour |
-| `agent-summary` | `ref` (key: the id answered), `at`, `summary`, `messages` (how many), `input-tokens`, `output-tokens` |
+| `agent-summary` | `ref` (key: the id answered), `at`, `summary`, `messages` (how many), `input-tokens`, `output-tokens` — removed after `summary-retention-days` |
 
 ## Who sees what
 

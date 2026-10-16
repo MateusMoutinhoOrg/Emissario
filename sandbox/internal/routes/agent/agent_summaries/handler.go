@@ -11,13 +11,14 @@ import (
 // Handle answers POST /api/agent/summaries: the whole conversation the body
 // holds — ending with the last answer of the agent, under the signature that
 // answer carried — is summarized by the model, the summary kept with no ip,
-// and its id answered 201; the text of the summary is never answered. It is
-// refused like POST /api/agent/messages, and has the same deadline.
+// and its id answered 201; the text of the summary is never answered. While
+// a root has not turned the summaries on it answers 503 summaries-disabled.
+// It is refused like POST /api/agent/messages, and has the same deadline.
 func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
 	response.SetWriteDeadline(agent.WriteDeadlineMilliseconds)
 	access := privacy.Access{AtMs: privacy.NowMilliseconds(sandbox), Ip: props.ClientIp, Port: props.ClientPort, Kind: privacy.AccessAgent}
 	defer func() { privacy.RecordAccess(sandbox, access) }()
-	if refusal := agent.Admit(sandbox, props.ClientIp, input.Origin, input.Host); refusal != nil {
+	if refusal := agent.AdmitSummary(sandbox, props.ClientIp, input.Origin, input.Host); refusal != nil {
 		return agent.Fail(sandbox, response.SetHeader, refusal)
 	}
 	messages := []agent.Message{}

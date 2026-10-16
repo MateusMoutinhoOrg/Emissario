@@ -27,7 +27,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Pattern = "/admin/root/set-agent-settings"
 	self.Category = "Agent"
 	self.Summary = "Saves the provider and the limits of the public agent"
-	self.Description = "Root only. enabled=1 turns the chat on, its absence off; a blank api-key keeps the one saved, clear-api-key=1 removes it; a blank max-tokens is 1024, a blank rate-per-minute 10, a blank daily limit no limit. A refused value answers the form again under a 400; a save answers 303 back to the page with ?notice=saved."
+	self.Description = "Root only. enabled=1 turns the chat on, its absence off; a blank api-key keeps the one saved, clear-api-key=1 removes it; a blank max-tokens is 1024, a blank rate-per-minute 10, a blank daily limit no limit; summaries-enabled=1 lets visitors ask for summaries, kept summary-retention-days days, blank until a root deletes them. A refused value answers the form again under a 400; a save that needs notices (agent-v1, summaries-v1, retention-summary-v1) answers it under a 409 with them inside, until each id is sent back as acknowledge; a save answers 303 back to the page with ?notice=saved."
 	self.Examples = []string{"curl -b \"backoffice_session=$SESSION\" -X POST localhost:3000/admin/root/set-agent-settings -H 'Origin: http://localhost:3000' --data 'enabled=1&base-url=https://api.openai.com/v1&api-key=sk-...&model=gpt-4o-mini&max-tokens=1024&daily-limit=200000&ip-daily-limit=20000&rate-per-minute=10'"}
 	self.Hidden = false
 

@@ -27,7 +27,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Pattern = "/api/admin/root/set-contact-settings"
 	self.Category = "Contact Requests API"
 	self.Summary = "Saves the settings of the contact requests"
-	self.Description = "Root only. Send every field: enabled; max_bytes, the largest body, 2 to 1048576; rate_per_minute, 1 to 10000; ip_daily_limit, requests a day per ip, 0 for no limit. Answers {settings}."
+	self.Description = "Root only. Send every field: enabled; max_bytes, the largest body, 2 to 1048576; rate_per_minute, 1 to 10000; ip_daily_limit, requests a day per ip, 0 for no limit; retention_days, 1 to 36500, null or absent to keep the requests until a root deletes them. Turning enabled on asks for the contacts-v1 notice, and a retention past 365 days or null for retention-contact-v1: until every id is in acknowledge it answers 409 acknowledgement-required with the notices and writes nothing. Answers {settings}."
 	self.Examples = []string{"curl -X POST localhost:3000/api/admin/root/set-contact-settings -H \"Authorization: Bearer $TOKEN\" -H 'Content-Type: application/json' -d '{\"enabled\":true,\"max_bytes\":16384,\"rate_per_minute\":5,\"ip_daily_limit\":0}'"}
 	self.Hidden = false
 

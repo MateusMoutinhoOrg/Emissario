@@ -116,6 +116,8 @@ func AgentSettingsJSON(sandbox *api.Sandbox, settings agent.Settings) *serializa
 	item.AddItemToObject("daily_limit", settings.DailyLimit)
 	item.AddItemToObject("ip_daily_limit", settings.IpDailyLimit)
 	item.AddItemToObject("rate_per_minute", settings.RatePerMinute)
+	item.AddItemToObject("summaries_enabled", settings.SummariesEnabled)
+	item.AddItemToObject("summary_retention_days", RetentionJSON(sandbox, settings.SummaryRetentionDays))
 	return item
 }
 
@@ -135,6 +137,9 @@ func AgentSettingsStateJSON(sandbox *api.Sandbox, settings agent.Settings, state
 	status.AddItemToObject("summary", state.Summary)
 	status.AddItemToObject("running", state.Running)
 	status.AddItemToObject("dropped", state.Dropped)
+	host := agent.ProviderHost(sandbox, settings)
+	status.AddItemToObject("provider_host", host)
+	status.AddItemToObject("third_party", host != "" && !agent.ProviderIsLocal(sandbox, host))
 	document := sandbox.Deps.SerializableDeps.CreateObject()
 	document.AddItemToObject("settings", AgentSettingsJSON(sandbox, settings))
 	document.AddItemToObject("status", status)
