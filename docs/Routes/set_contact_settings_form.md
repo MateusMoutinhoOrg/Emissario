@@ -25,7 +25,7 @@ curl -X POST localhost:3000/admin/root/set-contact-settings \
   -H 'origin: my-origin' \
   -H 'host: my-host' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'enabled=text&ip-daily-limit=text&max-bytes=text&rate-per-minute=text'
+  -d 'acknowledge=text&enabled=text&ip-daily-limit=text&max-bytes=text&rate-per-minute=text&retention-days=text'
 ```
 
 More examples:
@@ -51,15 +51,17 @@ Send form fields, like `name=value&other=value` with the header `Content-Type: a
 
 | Field | What goes there | Required | Rules |
 | --- | --- | --- | --- |
+| `acknowledge` | list of texts | no |  |
 | `enabled` | text | no | at most 8 characters |
 | `ip-daily-limit` | text | no | at most 16 characters |
 | `max-bytes` | text | no | at most 16 characters |
 | `rate-per-minute` | text | no | at most 16 characters |
+| `retention-days` | text | no | at most 16 characters |
 
 Example:
 
 ```text
-enabled=text&ip-daily-limit=text&max-bytes=text&rate-per-minute=text
+acknowledge=text&enabled=text&ip-daily-limit=text&max-bytes=text&rate-per-minute=text&retention-days=text
 ```
 
 ## What comes back

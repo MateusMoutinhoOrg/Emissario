@@ -3,30 +3,38 @@ package contact
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/contact_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 )
 
 // Settings is the one contact-setting record: whether the route takes contact
-// requests, the largest body it takes, and the limits of one ip. An ip daily
-// limit of 0 is no limit.
+// requests, the largest body it takes, the limits of one ip, and how many days
+// a contact request is kept. An ip daily limit of 0 is no limit; a retention
+// of privacy.Forever keeps the requests until a root deletes them.
 type Settings struct {
 	Enabled       bool
 	MaxBytes      int64
 	RatePerMinute int64
 	IpDailyLimit  int64
+	RetentionDays int64
 }
 
-// SettingsInput is what a form or a JSON body sends to change the settings.
+// SettingsInput is what a form or a JSON body sends to change the settings,
+// with the ids of the notices it acknowledged.
 type SettingsInput struct {
 	Enabled       bool
 	MaxBytes      int64
 	RatePerMinute int64
 	IpDailyLimit  int64
+	RetentionDays int64
+	Acknowledge   []string
 }
 
-// DefaultSettings are the settings before a root saved any: the route on, so
-// the form of a new website works at once, within the default limits.
+// DefaultSettings are the settings before a root saved any: the route off —
+// private by default, as the GDPR art. 25 and the LGPD art. 46 §2 ask — and
+// the requests kept 180 days once a root turns it on, within the default
+// limits.
 func DefaultSettings(sandbox *api.Sandbox) Settings {
-	return Settings{Enabled: true, MaxBytes: DefaultMaxBytes, RatePerMinute: DefaultRatePerMinute}
+	return Settings{Enabled: false, MaxBytes: DefaultMaxBytes, RatePerMinute: DefaultRatePerMinute, RetentionDays: privacy.Rule(privacy.DataContact).Default}
 }
 
 // settingsCacheSeconds is how long the route goes by the settings it read:
@@ -65,6 +73,10 @@ func readSettings(sandbox *api.Sandbox) (Settings, error) {
 		MaxBytes:      record.MaxBytes,
 		RatePerMinute: record.RatePerMinute,
 		IpDailyLimit:  record.IpDailyLimit,
+		RetentionDays: record.RetentionDays,
+	}
+	if settings.RetentionDays < 0 || settings.RetentionDays > privacy.MaxRetentionDays {
+		settings.RetentionDays = privacy.Forever
 	}
 	if settings.MaxBytes < MinMaxBytes || settings.MaxBytes > MaxMaxBytes {
 		settings.MaxBytes = DefaultMaxBytes
@@ -111,19 +123,47 @@ func findSetting(sandbox *api.Sandbox) (contact_db.ContactSettingRecord, bool, e
 }
 
 // ApplySettings checks input and saves it. A refused value comes back as the
-// refusal, and nothing is written.
+// refusal, and nothing is written. Turning the route on asks for the
+// contacts-v1 notice, and a retention past its warning for the retention
+// notice: until input acknowledges them the refusal is a 409 listing them.
+// Nothing records that a notice was acknowledged.
 func ApplySettings(sandbox *api.Sandbox, input SettingsInput) (Settings, *Refusal, error) {
 	settings, refusal := CheckSettings(sandbox, input)
 	if refusal != nil {
 		return settings, refusal, nil
 	}
+	current, err := ReadSettings(sandbox)
+	if err != nil {
+		return settings, nil, err
+	}
+	if missing := privacy.NeedsAcknowledgement(RequiredNotices(current, settings), input.Acknowledge); missing != nil {
+		return settings, &Refusal{Status: missing.Status, Field: missing.Field, Message: missing.Message, Notices: missing.Notices}, nil
+	}
 	return settings, nil, saveSettings(sandbox, settings)
+}
+
+// RequiredNotices is every notice turning before into after asks for.
+func RequiredNotices(before Settings, after Settings) []string {
+	notices := []string{}
+	if after.Enabled && !before.Enabled {
+		notices = append(notices, privacy.NoticeContacts)
+	}
+	return privacy.RetentionNotice(notices, privacy.DataContact, before.RetentionDays, after.RetentionDays, 0)
 }
 
 // CheckSettings answers input as the settings to save, or the refusal of the
 // first value that does not hold.
 func CheckSettings(sandbox *api.Sandbox, input SettingsInput) (Settings, *Refusal) {
-	settings := Settings(input)
+	settings := Settings{
+		Enabled:       input.Enabled,
+		MaxBytes:      input.MaxBytes,
+		RatePerMinute: input.RatePerMinute,
+		IpDailyLimit:  input.IpDailyLimit,
+		RetentionDays: input.RetentionDays,
+	}
+	if refusal := privacy.CheckRetention(sandbox, "retention_days", settings.RetentionDays); refusal != nil {
+		return settings, refuse(refusal.Field, refusal.Message)
+	}
 	if settings.MaxBytes < MinMaxBytes || settings.MaxBytes > MaxMaxBytes {
 		return settings, refuse("max_bytes", "The largest body is a number of bytes from 2 to 1048576.")
 	}
@@ -157,6 +197,7 @@ func saveSettings(sandbox *api.Sandbox, settings Settings) error {
 			MaxBytes:      settings.MaxBytes,
 			RatePerMinute: settings.RatePerMinute,
 			IpDailyLimit:  settings.IpDailyLimit,
+			RetentionDays: settings.RetentionDays,
 		})
 		return err
 	}
@@ -165,6 +206,7 @@ func saveSettings(sandbox *api.Sandbox, settings Settings) error {
 		func() error { return db.SetContactSettingMaxBytes(record.Id, settings.MaxBytes) },
 		func() error { return db.SetContactSettingRatePerMinute(record.Id, settings.RatePerMinute) },
 		func() error { return db.SetContactSettingIpDailyLimit(record.Id, settings.IpDailyLimit) },
+		func() error { return db.SetContactSettingRetentionDays(record.Id, settings.RetentionDays) },
 	} {
 		if err := write(); err != nil {
 			return err
@@ -173,12 +215,15 @@ func saveSettings(sandbox *api.Sandbox, settings Settings) error {
 	return nil
 }
 
-// SettingsForm is the settings form as it was posted, every field text.
+// SettingsForm is the settings form as it was posted, every field text, and
+// the notices it acknowledged.
 type SettingsForm struct {
 	Enabled       string
 	MaxBytes      string
 	RatePerMinute string
 	IpDailyLimit  string
+	RetentionDays string
+	Acknowledge   []string
 }
 
 // InputOfForm reads form as a SettingsInput: a checkbox is on as 1 or on; a
@@ -186,7 +231,12 @@ type SettingsForm struct {
 // and a blank ip daily limit no limit. A number that does not read is
 // refused.
 func InputOfForm(sandbox *api.Sandbox, form SettingsForm) (SettingsInput, *Refusal) {
-	input := SettingsInput{Enabled: form.Enabled == "1" || form.Enabled == "on"}
+	input := SettingsInput{Enabled: form.Enabled == "1" || form.Enabled == "on", Acknowledge: form.Acknowledge}
+	retention, refusal := privacy.ParseRetention(sandbox, "retention_days", form.RetentionDays)
+	if refusal != nil {
+		return input, refuse(refusal.Field, refusal.Message)
+	}
+	input.RetentionDays = retention
 	for _, number := range []struct {
 		text     string
 		fallback int64

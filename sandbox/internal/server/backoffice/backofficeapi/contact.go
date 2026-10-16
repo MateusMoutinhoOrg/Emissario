@@ -65,6 +65,7 @@ func ContactSettingsJSON(sandbox *api.Sandbox, settings contact.Settings) *seria
 	item.AddItemToObject("max_bytes", settings.MaxBytes)
 	item.AddItemToObject("rate_per_minute", settings.RatePerMinute)
 	item.AddItemToObject("ip_daily_limit", settings.IpDailyLimit)
+	item.AddItemToObject("retention_days", RetentionJSON(sandbox, settings.RetentionDays))
 	return item
 }
 
@@ -83,5 +84,17 @@ func ContactSettingsStateJSON(sandbox *api.Sandbox, settings contact.Settings, s
 	document.AddItemToObject("inbox", state.Inbox)
 	document.AddItemToObject("running", state.Running)
 	document.AddItemToObject("dropped", state.Dropped)
+	return document
+}
+
+// ContactRequestsExportJSON is {contact_requests}: every one of requests, as
+// a root reads it.
+func ContactRequestsExportJSON(sandbox *api.Sandbox, requests []contact_db.ContactRequestRecord) *serializabledeps.SerializableObject {
+	list := sandbox.Deps.SerializableDeps.CreateArray()
+	for _, request := range requests {
+		list.AddItemToArray(ContactRequestJSON(sandbox, request, true))
+	}
+	document := sandbox.Deps.SerializableDeps.CreateObject()
+	document.AddItemToObject("contact_requests", list)
 	return document
 }

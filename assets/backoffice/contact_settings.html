@@ -695,6 +695,24 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .law-panel {
+      margin: 0.5rem 0 1.25rem;
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.08);
+    }
+    .law-lead { font-size: 0.85rem; color: #FCD34D; margin-bottom: 0.75rem; }
+    .law-notice h3, .law-notice summary { font-size: 0.98rem; margin-bottom: 0.5rem; color: #FDE68A; cursor: default; }
+    details.law-notice summary { cursor: pointer; }
+    .law-notice + .law-notice { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+    .law-notice p, .law-notice li { font-size: 0.88rem; line-height: 1.55; color: #E5E7EB; margin-bottom: 0.5rem; }
+    .law-notice ul { margin: 0.25rem 0 0.75rem 1.25rem; }
+    .law-notice code, .facts code { background: rgba(255, 255, 255, 0.08); padding: 0.05rem 0.3rem; border-radius: 5px; font-size: 0.85em; }
+    .ack { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.75rem; font-weight: 600; font-size: 0.9rem; color: var(--text); }
+    .ack input { width: auto; }
+    .privacy-hint { margin: 0.25rem 0 1rem; }
+    .privacy-hint a { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -730,7 +748,7 @@
     <section class="head">
       <div>
         <h1>Contact settings</h1>
-        <p class="muted">What <code>{{.Endpoint}}</code> takes from the website, and how often one ip may send. Every contact request holds personal data — its JSON and its ip — and stays until a root deletes it.</p>
+        <p class="muted">What <code>{{.Endpoint}}</code> takes from the website, how often one ip may send, and how long it is kept. Every contact request holds personal data — its JSON and its ip, hashed unless the Privacy page keeps full IPs.</p>
       </div>
     </section>
 
@@ -747,7 +765,7 @@
         <div class="card-head"><h2>Route</h2></div>
         <div class="form-group">
           <label class="switch"><input type="checkbox" name="enabled" value="1"{{if .Form.Enabled}} checked{{end}}> The website may send contact requests</label>
-          <span class="hint">Off, {{.Endpoint}} answers 503 disabled.</span>
+          <span class="hint">Off — the default — {{.Endpoint}} answers 503 disabled. Turning it on asks for a notice on what it makes you responsible for.</span>
         </div>
         <div class="form-group">
           <label for="max-bytes">Largest body (bytes)</label>
@@ -765,7 +783,18 @@
           <input type="text" inputmode="numeric" id="ip-daily-limit" name="ip-daily-limit" value="{{.Form.IpDailyLimit}}" placeholder="No limit">
           <span class="hint">Past it, 429 ip-daily-limit until midnight. An IPv6 ip counts by its /64. Blank is no limit.</span>
         </div>
-        <button type="submit" class="btn btn-primary">Save settings</button>
+        <div class="card-head"><h2>Retention</h2></div>
+        <div class="form-group">
+          <label for="retention-days">Keep each contact request (days)</label>
+          <input type="text" inputmode="numeric" id="retention-days" name="retention-days" value="{{.Form.RetentionDays}}" placeholder="Until a root deletes it">
+          <span class="hint">Older requests are deleted every hour. 180 by default; past 365 days, or blank to keep them until a root deletes them, asks for a notice (LGPD arts. 15–16; GDPR art. 5(1)(e)).</span>
+        </div>
+        <p class="hint privacy-hint">Your website must say in its privacy notice what the form keeps, why, for how long, and how to ask for deletion. <a href="{{.DraftHref}}">Start from the draft</a>.</p>
+        {{if .Form.Notices}}<div class="law-panel" role="alert">
+          <p class="law-lead">Read before you confirm. These notices are product information, not legal advice: you are the controller of this data.</p>
+          {{range .Form.Notices}}<article class="law-notice"><h3>{{.Title}}</h3>{{range .Blocks}}{{if .List}}<ul>{{range .Items}}<li>{{range .}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</li>{{end}}</ul>{{else}}<p>{{range .Spans}}{{if .Bold}}<strong>{{.Text}}</strong>{{else if .Italic}}<em>{{.Text}}</em>{{else if .Code}}<code>{{.Text}}</code>{{else}}{{.Text}}{{end}}{{end}}</p>{{end}}{{end}}<label class="ack"><input type="checkbox" name="acknowledge" value="{{.Id}}" required> I have read this notice</label></article>{{end}}
+        </div>{{end}}
+        <button type="submit" class="btn btn-primary">{{if .Form.Notices}}Confirm and save{{else}}Save settings{{end}}</button>
       </form>
 
       <article class="card">

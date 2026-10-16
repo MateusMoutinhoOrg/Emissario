@@ -2,6 +2,10 @@ body:
     content-type: application/x-www-form-urlencoded
     form-schema:
         properties:
+            acknowledge:
+                items:
+                    type: string
+                type: array
             enabled:
                 maxLength: 8
                 type: string
@@ -12,6 +16,9 @@ body:
                 maxLength: 16
                 type: string
             rate-per-minute:
+                maxLength: 16
+                type: string
+            retention-days:
                 maxLength: 16
                 type: string
         type: object

@@ -22,10 +22,12 @@ type Input struct {
 // Body is one object of this route's declared json-schema, as the
 // generated ReadBody hands it over.
 type Body struct {
+	Acknowledge   []string
 	Enabled       bool
 	IpDailyLimit  int
 	MaxBytes      int
 	RatePerMinute int
+	RetentionDays int
 }
 
 // MaxBodyBytes is the largest request body this route reads, from the
@@ -34,7 +36,7 @@ const MaxBodyBytes = 65536
 
 // BodySchema is this route's declared json-schema in canonical form — the text
 // Deps.OpinionatedAgnosServer.ValidateSchema checks a request body against.
-const BodySchema = "{\"properties\":{\"enabled\":{\"type\":\"boolean\"},\"ip_daily_limit\":{\"maximum\":1000000,\"minimum\":0,\"type\":\"integer\"},\"max_bytes\":{\"maximum\":1048576,\"minimum\":2,\"type\":\"integer\"},\"rate_per_minute\":{\"maximum\":10000,\"minimum\":1,\"type\":\"integer\"}},\"required\":[\"enabled\",\"ip_daily_limit\",\"max_bytes\",\"rate_per_minute\"],\"type\":\"object\"}"
+const BodySchema = "{\"properties\":{\"acknowledge\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"},\"enabled\":{\"type\":\"boolean\"},\"ip_daily_limit\":{\"maximum\":1000000,\"minimum\":0,\"type\":\"integer\"},\"max_bytes\":{\"maximum\":1048576,\"minimum\":2,\"type\":\"integer\"},\"rate_per_minute\":{\"maximum\":10000,\"minimum\":1,\"type\":\"integer\"},\"retention_days\":{\"maximum\":36500,\"minimum\":1,\"nullable\":true,\"type\":\"integer\"}},\"required\":[\"enabled\",\"ip_daily_limit\",\"max_bytes\",\"rate_per_minute\",\"retention_days\"],\"type\":\"object\"}"
 
 // ReadBody reads, validates and converts the request body of one bound route.
 // The generic Run calls it — through the ReadBody generated.new.go closes over
@@ -75,9 +77,13 @@ func ReadBody(sandbox *api.Sandbox, route *api.Route) (Body, error) {
 // optional and comes back as its zero value.
 func bindBody(sandbox *api.Sandbox, document *serializabledeps.SerializableObject) Body {
 	value := Body{}
+	for _, item := range sandbox.Deps.OpinionatedAgnosServer.ReadItems(document, "acknowledge") {
+		value.Acknowledge = append(value.Acknowledge, sandbox.Deps.OpinionatedAgnosServer.ItemString(item))
+	}
 	value.Enabled = sandbox.Deps.OpinionatedAgnosServer.ReadBool(document, "enabled")
 	value.IpDailyLimit = sandbox.Deps.OpinionatedAgnosServer.ReadInt(document, "ip_daily_limit")
 	value.MaxBytes = sandbox.Deps.OpinionatedAgnosServer.ReadInt(document, "max_bytes")
 	value.RatePerMinute = sandbox.Deps.OpinionatedAgnosServer.ReadInt(document, "rate_per_minute")
+	value.RetentionDays = sandbox.Deps.OpinionatedAgnosServer.ReadInt(document, "retention_days")
 	return value
 }

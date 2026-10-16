@@ -49,3 +49,12 @@ func FailPrivacy(sandbox *api.Sandbox, response *serverdeps.Response, refusal *p
 	}
 	return sandbox.Deps.OpinionatedAgnosServer.WriteJSON(sandbox.Deps.SerializableDeps, *response, api.StatusConflict, AcknowledgementRequiredJSON(sandbox, notices))
 }
+
+// RetentionJSON is a retention as JSON spells it: the number of days, or null
+// to keep the data until a root deletes it.
+func RetentionJSON(sandbox *api.Sandbox, days int64) any {
+	if days == privacy.Forever {
+		return sandbox.Deps.SerializableDeps.CreateNull()
+	}
+	return days
+}

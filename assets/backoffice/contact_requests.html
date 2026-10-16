@@ -792,6 +792,7 @@
           {{if .ShowArchive}}<button type="submit" class="btn btn-small" name="archived" value="1">Archive</button>{{end}}
           {{if .ShowUnarchive}}<button type="submit" class="btn btn-small" name="archived" value="0">Move to inbox</button>{{end}}
           <button type="submit" class="btn btn-small btn-danger" formaction="{{.RemoveAction}}" data-confirm="Delete the contact requests selected? This cannot be undone.">Delete</button>
+          {{if .ExportHref}}<a class="btn btn-small" href="{{.ExportHref}}">Export JSON</a>{{end}}
         </div>
       </form>{{end}}
       <table>

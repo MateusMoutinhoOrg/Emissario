@@ -98,12 +98,14 @@ const (
 // Refusal is why a request is not answered as asked: its status, the field it
 // blames ("" for none), the message — a code of /api/contact-requests or a
 // sentence of the backoffice — and, for a 429 or a 503, the Retry-After in
-// seconds.
+// seconds. Notices, when it holds any, are the ids of the notices a save has
+// to acknowledge first: it is then a 409.
 type Refusal struct {
 	Status     int
 	Field      string
 	Message    string
 	RetryAfter int64
+	Notices    []string
 }
 
 // refuse is a 400 blaming field.

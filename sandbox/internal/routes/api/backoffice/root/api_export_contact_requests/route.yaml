@@ -1,0 +1,42 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            contains:
+                maxLength: 256
+                type: string
+            country:
+                maxLength: 256
+                type: string
+            from:
+                maxLength: 256
+                type: string
+            ids:
+                items:
+                    type: string
+                type: array
+            status:
+                maxLength: 256
+                type: string
+            to:
+                maxLength: 256
+                type: string
+        type: object
+    max-bytes: 262144
+    required: true
+    type: json
+category: Contact Requests API
+description: 'Root only: the contact requests of ids, or — with no ids — every one the filter keeps, at most 10000, as {contact_requests: […]} (LGPD art. 18 II and V; GDPR arts. 15 and 20).'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootExportContactRequests
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/export-contact-requests
+priority: 100
+private: true
+response-type: application/json
+summary: Exports contact requests as JSON

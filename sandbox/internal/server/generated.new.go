@@ -36,6 +36,7 @@ import (
 	routes_api_download_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_download_backup"
 	routes_api_download_backup_file "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_download_backup_file"
 	routes_api_export_access_log "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_export_access_log"
+	routes_api_export_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_export_contact_requests"
 	routes_api_get_agent_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_agent_settings"
 	routes_api_get_contact_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_contact_settings"
 	routes_api_get_visualization_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_visualization_settings"
@@ -101,6 +102,7 @@ import (
 	routes_delete_access_log_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/delete_access_log_form"
 	routes_download_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/download_backup"
 	routes_export_access_log "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_access_log"
+	routes_export_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_contact_requests"
 	routes_export_visualization_views "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_visualization_views"
 	routes_hold_privacy_records_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/hold_privacy_records_form"
 	routes_list_agent_urls_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/list_agent_urls_page"
@@ -189,6 +191,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_download_backup.NewRoute(sandbox),
 		routes_api_download_backup_file.NewRoute(sandbox),
 		routes_api_export_access_log.NewRoute(sandbox),
+		routes_api_export_contact_requests.NewRoute(sandbox),
 		routes_api_get_agent_settings.NewRoute(sandbox),
 		routes_api_get_agent_summary.NewRoute(sandbox),
 		routes_api_get_backoffice_user.NewRoute(sandbox),
@@ -242,6 +245,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_delete_access_log_form.NewRoute(sandbox),
 		routes_download_backup.NewRoute(sandbox),
 		routes_export_access_log.NewRoute(sandbox),
+		routes_export_contact_requests.NewRoute(sandbox),
 		routes_export_visualization_views.NewRoute(sandbox),
 		routes_get_agent_summary_page.NewRoute(sandbox),
 		routes_get_contact_request_page.NewRoute(sandbox),

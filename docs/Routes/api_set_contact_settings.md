@@ -11,7 +11,7 @@ Only what is required:
 ```bash
 curl -X POST localhost:3000/api/admin/root/set-contact-settings \
   -H 'Content-Type: application/json' \
-  -d '{"enabled":true,"ip_daily_limit":1,"max_bytes":2,"rate_per_minute":1}'
+  -d '{"enabled":true,"ip_daily_limit":1,"max_bytes":2,"rate_per_minute":1,"retention_days":1}'
 ```
 
 With every value it reads:
@@ -24,7 +24,7 @@ curl -X POST localhost:3000/api/admin/root/set-contact-settings \
   -H 'x-client-port: my-x-client-port' \
   -H 'x-request-method: my-x-request-method' \
   -H 'Content-Type: application/json' \
-  -d '{"enabled":true,"ip_daily_limit":1,"max_bytes":2,"rate_per_minute":1}'
+  -d '{"acknowledge":["text"],"enabled":true,"ip_daily_limit":1,"max_bytes":2,"rate_per_minute":1,"retention_days":1}'
 ```
 
 More examples:
@@ -49,19 +49,25 @@ Send JSON with the header `Content-Type: application/json`, up to 64 KB. The bod
 
 | Field | What goes there | Required | Rules |
 | --- | --- | --- | --- |
+| `acknowledge` | list of texts | no |  |
 | `enabled` | `true` or `false` | yes |  |
 | `ip_daily_limit` | whole number | yes | from 0 to 1000000 |
 | `max_bytes` | whole number | yes | from 2 to 1048576 |
 | `rate_per_minute` | whole number | yes | from 1 to 10000 |
+| `retention_days` | whole number | yes | from 1 to 36500; may be `null` |
 
 Example:
 
 ```json
 {
+  "acknowledge": [
+    "text"
+  ],
   "enabled": true,
   "ip_daily_limit": 1,
   "max_bytes": 2,
-  "rate_per_minute": 1
+  "rate_per_minute": 1,
+  "retention_days": 1
 }
 ```
 

@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeapi"
 )
@@ -22,12 +23,14 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 		MaxBytes:      int64(input.Body.MaxBytes),
 		RatePerMinute: int64(input.Body.RatePerMinute),
 		IpDailyLimit:  int64(input.Body.IpDailyLimit),
+		RetentionDays: int64(input.Body.RetentionDays),
+		Acknowledge:   input.Body.Acknowledge,
 	})
 	if err != nil {
 		return err
 	}
 	if refusal != nil {
-		return sandbox.Deps.OpinionatedAgnosServer.Fail(refusal.Status, refusal.Field, refusal.Message)
+		return backofficeapi.FailPrivacy(sandbox, response, &privacy.Refusal{Status: refusal.Status, Field: refusal.Field, Message: refusal.Message, Notices: refusal.Notices}, privacy.NoticeContext{Retention: int64(input.Body.RetentionDays)})
 	}
 	return sandbox.Deps.OpinionatedAgnosServer.WriteJSON(sandbox.Deps.SerializableDeps, *response, api.StatusOK, backofficeapi.ContactSettingsResponseJSON(sandbox, settings))
 }

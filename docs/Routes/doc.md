@@ -76,6 +76,7 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /api/admin/get-contact-request`](api_get_contact_request.md) | Answers one contact request whole |
 | [`POST /api/admin/list-contact-requests`](api_list_contact_requests.md) | Answers one page of the contact requests, newest first: inbox, archived or all, filtered by period, country and a text of the JSON |
 | [`POST /api/admin/root/archive-contact-requests`](api_archive_contact_requests.md) | Archives contact requests, or moves them back to the inbox |
+| [`POST /api/admin/root/export-contact-requests`](api_export_contact_requests.md) | Exports contact requests as JSON |
 | [`POST /api/admin/root/get-contact-settings`](api_get_contact_settings.md) | Answers the settings of the contact requests and their state |
 | [`POST /api/admin/root/remove-contact-requests`](api_remove_contact_requests.md) | Deletes contact requests, or every one before a date |
 | [`POST /api/admin/root/set-contact-settings`](api_set_contact_settings.md) | Saves the settings of the contact requests |
@@ -181,6 +182,7 @@ it prints the address it took. Change it to wherever your server runs.
 | [`GET /admin/get-contact-request`](get_contact_request_page.md) | Shows one contact request whole: its JSON laid out as sent, its time, ip and country |
 | [`GET /admin/list-contact-requests`](list_contact_requests_page.md) | Lists the contact requests, newest first: inbox, archived or all, filtered by period, country and a text of the JSON |
 | [`POST /admin/root/archive-contact-requests`](archive_contact_requests_form.md) | Archives the contact requests selected, or moves them back to the inbox |
+| [`GET /admin/root/export-contact-requests`](export_contact_requests.md) | Exports contact requests as JSON |
 | [`POST /admin/root/remove-contact-requests`](remove_contact_requests_form.md) | Deletes the contact requests selected, or every one before a date |
 | [`POST /admin/root/set-contact-settings`](set_contact_settings_form.md) | Saves the settings of the contact requests |
 | [`GET /admin/root/set-contact-settings`](set_contact_settings_page.md) | Shows the settings of the contact requests: on or off, the largest body and the limits per ip |

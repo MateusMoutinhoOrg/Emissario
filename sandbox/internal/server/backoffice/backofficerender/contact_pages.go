@@ -199,7 +199,9 @@ type ContactRequestsPage struct {
 	// come back to. All three are "" for a viewer.
 	ArchiveAction string
 	RemoveAction  string
-	Back          string
+	// ExportHref downloads every contact request the filter keeps as JSON.
+	ExportHref string
+	Back       string
 	// ShowArchive and ShowUnarchive offer the buttons the status calls for.
 	ShowArchive   bool
 	ShowUnarchive bool
@@ -240,6 +242,7 @@ func RenderContactRequestsPage(sandbox *api.Sandbox, response *serverdeps.Respon
 	if viewer.IsRoot {
 		page.ArchiveAction = contact.ArchivePath
 		page.RemoveAction = contact.RemovePath
+		page.ExportHref = visualization.Href(sandbox, "/admin/root/export-contact-requests", params)
 		back := params
 		if paging.Page > 1 {
 			back = visualization.SetParam(back, "page", sandbox.Deps.StringsDeps.FormatInt(int64(paging.Page), 10))

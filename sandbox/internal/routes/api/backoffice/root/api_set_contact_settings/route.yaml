@@ -2,6 +2,10 @@ body:
     content-type: application/json
     json-schema:
         properties:
+            acknowledge:
+                items:
+                    type: string
+                type: array
             enabled:
                 type: boolean
             ip_daily_limit:
@@ -16,11 +20,17 @@ body:
                 maximum: 10000
                 minimum: 1
                 type: integer
+            retention_days:
+                maximum: 36500
+                minimum: 1
+                nullable: true
+                type: integer
         required:
             - enabled
             - ip_daily_limit
             - max_bytes
             - rate_per_minute
+            - retention_days
         type: object
     max-bytes: 65536
     required: true

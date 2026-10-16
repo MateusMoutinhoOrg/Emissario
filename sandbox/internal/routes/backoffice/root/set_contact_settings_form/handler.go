@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficerender"
 )
@@ -23,12 +24,15 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 		MaxBytes:      input.Body.MaxBytes,
 		RatePerMinute: input.Body.RatePerMinute,
 		IpDailyLimit:  input.Body.IpDailyLimit,
+		RetentionDays: input.Body.RetentionDays,
 	}
 	settingsInput, refusal := contact.InputOfForm(sandbox, contact.SettingsForm{
 		Enabled:       input.Body.Enabled,
 		MaxBytes:      input.Body.MaxBytes,
 		RatePerMinute: input.Body.RatePerMinute,
 		IpDailyLimit:  input.Body.IpDailyLimit,
+		RetentionDays: input.Body.RetentionDays,
+		Acknowledge:   input.Body.Acknowledge,
 	})
 	if refusal == nil {
 		var err error
@@ -36,6 +40,14 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 		if err != nil {
 			return err
 		}
+	}
+	if refusal != nil && len(refusal.Notices) > 0 {
+		notices, err := privacy.LoadNotices(sandbox, refusal.Notices, privacy.NoticeContext{Retention: settingsInput.RetentionDays})
+		if err != nil {
+			return err
+		}
+		sent.Notices = notices
+		return backofficerender.RenderContactSettingsPage(sandbox, response, refusal.Status, props.User, sent, "", 0, "")
 	}
 	if refusal != nil {
 		return backofficerender.RenderContactSettingsPage(sandbox, response, refusal.Status, props.User, sent, "", 0, refusal.Message)

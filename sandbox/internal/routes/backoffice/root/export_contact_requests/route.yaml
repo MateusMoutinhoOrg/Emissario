@@ -1,0 +1,52 @@
+category: Contact Requests
+description: 'Root only: the contact requests of ids, or — with no ids — every one the filter keeps (from, to, country, contains, status), at most 10000, downloaded as {contact_requests: […]}: what an access or a portability request asks for (LGPD art. 18 II and V; GDPR arts. 15 and 20).'
+methods:
+    - GET
+parameters:
+    - description: the from filter of the contact requests
+      id: From
+      key: from
+      sources:
+        - query
+      type: string
+    - description: the to filter of the contact requests
+      id: To
+      key: to
+      sources:
+        - query
+      type: string
+    - description: the country filter of the contact requests
+      id: Country
+      key: country
+      sources:
+        - query
+      type: string
+    - description: the contains filter of the contact requests
+      id: Contains
+      key: contains
+      sources:
+        - query
+      type: string
+    - description: the status filter of the contact requests
+      id: Status
+      key: status
+      sources:
+        - query
+      type: string
+    - description: the ids of the contact requests to export, repeated
+      id: Ids
+      key: ids
+      sources:
+        - query
+      type: string-array
+paths:
+    - end: -1
+      id: AdminRootExportContactRequests
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/export-contact-requests
+priority: 100
+private: true
+response-type: application/json
+summary: Exports contact requests as JSON

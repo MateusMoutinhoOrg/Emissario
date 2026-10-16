@@ -12,9 +12,19 @@ import (
 
 // List is one page of the contact requests filter keeps, newest first.
 func List(sandbox *api.Sandbox, filter Filter, page int, limit int) ([]contact_db.ContactRequestRecord, visualization.Paging, error) {
-	all, err := contact_db.ListContactRequestsBetween(sandbox, contact_db.New(sandbox), filter.AtMin, filter.AtMax)
+	kept, err := Selected(sandbox, filter)
 	if err != nil {
 		return nil, visualization.Paging{}, err
+	}
+	paging, from, to := visualization.Paginate(sandbox, len(kept), page, limit)
+	return kept[from:to], paging, nil
+}
+
+// Selected is every contact request filter keeps, newest first.
+func Selected(sandbox *api.Sandbox, filter Filter) ([]contact_db.ContactRequestRecord, error) {
+	all, err := contact_db.ListContactRequestsBetween(sandbox, contact_db.New(sandbox), filter.AtMin, filter.AtMax)
+	if err != nil {
+		return nil, err
 	}
 	needle := sandbox.Deps.StringsDeps.ToLower(filter.Contains)
 	kept := []contact_db.ContactRequestRecord{}
@@ -29,8 +39,7 @@ func List(sandbox *api.Sandbox, filter Filter, page int, limit int) ([]contact_d
 		}
 		return kept[i].Id > kept[j].Id
 	})
-	paging, from, to := visualization.Paginate(sandbox, len(kept), page, limit)
-	return kept[from:to], paging, nil
+	return kept, nil
 }
 
 // Find is the contact request whose id is ref, false when there is none.
@@ -158,4 +167,41 @@ func BackTo(sandbox *api.Sandbox, back string, gone bool, notice string, count i
 		separator = "&"
 	}
 	return back + separator + "notice=" + notice + "&count=" + strings.FormatInt(int64(count), 10)
+}
+
+// MaxExport is how many contact requests one export holds at most.
+const MaxExport = 10000
+
+// Export is the contact requests an access or a portability request asks
+// for: those of refs, or — with no refs — every one filter keeps, newest
+// first. More than MaxExport is refused.
+func Export(sandbox *api.Sandbox, filter Filter, refs []string) ([]contact_db.ContactRequestRecord, *Refusal, error) {
+	named := []string{}
+	for _, ref := range refs {
+		if sandbox.Deps.StringsDeps.TrimSpace(ref) != "" {
+			named = append(named, ref)
+		}
+	}
+	if len(named) > 0 {
+		if len(named) > MaxExport {
+			return nil, refuse("ids", "Export at most 10000 contact requests at once."), nil
+		}
+		found := []contact_db.ContactRequestRecord{}
+		seen := map[string]bool{}
+		for _, ref := range named {
+			if request, ok := Find(sandbox, ref); ok && !seen[request.Ref] {
+				seen[request.Ref] = true
+				found = append(found, request)
+			}
+		}
+		return found, nil, nil
+	}
+	kept, err := Selected(sandbox, filter)
+	if err != nil {
+		return nil, nil, err
+	}
+	if len(kept) > MaxExport {
+		return nil, refuse("", "The filter keeps more than 10000 contact requests: narrow it."), nil
+	}
+	return kept, nil, nil
 }

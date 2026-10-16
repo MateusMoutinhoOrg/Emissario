@@ -5,6 +5,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -18,6 +19,11 @@ type ContactSettingsForm struct {
 	MaxBytes      string
 	RatePerMinute string
 	IpDailyLimit  string
+	// RetentionDays is blank to keep the requests until a root deletes
+	// them.
+	RetentionDays string
+	// Notices are the notices the save asks for, shown inside the form.
+	Notices []privacy.Notice
 }
 
 // ContactSettingsFormOf is the form filled with settings; a limit of 0 is
@@ -34,6 +40,7 @@ func ContactSettingsFormOf(sandbox *api.Sandbox, settings contact.Settings) Cont
 		MaxBytes:      blank(settings.MaxBytes),
 		RatePerMinute: blank(settings.RatePerMinute),
 		IpDailyLimit:  blank(settings.IpDailyLimit),
+		RetentionDays: privacy.FormatRetention(sandbox, settings.RetentionDays),
 	}
 }
 
@@ -59,6 +66,9 @@ type ContactSettingsPage struct {
 	// before a date.
 	RemoveAction string
 	Today        string
+	// DraftHref is the privacy notice draft the website's notice starts
+	// from.
+	DraftHref string
 }
 
 // RenderContactSettingsPage answers, under status, the settings form filled
@@ -85,6 +95,7 @@ func RenderContactSettingsPage(sandbox *api.Sandbox, response *serverdeps.Respon
 		MaxMaxBytes:  contact.MaxMaxBytes,
 		RemoveAction: contact.RemovePath,
 		Today:        visualization.Today(sandbox),
+		DraftHref:    privacy.SettingsPath + "#notice-draft",
 	}
 	return RenderHTML(sandbox, response, status, "backoffice/contact_settings.html", page)
 }

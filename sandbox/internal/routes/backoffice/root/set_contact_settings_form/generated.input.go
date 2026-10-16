@@ -22,10 +22,12 @@ type Input struct {
 // Body is one object of this route's declared form-schema, as the
 // generated ReadBody hands it over.
 type Body struct {
+	Acknowledge   []string
 	Enabled       string
 	IpDailyLimit  string
 	MaxBytes      string
 	RatePerMinute string
+	RetentionDays string
 }
 
 // MaxBodyBytes is the largest request body this route reads, from the
@@ -34,7 +36,7 @@ const MaxBodyBytes = 16384
 
 // BodySchema is this route's declared form-schema in canonical form — the text
 // Deps.OpinionatedAgnosServer.ValidateForm checks a request body against.
-const BodySchema = "{\"properties\":{\"enabled\":{\"maxLength\":8,\"type\":\"string\"},\"ip-daily-limit\":{\"maxLength\":16,\"type\":\"string\"},\"max-bytes\":{\"maxLength\":16,\"type\":\"string\"},\"rate-per-minute\":{\"maxLength\":16,\"type\":\"string\"}},\"type\":\"object\"}"
+const BodySchema = "{\"properties\":{\"acknowledge\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"},\"enabled\":{\"maxLength\":8,\"type\":\"string\"},\"ip-daily-limit\":{\"maxLength\":16,\"type\":\"string\"},\"max-bytes\":{\"maxLength\":16,\"type\":\"string\"},\"rate-per-minute\":{\"maxLength\":16,\"type\":\"string\"},\"retention-days\":{\"maxLength\":16,\"type\":\"string\"}},\"type\":\"object\"}"
 
 // ReadBody reads, validates and converts the request body of one bound route.
 // The generic Run calls it — through the ReadBody generated.new.go closes over
@@ -81,9 +83,13 @@ func ReadBody(sandbox *api.Sandbox, route *api.Route) (Body, error) {
 // optional and comes back as its zero value.
 func bindBody(sandbox *api.Sandbox, document *serializabledeps.SerializableObject) Body {
 	value := Body{}
+	for _, item := range sandbox.Deps.OpinionatedAgnosServer.ReadItems(document, "acknowledge") {
+		value.Acknowledge = append(value.Acknowledge, sandbox.Deps.OpinionatedAgnosServer.ItemString(item))
+	}
 	value.Enabled = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "enabled")
 	value.IpDailyLimit = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "ip-daily-limit")
 	value.MaxBytes = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "max-bytes")
 	value.RatePerMinute = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "rate-per-minute")
+	value.RetentionDays = sandbox.Deps.OpinionatedAgnosServer.ReadString(document, "retention-days")
 	return value
 }
