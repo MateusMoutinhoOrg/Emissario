@@ -2,7 +2,7 @@
 
 Sets the settings of the visualization: tracking on or off, the retention in days and the ignored ips
 
-Root only. retention_days 0 keeps the views forever; ignored_ips holds ips and CIDR ranges, 100 at most. Answers {settings}.
+Root only. retention_days 0 keeps the views forever, else 1 to 36500; past 760 days, or 0, it answers 409 acknowledgement-required with the retention-view-v1 notice until its id is in acknowledge. ignored_ips holds ips and CIDR ranges, 100 at most. Answers {settings}.
 
 ## Try it
 
@@ -24,7 +24,7 @@ curl -X POST localhost:3000/api/admin/root/set-visualization-settings \
   -H 'x-client-port: my-x-client-port' \
   -H 'x-request-method: my-x-request-method' \
   -H 'Content-Type: application/json' \
-  -d '{"enabled":true,"ignored_ips":["text"],"retention_days":1}'
+  -d '{"acknowledge":["text"],"enabled":true,"ignored_ips":["text"],"retention_days":1}'
 ```
 
 More examples:
@@ -49,14 +49,18 @@ Send JSON with the header `Content-Type: application/json`, up to 1 MB. The body
 
 | Field | What goes there | Required | Rules |
 | --- | --- | --- | --- |
+| `acknowledge` | list of texts | no |  |
 | `enabled` | `true` or `false` | yes |  |
 | `ignored_ips` | list of texts | yes | at most 100 items |
-| `retention_days` | whole number | yes | from 0 to 3650 |
+| `retention_days` | whole number | yes | from 0 to 36500 |
 
 Example:
 
 ```json
 {
+  "acknowledge": [
+    "text"
+  ],
   "enabled": true,
   "ignored_ips": [
     "text"

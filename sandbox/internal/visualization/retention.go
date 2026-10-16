@@ -5,44 +5,10 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/visualization_db"
 )
 
-// The ip is personal data, so a view is kept RetentionDays at most: every
-// hour the retention goroutine removes the views older than that, and a root
-// can remove them at any time through Purge.
-
-// retentionMilliseconds is how long the retention goroutine waits between two
-// cleanups.
-const retentionMilliseconds = 60 * 60 * 1000
-
-// retain is the body of the retention goroutine: a cleanup at once, then one
-// every hour. It never returns.
-func retain(sandbox *api.Sandbox) {
-	for {
-		holdForBackups(sandbox)
-		removed, days, err := RemoveExpired(sandbox)
-		if err != nil {
-			sandbox.Deps.StdDeps.Eprintf("warning: the views older than the retention could not be removed: %s\n", err.Error())
-		} else if removed > 0 {
-			sandbox.Deps.StdDeps.Logf("visualization: %d views older than %d days removed\n", removed, days)
-		}
-		sandbox.Deps.SleepDeps.Sleep(retentionMilliseconds)
-	}
-}
-
-// RemoveExpired removes the views older than the retention of the settings,
-// nothing when it keeps them forever, and answers how many it removed and the
-// retention it went by.
-func RemoveExpired(sandbox *api.Sandbox) (int, int64, error) {
-	settings, err := ReadSettings(sandbox)
-	if err != nil {
-		return 0, 0, err
-	}
-	if settings.RetentionDays <= 0 {
-		return 0, 0, nil
-	}
-	cutoff := NowSeconds(sandbox) - settings.RetentionDays*daySeconds
-	removed, err := visualization_db.RemoveVisualizationViewsBefore(sandbox, visualization_db.New(sandbox), cutoff)
-	return removed, settings.RetentionDays, err
-}
+// The ip is personal data, so a view is kept RetentionDays at most: the
+// retention cleanup of privacyadmin, which runs every hour in start-server,
+// removes the views older than that, and a root can remove them at any time
+// through Purge.
 
 // Purge removes, at a root's asking, every view before the local day before
 // (DayLayout) — or every view, with all — and answers how many it removed.

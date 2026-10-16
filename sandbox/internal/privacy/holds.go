@@ -73,6 +73,27 @@ func HeldIds(sandbox *api.Sandbox, table string, now int64) (map[int64]bool, err
 	return held, nil
 }
 
+// HeldUntil is the end of the longest hold in force at now that keeps the
+// row id of table, in Unix seconds, and false when none keeps it.
+func HeldUntil(sandbox *api.Sandbox, table string, id int64, now int64) (int64, bool, error) {
+	holds, err := Holds(sandbox)
+	if err != nil {
+		return 0, false, err
+	}
+	until, held := int64(0), false
+	for _, hold := range holds {
+		if hold.Table != table || hold.Until <= now {
+			continue
+		}
+		for _, kept := range hold.Ids {
+			if kept == id && hold.Until > until {
+				until, held = hold.Until, true
+			}
+		}
+	}
+	return until, held, nil
+}
+
 // validTable tells whether table is one a hold keeps rows of.
 func validTable(table string) bool {
 	for _, known := range HoldTables {

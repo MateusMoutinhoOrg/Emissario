@@ -2,6 +2,10 @@ body:
     content-type: application/json
     json-schema:
         properties:
+            acknowledge:
+                items:
+                    type: string
+                type: array
             enabled:
                 type: boolean
             ignored_ips:
@@ -10,7 +14,7 @@ body:
                 maxItems: 100
                 type: array
             retention_days:
-                maximum: 3650
+                maximum: 36500
                 minimum: 0
                 type: integer
         required:
@@ -22,7 +26,7 @@ body:
     required: true
     type: json
 category: Visualization API
-description: Root only. retention_days 0 keeps the views forever; ignored_ips holds ips and CIDR ranges, 100 at most. Answers {settings}.
+description: Root only. retention_days 0 keeps the views forever, else 1 to 36500; past 760 days, or 0, it answers 409 acknowledgement-required with the retention-view-v1 notice until its id is in acknowledge. ignored_ips holds ips and CIDR ranges, 100 at most. Answers {settings}.
 examples:
     - 'curl -X POST localhost:3000/api/admin/root/set-visualization-settings -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"enabled":true,"retention_days":90,"ignored_ips":["203.0.113.7"]}'''
 methods:

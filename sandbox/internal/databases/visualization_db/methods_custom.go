@@ -98,3 +98,10 @@ func listViews(sandbox *api.Sandbox, db *VisualizationDb) ([]databasedeps.Record
 	}
 	return records, nil
 }
+
+// VisualizationViewRecords is every visualization-view, none of its fields
+// read yet: the retention cleanup reads the at of each, and the rest only of
+// the ones it touches.
+func VisualizationViewRecords(sandbox *api.Sandbox, db *VisualizationDb) ([]databasedeps.Record, error) {
+	return listViews(sandbox, db)
+}

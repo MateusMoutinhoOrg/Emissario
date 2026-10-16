@@ -27,7 +27,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Pattern = "/admin/get-agent-summary"
 	self.Category = "Agent"
 	self.Summary = "Shows one summary whole"
-	self.Description = "Root and viewer; a root also sees the button that deletes it. An id no summary holds answers 404."
+	self.Description = "Root and viewer; a root also sees the buttons that delete and hold it, and the end of the legal hold that keeps it. An id no summary holds answers 404."
 	self.Examples = []string{"curl -b \"backoffice_session=$SESSION\" \"localhost:3000/admin/get-agent-summary?id=3f9a0c1b2d4e5f60\""}
 	self.Hidden = false
 
@@ -52,6 +52,39 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 			Default:     "",
 			HasDefault:  false,
 			Description: "the id of the summary, as /api/agent/summaries answered it",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
+		{
+			Id:          "Notice",
+			Key:         "notice",
+			Sources:     []api.ParameterSource{api.SourceQuery},
+			Required:    false,
+			Type:        api.ParameterString,
+			Default:     "",
+			HasDefault:  false,
+			Description: "the outcome code of the last hold",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
+		{
+			Id:          "Count",
+			Key:         "count",
+			Sources:     []api.ParameterSource{api.SourceQuery},
+			Required:    false,
+			Type:        api.ParameterInteger,
+			Default:     "0",
+			HasDefault:  true,
+			Description: "how many summaries the last hold kept",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
+		{
+			Id:          "Reason",
+			Key:         "reason",
+			Sources:     []api.ParameterSource{api.SourceQuery},
+			Required:    false,
+			Type:        api.ParameterString,
+			Default:     "",
+			HasDefault:  false,
+			Description: "why the last hold was refused",
 			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
 		},
 	}

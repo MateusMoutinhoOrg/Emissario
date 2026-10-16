@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -24,6 +25,7 @@ type VisualizationSettingsPage struct {
 	Enabled    bool
 	Retention  string
 	IgnoredIps string
+	Notices    []privacy.Notice
 	// GeoipSource names the country database in use, GeoipBuilt its build
 	// date; GeoipEmbedded shows its credit.
 	GeoipSource   string
@@ -52,6 +54,8 @@ type VisualizationSettingsForm struct {
 	Enabled    bool
 	Retention  string
 	IgnoredIps string
+	// Notices are the notices the save asks for, shown inside the form.
+	Notices []privacy.Notice
 }
 
 // VisualizationSettingsFormOf is the form filled with settings.
@@ -96,6 +100,7 @@ func RenderVisualizationSettingsPage(sandbox *api.Sandbox, response *serverdeps.
 		Enabled:       form.Enabled,
 		Retention:     form.Retention,
 		IgnoredIps:    form.IgnoredIps,
+		Notices:       form.Notices,
 		GeoipSource:   "Not opened in this process: it is opened by start-server",
 		GeoipKind:     geoip.Kind,
 		GeoipEmbedded: geoip.Source == visualization.GeoipSourceEmbedded,

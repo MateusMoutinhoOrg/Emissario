@@ -1,5 +1,5 @@
 category: Agent
-description: Root and viewer; a root also sees the button that deletes it. An id no summary holds answers 404.
+description: Root and viewer; a root also sees the buttons that delete and hold it, and the end of the legal hold that keeps it. An id no summary holds answers 404.
 examples:
     - curl -b "backoffice_session=$SESSION" "localhost:3000/admin/get-agent-summary?id=3f9a0c1b2d4e5f60"
 methods:
@@ -8,6 +8,25 @@ parameters:
     - description: the id of the summary, as /api/agent/summaries answered it
       id: Id
       key: id
+      sources:
+        - query
+      type: string
+    - description: the outcome code of the last hold
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many summaries the last hold kept
+      id: Count
+      key: count
+      sources:
+        - query
+      type: integer
+    - description: why the last hold was refused
+      id: Reason
+      key: reason
       sources:
         - query
       type: string

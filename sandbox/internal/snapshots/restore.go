@@ -31,8 +31,43 @@ const preRestorePrefix = "pre-restore"
 // revoked tokens, closed sessions, removed users and changed passwords.
 const BackofficeDir = "backofficedb"
 
+// PrivacyDir is the directory of DataDir privacy-db lives in: the privacy
+// settings and the IP key, the Marco Civil access log and the inventory of
+// its reads, the legal holds and the erasures. A restore leaves it as it is
+// unless asked to include the backoffice too: an older copy would lose the
+// access log rows kept since — which the law asks to keep — and the holds
+// made since, so the cleanup would delete rows an authority asked to keep.
+const PrivacyDir = "privacydb"
+
+// liveDirs are the directories of DataDir a restore leaves as they are
+// unless asked to include them.
+var liveDirs = []string{BackofficeDir, PrivacyDir}
+
 // restoring holds a token while a restore or a roll-back writes DataDir.
 var restoring = make(chan struct{}, 1)
+
+// restoresEnded counts the restores that ended in this process, guarded by
+// restoresLock.
+var restoresEnded int64
+
+// restoresLock guards restoresEnded.
+var restoresLock = make(chan struct{}, 1)
+
+// RestoresEnded is how many restores ended in this process, finished or
+// failed: a cache of what DataDir holds compares it with the count it last
+// saw, so even a restore shorter than its polling is never missed.
+func RestoresEnded(sandbox *api.Sandbox) int64 {
+	restoresLock <- struct{}{}
+	defer func() { <-restoresLock }()
+	return restoresEnded
+}
+
+// restoreEnded counts one more restore that ended.
+func restoreEnded() {
+	restoresLock <- struct{}{}
+	restoresEnded++
+	<-restoresLock
+}
 
 // Restoring tells whether a restore or a roll-back is writing DataDir: every
 // request is refused until it ends.
@@ -64,6 +99,7 @@ func StartRestore(sandbox *api.Sandbox, id int64, includeBackoffice bool) (strin
 	restoring <- struct{}{}
 	go func() {
 		defer release(sandbox)
+		defer restoreEnded()
 		defer func() { <-restoring }()
 		if err := restore(sandbox, db, target, includeBackoffice); err != nil {
 			sandbox.Deps.StdDeps.Eprintf("restore of snapshot %s failed: %s\n", target.Name, err.Error())
@@ -75,7 +111,8 @@ func StartRestore(sandbox *api.Sandbox, id int64, includeBackoffice bool) (strin
 }
 
 // restore puts target back over DataDir: every database directory but
-// BackupDir — and BackofficeDir, unless includeBackoffice — is removed, and
+// BackupDir — and BackofficeDir and PrivacyDir, unless includeBackoffice — is
+// removed, and
 // every file of target under the others written in its place. Every file is
 // checked first — its path, its content, no path a folder of another — so a
 // restore that cannot finish fails before anything is removed. One that fails
@@ -149,14 +186,20 @@ func prunePreRestore(sandbox *api.Sandbox, db *backup.Backup) error {
 }
 
 // scoped is every one of contents a restore writes: every one but those under
-// BackofficeDir, unless includeBackoffice.
+// BackofficeDir and PrivacyDir, unless includeBackoffice.
 func scoped(sandbox *api.Sandbox, contents []backup.SnapshotContentRecord, includeBackoffice bool) []backup.SnapshotContentRecord {
 	if includeBackoffice {
 		return contents
 	}
 	kept := []backup.SnapshotContentRecord{}
 	for _, content := range contents {
-		if !sandbox.Deps.StringsDeps.HasPrefix(content.Path, BackofficeDir+"/") {
+		live := false
+		for _, dir := range liveDirs {
+			if sandbox.Deps.StringsDeps.HasPrefix(content.Path, dir+"/") {
+				live = true
+			}
+		}
+		if !live {
 			kept = append(kept, content)
 		}
 	}
@@ -217,14 +260,16 @@ func Conflict(sandbox *api.Sandbox, paths []string) string {
 }
 
 // write removes every database directory of DataDir but BackupDir — and
-// BackofficeDir, unless includeBackoffice — and writes every one of contents
-// in their place.
+// BackofficeDir and PrivacyDir, unless includeBackoffice — and writes every
+// one of contents in their place.
 func write(sandbox *api.Sandbox, db *backup.Backup, contents []backup.SnapshotContentRecord, includeBackoffice bool) error {
 	io := sandbox.Deps.IoDeps
 	root := DataDir(sandbox)
 	kept := map[string]bool{io.Join(root, BackupDir): true}
 	if !includeBackoffice {
-		kept[io.Join(root, BackofficeDir)] = true
+		for _, dir := range liveDirs {
+			kept[io.Join(root, dir)] = true
+		}
 	}
 	for _, dir := range io.ListDirs(root) {
 		if !kept[dir] {

@@ -123,3 +123,13 @@ func listCollection(sandbox *api.Sandbox, db *AgentDb, collection string) ([]dat
 	}
 	return records, nil
 }
+
+// AgentSummaryRecords is every agent-summary, none of its fields read yet.
+func AgentSummaryRecords(sandbox *api.Sandbox, db *AgentDb) ([]databasedeps.Record, error) {
+	return listCollection(sandbox, db, "agent-summary")
+}
+
+// AgentUsageRecords is every agent-usage, none of its fields read yet.
+func AgentUsageRecords(sandbox *api.Sandbox, db *AgentDb) ([]databasedeps.Record, error) {
+	return listCollection(sandbox, db, "agent-usage")
+}

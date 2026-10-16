@@ -2,7 +2,7 @@
 
 Puts rows on a legal hold
 
-Root only, and a reader of the access log to hold its rows. table is contact-request, agent-summary or access-log; ids the rows; reason the request the hold answers — an ofício, a court order, a lawsuit; until the last day it holds, a day after today (60 days from now for a Marco Civil art. 15 §2 request). Held rows are skipped by the cleanup and by Find and erase until then. Redirects to back with ?notice=held&count=<n>.
+Root only, and a reader of the access log to hold its rows. table is contact-request, agent-summary or access-log; ids the rows; reason the request the hold answers — an ofício, a court order, a lawsuit; until the last day it holds, a day after today (60 days from now for a Marco Civil art. 15 §2 request). Held rows are skipped by the retention cleanup and by Find and erase until then. Redirects to back — a backoffice path with no query, or with one id= of a record — with notice=held&count=<n>, or notice=hold-refused and its reason.
 
 ## Try it
 

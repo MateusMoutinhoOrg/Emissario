@@ -40,7 +40,7 @@ the queue and writes it afterwards. A failed write goes to stderr, never to the 
 | Piece | What |
 |---|---|
 | `visualization-start-server` | cli middleware, priority `52`, in front of `start-server`: reads `--visualization-geoip` into `sandbox.Config.VisualizationGeoipFile`, opens the country database, starts the writer and the retention cleanup |
-| retention cleanup | every hour (and at start): removes the views older than `retention-days`; nothing when it is `0` |
+| retention cleanup | the one of `privacy-start-server` (`privacyadmin.RunCleanup`), every hour and at start: removes the views older than `retention-days` — nothing when it is `0` — and blanks the `ip` of the ones past the IP retention of the Privacy page |
 
 ## Database — `visualization-db` (`./data/visualizationdb`, gitignored)
 
@@ -61,7 +61,8 @@ the queue and writes it afterwards. A failed write goes to stderr, never to the 
 | `referrer` | the host of `Referer` when it is another site; empty for a direct visit or a link inside the site |
 
 `visualization-setting`, one record: `enabled` (`1` on, the default), `retention-days` (`90` by
-default, `0` forever), `ignored-ips` (one ip or CIDR range per line).
+default, `0` forever; past 760 days — the CNIL's 25 months for audience measurement — or `0`, a save
+asks for the `retention-view-v1` notice), `ignored-ips` (one ip or CIDR range per line).
 
 Device, browser and os come from substring rules in `sandbox/internal/visualization/useragent.go`.
 A query by period reads only `at` first (`ListVisualizationViewsBetween`, `methods_custom.go`);
@@ -119,7 +120,7 @@ holds, an unknown `sort` or `bucket`; `403` for an ip sent by a viewer.
 | Visitors: country of the last view, device, browser and os used most; `sort=views\|last` | `GET /admin/list-visualization-visitors` |
 | Views: the raw log, newest first; one exact `ip` opens a visitor summary | `GET /admin/list-visualization-views` |
 | Export: CSV, 100 000 rows at most | `GET /admin/root/export-visualization-views` |
-| Settings: tracking, retention (1–3650 days, blank forever), ignored ips (100 at most); the country database, views stored, oldest, dropped, your ip | `GET` / `POST /admin/root/set-visualization-settings` |
+| Settings: tracking, retention (1–36500 days, blank forever, past 760 days after its notice), ignored ips (100 at most); the country database, views stored, oldest, dropped, your ip | `GET` / `POST /admin/root/set-visualization-settings` |
 | Delete views: `before=YYYY-MM-DD` or `all=1` | `POST /admin/root/purge-visualization-views` |
 
 Listings paginate with `page` and `limit` (20, 1 to 100).
@@ -135,7 +136,7 @@ Listings paginate with `page` and `limit` (20, 1 to 100).
 | `/api/admin/list-visualization-visitors` | all | filters + `sort`, `page`, `limit` | `{visitors, total, page, pages, limit}` |
 | `/api/admin/list-visualization-views` | all | filters + `page`, `limit` | `{views, total, page, pages, limit}` |
 | `/api/admin/root/get-visualization-settings` | root | — | `{settings, geoip, stored, oldest_at, dropped}` |
-| `/api/admin/root/set-visualization-settings` | root | `{enabled, retention_days, ignored_ips}` | `{settings}` |
+| `/api/admin/root/set-visualization-settings` | root | `{enabled, retention_days, ignored_ips, acknowledge?}` | `{settings}`; `409` with the retention notice |
 | `/api/admin/root/purge-visualization-views` | root | `{before}` or `{all: true}` | `{removed}` |
 
 ```bash

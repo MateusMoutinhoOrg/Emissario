@@ -667,6 +667,13 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .head-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .head-actions form { display: inline; }
+    details.hold { display: inline-block; }
+    details.hold summary { list-style: none; }
+    .hold-fields { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: end; margin-top: 0.5rem; }
+    .hold-fields label { display: flex; flex-direction: column; font-size: 0.8rem; color: var(--text-muted); gap: 0.25rem; }
+    .held { margin: -0.5rem 0 1rem; font-size: 0.88rem; }
   </style>
 </head>
 <body>
@@ -706,10 +713,23 @@
         <p class="muted"><code>{{.Id}}</code> · {{.At}}</p>
       </div>
       {{if .RemoveAction}}
-      <form action="{{.RemoveAction}}" method="POST" data-confirm="Delete this summary? This cannot be undone.">
-        <input type="hidden" name="id" value="{{.Id}}">
-        <button type="submit" class="btn btn-danger">Delete</button>
-      </form>
+      <div class="head-actions">
+        <form action="{{.RemoveAction}}" method="POST" data-confirm="Delete this summary? This cannot be undone.">
+          <input type="hidden" name="id" value="{{.Id}}">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
+        {{with .Hold}}<details class="hold">
+          <summary class="btn">{{if .HeldUntil}}Held until {{.HeldUntil}}{{else}}Hold…{{end}}</summary>
+          <form class="hold-fields" action="{{.Action}}" method="POST">
+            <input type="hidden" name="table" value="{{.Table}}">
+            <input type="hidden" name="ids" value="{{.Id}}">
+            <input type="hidden" name="back" value="{{.Back}}">
+            <label>Reason <input type="text" name="reason" maxlength="500" required placeholder="Ofício nº 123/2026, a court order, a lawsuit"></label>
+            <label>Until <input type="date" name="until" value="{{.Until}}" required></label>
+            <button type="submit" class="btn btn-small">Hold</button>
+          </form>
+        </details>{{end}}
+      </div>
       {{end}}
     </section>
 
@@ -717,6 +737,9 @@
       {{range .Tabs}}<a href="{{.Href}}"{{if .Active}} class="active"{{end}}>{{.Label}}</a>
       {{end}}
     </nav>
+
+    {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{.Notice.Text}}</div>{{end}}
+    {{with .Hold}}{{if .HeldUntil}}<p class="muted held">On a legal hold until {{.HeldUntil}}: the retention cleanup and Find and erase keep it until then. Deleting it here still deletes it.</p>{{end}}{{end}}
 
     <section class="grid-2">
       <article class="card">

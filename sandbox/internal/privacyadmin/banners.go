@@ -72,6 +72,7 @@ func Banners(sandbox *api.Sandbox, user *backoffice_db.BackofficeUserRecord) []B
 // are shown.
 var bannerChecks = []func(sandbox *api.Sandbox) []Banner{
 	notEncryptedBanner,
+	pastRetentionBanner,
 	accessLogBanners,
 	rootsWithoutTotpBanner,
 }
@@ -94,6 +95,24 @@ func notEncryptedBanner(sandbox *api.Sandbox) []Banner {
 		Kind: BannerDanger,
 		Text: "Database not encrypted — debug only. This server runs with --notencrypt: every IP, email, contact request and summary, the access log and the key that hashes the IPs sit in clear on the disk and in every backup.",
 	}}
+}
+
+// BackupsPath is the Backups page, which marks the snapshots past retention.
+const BackupsPath = "/admin/root/list-backups"
+
+// pastRetentionBanner warns of the snapshots holding data the databases
+// already deleted by retention.
+func pastRetentionBanner(sandbox *api.Sandbox) []Banner {
+	past, err := PastRetention(sandbox)
+	if err != nil || len(past) == 0 {
+		return nil
+	}
+	count := sandbox.Deps.StringsDeps.FormatInt(int64(len(past)), 10)
+	text := count + " snapshots hold data the databases already deleted by retention: it lives on until they are deleted."
+	if len(past) == 1 {
+		text = "1 snapshot holds data the databases already deleted by retention: it lives on until it is deleted."
+	}
+	return []Banner{{Kind: BannerWarn, Text: text, Href: BackupsPath, Link: "Backups"}}
 }
 
 // accessLogBanners warns of an access log on without what Decreto 8.771/2016

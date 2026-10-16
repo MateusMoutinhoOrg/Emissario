@@ -2,7 +2,7 @@
 
 Saves the settings of the visualization: tracking on or off, the retention in days and the ignored ips
 
-Root only. enabled=1 turns tracking on, its absence off; a blank retention keeps the views forever, else 1 to 3650 days; the ignored ips are one ip or CIDR range per line, 100 at most. A refused value answers the form again under a 400; a save answers 303 back to the page with ?notice=saved.
+Root only. enabled=1 turns tracking on, its absence off; a blank retention keeps the views forever, else 1 to 36500 days, past 760 days or blank asking for the retention-view-v1 notice; the ignored ips are one ip or CIDR range per line, 100 at most. A refused value answers the form again under a 400, a save that needs the notice under a 409 with it inside until acknowledge=retention-view-v1 is sent; a save answers 303 back to the page with ?notice=saved.
 
 ## Try it
 
@@ -25,7 +25,7 @@ curl -X POST localhost:3000/admin/root/set-visualization-settings \
   -H 'origin: my-origin' \
   -H 'host: my-host' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
-  -d 'enabled=text&ignored-ips=text&retention-days=text'
+  -d 'acknowledge=text&enabled=text&ignored-ips=text&retention-days=text'
 ```
 
 More examples:
@@ -51,6 +51,7 @@ Send form fields, like `name=value&other=value` with the header `Content-Type: a
 
 | Field | What goes there | Required | Rules |
 | --- | --- | --- | --- |
+| `acknowledge` | list of texts | no |  |
 | `enabled` | text | no | at most 8 characters |
 | `ignored-ips` | text | no | at most 8192 characters |
 | `retention-days` | text | no | at most 16 characters |
@@ -58,7 +59,7 @@ Send form fields, like `name=value&other=value` with the header `Content-Type: a
 Example:
 
 ```text
-enabled=text&ignored-ips=text&retention-days=text
+acknowledge=text&enabled=text&ignored-ips=text&retention-days=text
 ```
 
 ## What comes back

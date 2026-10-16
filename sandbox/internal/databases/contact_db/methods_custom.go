@@ -113,3 +113,10 @@ func listCollection(sandbox *api.Sandbox, db *ContactDb, collection string) ([]d
 	}
 	return records, nil
 }
+
+// ContactRequestRecords is every contact-request, none of its fields read
+// yet: the retention cleanup reads the at of each, and the rest only of the
+// ones it touches.
+func ContactRequestRecords(sandbox *api.Sandbox, db *ContactDb) ([]databasedeps.Record, error) {
+	return listCollection(sandbox, db, "contact-request")
+}

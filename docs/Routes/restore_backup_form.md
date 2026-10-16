@@ -2,6 +2,8 @@
 
 Starts putting a snapshot back over every database, after a pre-restore snapshot of them, and answers at once
 
+Root only. backofficedb and privacydb are kept as they are unless include-backoffice=true: the backoffice users, sessions and tokens, and the privacy settings, the access log, its inventory, the legal holds and the erasures. Answers 303 back to the list; every request is answered 503 while the restore runs.
+
 ## Try it
 
 Only what is required:

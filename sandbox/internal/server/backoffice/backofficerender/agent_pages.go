@@ -6,6 +6,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/agent"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/agent_db"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -256,10 +257,15 @@ type AgentSummaryPage struct {
 	OutputTokens string
 	// RemoveAction is where a root removes it.
 	RemoveAction string
+	// Notice is the outcome of the last hold.
+	Notice Notice
+	// Hold is the form a root holds the summary with, nil for a viewer.
+	Hold *HoldBox
 }
 
-// RenderAgentSummaryPage answers one summary whole.
-func RenderAgentSummaryPage(sandbox *api.Sandbox, response *serverdeps.Response, user *backoffice_db.BackofficeUserRecord, summary agent_db.AgentSummaryRecord) error {
+// RenderAgentSummaryPage answers one summary whole, with the outcome of the
+// last hold — notice, and reason when it was refused — above it.
+func RenderAgentSummaryPage(sandbox *api.Sandbox, response *serverdeps.Response, user *backoffice_db.BackofficeUserRecord, summary agent_db.AgentSummaryRecord, notice string, reason string) error {
 	viewer := viewerOf(sandbox, user)
 	page := AgentSummaryPage{
 		Viewer:       viewer,
@@ -273,7 +279,13 @@ func RenderAgentSummaryPage(sandbox *api.Sandbox, response *serverdeps.Response,
 	}
 	if viewer.IsRoot {
 		page.RemoveAction = agent.RemoveSummariesPath
+		hold, err := holdBoxOf(sandbox, privacy.TableAgentSummary, summary.Id, agent.SummaryPath+"?id="+summary.Ref)
+		if err != nil {
+			return err
+		}
+		page.Hold = &hold
 	}
+	page.Notice = holdNotice(sandbox, notice, reason)
 	return RenderHTML(sandbox, response, api.StatusOK, "backoffice/agent_summary.html", page)
 }
 

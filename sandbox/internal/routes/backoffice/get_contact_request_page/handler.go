@@ -20,5 +20,5 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 	if !ok {
 		return backofficerender.RenderContactRequestsRefusal(sandbox, response, api.StatusNotFound, props.User, "No contact request has this id.")
 	}
-	return backofficerender.RenderContactRequestPage(sandbox, response, props.User, request, input.Notice, input.Count)
+	return backofficerender.RenderContactRequestPage(sandbox, response, props.User, request, input.Notice, input.Count, input.Reason)
 }

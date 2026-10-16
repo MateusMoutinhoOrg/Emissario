@@ -3,6 +3,7 @@ package set_visualization_settings_form
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficerender"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
@@ -12,8 +13,10 @@ import (
 // (enabled=1) or off, the retention — blank for forever — and the ignored ips,
 // one per line, are saved and the browser is sent back to the page with
 // ?notice=saved. A refused value answers the form again, filled with what was
-// sent, under a 400 with the reason above it. Only a root reaches it: the
-// backoffice-root-guard answers anyone else under /admin/root first.
+// sent, under a 400 with the reason above it; a retention past its warning,
+// or blank, answers it under a 409 with the retention notice inside it, to
+// confirm. Only a root reaches it: the backoffice-root-guard answers anyone
+// else under /admin/root first.
 func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, response *serverdeps.Response) error {
 	if props.User == nil {
 		return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusUnauthorized, "", "no authenticated user")
@@ -35,6 +38,18 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 	})
 	if message != "" {
 		return backofficerender.RenderVisualizationSettingsPage(sandbox, response, api.StatusBadRequest, props.User, form, "", 0, message, props.ClientIp)
+	}
+	current, err := visualization.ReadSettings(sandbox)
+	if err != nil {
+		return err
+	}
+	if missing := privacy.NeedsAcknowledgement(visualization.RequiredNotices(current, settings), input.Body.Acknowledge); missing != nil {
+		notices, err := privacy.LoadNotices(sandbox, missing.Notices, privacy.NoticeContext{Retention: settings.RetentionDays})
+		if err != nil {
+			return err
+		}
+		form.Notices = notices
+		return backofficerender.RenderVisualizationSettingsPage(sandbox, response, missing.Status, props.User, form, "", 0, "", props.ClientIp)
 	}
 	if err := visualization.SaveSettings(sandbox, settings); err != nil {
 		return err

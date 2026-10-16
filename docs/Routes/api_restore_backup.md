@@ -2,7 +2,7 @@
 
 Starts putting a snapshot back over every database, after a pre-restore snapshot of them, and answers 202 at once
 
-The backoffice's own users, sessions and API tokens (backofficedb) are kept as they are unless include-backoffice is true: an older copy would bring back revoked tokens, closed sessions, removed users and old passwords. A restore that fails, or that the process stopped in the middle of, puts the pre-restore snapshot back; every request is answered 503 while it runs.
+The backoffices own users, sessions and API tokens (backofficedb) and privacy-db — the privacy settings and the IP key, the access log and the inventory of its reads, the legal holds and the erasures — are kept as they are unless include-backoffice is true: an older copy would bring back revoked tokens, closed sessions, removed users and old passwords, and lose the access log rows and the holds made since. A restore that fails, or that the process stopped in the middle of, puts the pre-restore snapshot back; every request is answered 503 while it runs.
 
 ## Try it
 

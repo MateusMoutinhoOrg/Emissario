@@ -12,4 +12,7 @@ type Input struct {
 	FullRoute            string `id:"FullRoute"`
 	AdminGetAgentSummary string `id:"AdminGetAgentSummary"`
 	Id                   string `id:"Id"`
+	Notice               string `id:"Notice"`
+	Count                int    `id:"Count"`
+	Reason               string `id:"Reason"`
 }

@@ -8,6 +8,7 @@ body:
     max-bytes: 4096
     type: form
 category: Backoffice Backups
+description: 'Root only. backofficedb and privacydb are kept as they are unless include-backoffice=true: the backoffice users, sessions and tokens, and the privacy settings, the access log, its inventory, the legal holds and the erasures. Answers 303 back to the list; every request is answered 503 while the restore runs.'
 methods:
     - POST
 paths:

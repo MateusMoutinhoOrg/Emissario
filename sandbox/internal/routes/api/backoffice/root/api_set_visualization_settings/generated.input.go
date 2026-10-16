@@ -22,6 +22,7 @@ type Input struct {
 // Body is one object of this route's declared json-schema, as the
 // generated ReadBody hands it over.
 type Body struct {
+	Acknowledge   []string
 	Enabled       bool
 	IgnoredIps    []string
 	RetentionDays int
@@ -33,7 +34,7 @@ const MaxBodyBytes = 1048576
 
 // BodySchema is this route's declared json-schema in canonical form — the text
 // Deps.OpinionatedAgnosServer.ValidateSchema checks a request body against.
-const BodySchema = "{\"properties\":{\"enabled\":{\"type\":\"boolean\"},\"ignored_ips\":{\"items\":{\"type\":\"string\"},\"maxItems\":100,\"type\":\"array\"},\"retention_days\":{\"maximum\":3650,\"minimum\":0,\"type\":\"integer\"}},\"required\":[\"enabled\",\"ignored_ips\",\"retention_days\"],\"type\":\"object\"}"
+const BodySchema = "{\"properties\":{\"acknowledge\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"},\"enabled\":{\"type\":\"boolean\"},\"ignored_ips\":{\"items\":{\"type\":\"string\"},\"maxItems\":100,\"type\":\"array\"},\"retention_days\":{\"maximum\":36500,\"minimum\":0,\"type\":\"integer\"}},\"required\":[\"enabled\",\"ignored_ips\",\"retention_days\"],\"type\":\"object\"}"
 
 // ReadBody reads, validates and converts the request body of one bound route.
 // The generic Run calls it — through the ReadBody generated.new.go closes over
@@ -74,6 +75,9 @@ func ReadBody(sandbox *api.Sandbox, route *api.Route) (Body, error) {
 // optional and comes back as its zero value.
 func bindBody(sandbox *api.Sandbox, document *serializabledeps.SerializableObject) Body {
 	value := Body{}
+	for _, item := range sandbox.Deps.OpinionatedAgnosServer.ReadItems(document, "acknowledge") {
+		value.Acknowledge = append(value.Acknowledge, sandbox.Deps.OpinionatedAgnosServer.ItemString(item))
+	}
 	value.Enabled = sandbox.Deps.OpinionatedAgnosServer.ReadBool(document, "enabled")
 	for _, item := range sandbox.Deps.OpinionatedAgnosServer.ReadItems(document, "ignored_ips") {
 		value.IgnoredIps = append(value.IgnoredIps, sandbox.Deps.OpinionatedAgnosServer.ItemString(item))

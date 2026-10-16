@@ -3,6 +3,7 @@ package visualization
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/visualization_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficehttp"
 )
 
@@ -146,6 +147,12 @@ func ParseRetention(sandbox *api.Sandbox, text string) (int64, string) {
 		return 0, sandbox.Deps.StdDeps.Sprintf("The retention is a number of days from 1 to %d, or blank to keep the views forever.", MaxRetentionDays)
 	}
 	return days, ""
+}
+
+// RequiredNotices is every notice turning before into after asks for: the
+// retention notice of the views when the retention changes past its warning.
+func RequiredNotices(before Settings, after Settings) []string {
+	return privacy.RetentionNotice([]string{}, privacy.DataView, before.RetentionDays, after.RetentionDays, 0)
 }
 
 // SplitIgnoredIps reads the ignored ips a form sends, one per line.

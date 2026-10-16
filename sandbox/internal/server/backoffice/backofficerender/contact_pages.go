@@ -276,11 +276,13 @@ type ContactRequestPage struct {
 	ArchiveAction string
 	RemoveAction  string
 	Back          string
+	// Hold is the form a root holds the request with, nil for a viewer.
+	Hold *HoldBox
 }
 
 // RenderContactRequestPage answers one contact request whole, with the
 // sentence of notice above it.
-func RenderContactRequestPage(sandbox *api.Sandbox, response *serverdeps.Response, user *backoffice_db.BackofficeUserRecord, request contact_db.ContactRequestRecord, notice string, count int) error {
+func RenderContactRequestPage(sandbox *api.Sandbox, response *serverdeps.Response, user *backoffice_db.BackofficeUserRecord, request contact_db.ContactRequestRecord, notice string, count int, reason string) error {
 	viewer := viewerOf(sandbox, user)
 	status := contact.StatusInbox
 	statusParams := []visualization.Param{}
@@ -307,6 +309,14 @@ func RenderContactRequestPage(sandbox *api.Sandbox, response *serverdeps.Respons
 		page.ArchiveAction = contact.ArchivePath
 		page.RemoveAction = contact.RemovePath
 		page.Back = contact.RequestPath + "?id=" + request.Ref
+		hold, err := holdBoxOf(sandbox, privacy.TableContactRequest, request.Id, page.Back)
+		if err != nil {
+			return err
+		}
+		page.Hold = &hold
+	}
+	if held := holdNotice(sandbox, notice, reason); held.Text != "" {
+		page.Notice = held
 	}
 	return RenderHTML(sandbox, response, api.StatusOK, "backoffice/contact_request.html", page)
 }

@@ -370,6 +370,15 @@ func EnsureSettings(sandbox *api.Sandbox) error {
 	return err
 }
 
+// InvalidateCache makes the next read go to the store again, for the
+// settings and the IP key alike: a restore that put privacy-db back calls it.
+func InvalidateCache(sandbox *api.Sandbox) {
+	lock <- struct{}{}
+	cache.valid = false
+	cache.ipKey = nil
+	<-lock
+}
+
 // IpKey answers the key the IPs are hashed under, adding the settings record
 // with a new one when there is none.
 func IpKey(sandbox *api.Sandbox) ([]byte, error) {

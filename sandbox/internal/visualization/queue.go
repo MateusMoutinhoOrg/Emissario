@@ -95,9 +95,9 @@ func Dropped(sandbox *api.Sandbox) int64 {
 	return dropped
 }
 
-// Start runs the writer and the retention cleanup, each in a goroutine of its
-// own, once per process: they live as long as the process does and stop with
-// it.
+// Start runs the writer in a goroutine of its own, once per process: it lives
+// as long as the process does and stops with it. The views past their
+// retention are removed by the retention cleanup of privacyadmin.
 func Start(sandbox *api.Sandbox) {
 	select {
 	case started <- struct{}{}:
@@ -105,7 +105,6 @@ func Start(sandbox *api.Sandbox) {
 		return
 	}
 	go write(sandbox)
-	go retain(sandbox)
 }
 
 // write is the body of the writer goroutine. It never returns.

@@ -27,7 +27,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Pattern = "/admin/root/set-visualization-settings"
 	self.Category = "Visualization"
 	self.Summary = "Saves the settings of the visualization: tracking on or off, the retention in days and the ignored ips"
-	self.Description = "Root only. enabled=1 turns tracking on, its absence off; a blank retention keeps the views forever, else 1 to 3650 days; the ignored ips are one ip or CIDR range per line, 100 at most. A refused value answers the form again under a 400; a save answers 303 back to the page with ?notice=saved."
+	self.Description = "Root only. enabled=1 turns tracking on, its absence off; a blank retention keeps the views forever, else 1 to 36500 days, past 760 days or blank asking for the retention-view-v1 notice; the ignored ips are one ip or CIDR range per line, 100 at most. A refused value answers the form again under a 400, a save that needs the notice under a 409 with it inside until acknowledge=retention-view-v1 is sent; a save answers 303 back to the page with ?notice=saved."
 	self.Examples = []string{"curl -b \"backoffice_session=$SESSION\" -X POST localhost:3000/admin/root/set-visualization-settings -H 'Origin: http://localhost:3000' --data 'enabled=1&retention-days=90&ignored-ips=203.0.113.7'"}
 	self.Hidden = false
 

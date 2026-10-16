@@ -27,7 +27,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Pattern = "/admin/get-contact-request"
 	self.Category = "Contact Requests"
 	self.Summary = "Shows one contact request whole: its JSON laid out as sent, its time, ip and country"
-	self.Description = "Root and viewer; a root also sees the buttons that archive, move back to the inbox and delete it. An id no contact request holds answers the list under a 404."
+	self.Description = "Root and viewer; a root also sees the buttons that archive, move back to the inbox, delete and hold it, and the end of the legal hold that keeps it. An id no contact request holds answers the list under a 404."
 	self.Examples = []string{"curl -b \"backoffice_session=$SESSION\" \"localhost:3000/admin/get-contact-request?id=3f9a0c1b2d4e5f60\""}
 	self.Hidden = false
 
@@ -74,6 +74,17 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 			Default:     "0",
 			HasDefault:  true,
 			Description: "how many contact requests the last archive touched",
+			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
+		},
+		{
+			Id:          "Reason",
+			Key:         "reason",
+			Sources:     []api.ParameterSource{api.SourceQuery},
+			Required:    false,
+			Type:        api.ParameterString,
+			Default:     "",
+			HasDefault:  false,
+			Description: "why the last hold was refused",
 			Trigger:     api.Trigger{Set: false, Type: api.TriggerEqual, Value: "", Negate: false, IgnoreCase: false},
 		},
 	}

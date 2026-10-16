@@ -500,6 +500,8 @@
       border: 1px solid rgba(245, 158, 11, 0.5);
       color: #FCD34D;
     }
+    .retention-note { margin: 0 0 1rem; font-size: 0.88rem; }
+    .retention-note a { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -549,6 +551,7 @@
     </section>
 
     {{if .Notice.Text}}<div class="notice notice-{{.Notice.Kind}}" role="status">{{html .Notice.Text}}</div>{{end}}
+    <p class="muted retention-note">Snapshots are encrypted like the databases. Data a retention deletes from the databases lives on in the snapshots taken before: {{if .PastRetention}}<strong>{{.PastRetention}} {{if eq .PastRetention 1}}snapshot is{{else}}snapshots are{{end}} older than the shortest retention ({{html .Shortest}})</strong> and hold data the databases already deleted — marked below.{{else}}none is older than the shortest retention ({{html .Shortest}}).{{end}} {{if .BackupForever}}Snapshots are kept until a root deletes them — set a backup retention on the <a href="{{.PrivacyHref}}">Privacy</a> page.{{else}}Snapshots are kept {{html .BackupRetention}}, then deleted by the hourly cleanup.{{end}}</p>
     {{if .Busy}}<div class="notice notice-ok" role="status">A backup job is running. This page refreshes until it ends.</div>{{end}}
 
     <form class="card upload" id="snapshot-upload" action="/admin/root/upload-backup" method="POST">
@@ -586,15 +589,15 @@
         <tbody>
           {{range .Snapshots}}
           <tr>
-            <td data-label="Name"><span class="mono">{{html .Name}}</span></td>
+            <td data-label="Name"><span class="mono">{{html .Name}}</span>{{if .PastRetention}} <span class="badge badge-failed" title="Older than the shortest retention: it holds data the databases already deleted">past retention</span>{{end}}</td>
             <td data-label="Taken">{{html .Date}}</td>
             <td data-label="Status"><span class="badge badge-{{html .Status}}">{{html .Status}}</span></td>
             <td data-label="Actions">
               <div class="row-actions">
                 {{if .IsReady}}
                 <a class="btn btn-small" href="/admin/root/download-backup/{{.Id}}">Download</a>
-                <form action="/admin/root/restore-backup/{{.Id}}" method="POST" data-confirm="Restore the snapshot {{html .Name}}? Every database is replaced by it, after a pre-restore snapshot of the current data, and the site answers 503 until it ends. Backoffice users and API tokens are kept as they are unless you ticked the box: restoring them brings back revoked tokens, removed users and old passwords.">
-                  <label class="muted"><input type="checkbox" name="include-backoffice" value="true"> users &amp; tokens</label>
+                <form action="/admin/root/restore-backup/{{.Id}}" method="POST" data-confirm="Restore the snapshot {{html .Name}}? Every database is replaced by it, after a pre-restore snapshot of the current data, and the site answers 503 until it ends. Backoffice users and API tokens, and privacy-db — the privacy settings, the access log and the legal holds — are kept as they are unless you ticked the box: restoring them brings back revoked tokens, removed users and old passwords, and loses the access log rows and holds made since.">
+                  <label class="muted"><input type="checkbox" name="include-backoffice" value="true"> users, tokens &amp; privacy</label>
                   <button type="submit" class="btn btn-small btn-danger"{{if $.Busy}} disabled{{end}}>Restore</button>
                 </form>
                 {{else}}

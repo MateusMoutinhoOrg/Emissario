@@ -11,9 +11,9 @@ import (
 // at the country database --visualization-geoip names — empty for the DB-IP
 // Lite one embedded in the binary — and opens it: a file that does not open
 // stops the server here, before it listens. It then starts the goroutine that
-// writes the views the front route queues, and the one that removes every
-// hour the views older than the retention. Both live as long as the process:
-// when start-server stops, they stop.
+// writes the views the front route queues; it lives as long as the process:
+// when start-server stops, it stops. The views older than the retention are
+// removed by the retention cleanup privacy-start-server starts.
 //
 // It is a middleware rather than an edit to start-server's own handler, the
 // same way website-source-start-server is, so start-server stays as it was.

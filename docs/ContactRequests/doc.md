@@ -145,9 +145,14 @@ Every request and answer is in [Routes](../Routes/doc.md).
 
 ## Personal data (LGPD)
 
-A contact request holds personal data: what the visitor typed (a name, an email, a phone) and the ip. It
-stays until a root deletes it. There is no retention: delete the ones answered, or every one before a
-date from **Settings → Danger zone**. Say in the website's privacy notice what the form keeps and why.
+A contact request holds personal data: what the visitor typed (a name, an email, a phone) and the ip,
+hashed unless the Privacy page keeps full IPs. The route is **off by default**; turning it on asks for
+the `contacts-v1` notice. Each request is kept `retention-days` (180 by default): the hourly retention
+cleanup of `privacy-start-server` deletes the older ones, and blanks the ip of the ones past the IP
+retention (184 days by default) while the request stays. A request on a legal hold is skipped by both
+until its hold ends. A root can also delete the ones answered, or every one before a date, from
+**Settings → Danger zone**. Say in the website's privacy notice what the form keeps, why, for how long
+and how to ask for deletion.
 The JSON never leaves the server. The country is looked up locally.
 
 ## Where it lives

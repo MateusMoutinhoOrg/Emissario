@@ -227,8 +227,8 @@ async function send(text) {
 |---|---|
 | `agent-setting` | `enabled`, `base-url`, `api-key`, `model`, `max-tokens`, `daily-limit`, `ip-daily-limit`, `rate-per-minute`, `summaries-enabled`, `summary-retention-days` |
 | `agent-url` | `name` (key), `description`, `method`, `url`, `headers` |
-| `agent-usage` | `at`, `ip` (empty for a summary), `kind` (`message`/`summary`), `input-tokens`, `output-tokens` — removed after 90 days, every hour |
-| `agent-summary` | `ref` (key: the id answered), `at`, `summary`, `messages` (how many), `input-tokens`, `output-tokens` — removed after `summary-retention-days` |
+| `agent-usage` | `at`, `ip` (empty for a summary), `kind` (`message`/`summary`), `input-tokens`, `output-tokens` — removed after 90 days, every hour; its `ip` is blanked before if the IP retention is shorter |
+| `agent-summary` | `ref` (key: the id answered), `at`, `summary`, `messages` (how many), `input-tokens`, `output-tokens` — removed after `summary-retention-days` by the hourly retention cleanup of `privacy-start-server`, unless on a legal hold |
 
 ## Who sees what
 

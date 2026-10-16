@@ -27,7 +27,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Pattern = "/api/admin/root/set-visualization-settings"
 	self.Category = "Visualization API"
 	self.Summary = "Sets the settings of the visualization: tracking on or off, the retention in days and the ignored ips"
-	self.Description = "Root only. retention_days 0 keeps the views forever; ignored_ips holds ips and CIDR ranges, 100 at most. Answers {settings}."
+	self.Description = "Root only. retention_days 0 keeps the views forever, else 1 to 36500; past 760 days, or 0, it answers 409 acknowledgement-required with the retention-view-v1 notice until its id is in acknowledge. ignored_ips holds ips and CIDR ranges, 100 at most. Answers {settings}."
 	self.Examples = []string{"curl -X POST localhost:3000/api/admin/root/set-visualization-settings -H \"Authorization: Bearer $TOKEN\" -H 'Content-Type: application/json' -d '{\"enabled\":true,\"retention_days\":90,\"ignored_ips\":[\"203.0.113.7\"]}'"}
 	self.Hidden = false
 

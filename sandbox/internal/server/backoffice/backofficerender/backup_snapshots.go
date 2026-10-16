@@ -5,6 +5,8 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backup"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacyadmin"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficesnapshots"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/snapshots"
 )
@@ -25,6 +27,14 @@ type BackupSnapshotsPage struct {
 	Refresh bool
 	// MaxUploadMegabytes is the largest archive the upload form takes.
 	MaxUploadMegabytes int
+	// PastRetention is how many snapshots hold data the databases already
+	// deleted by retention; Shortest the shortest retention of the records,
+	// BackupRetention how long a snapshot is kept, both spelled for the page.
+	PastRetention   int
+	Shortest        string
+	BackupRetention string
+	BackupForever   bool
+	PrivacyHref     string
 }
 
 // BackupSnapshotRow is one snapshot of the list.
@@ -37,6 +47,9 @@ type BackupSnapshotRow struct {
 	IsReady    bool
 	IsCreating bool
 	IsFailed   bool
+	// PastRetention is true when the snapshot is older than the shortest
+	// retention of the records: it holds data the databases already deleted.
+	PastRetention bool
 }
 
 // backupSnapshotNoticeOf is how the list page words a backofficesnapshots
@@ -46,7 +59,7 @@ func backupSnapshotNoticeOf(sandbox *api.Sandbox, code string) Notice {
 	case backofficesnapshots.NoticeCreating:
 		return Notice{Text: "Snapshot started. It is listed as creating until every database is copied, and this page refreshes until then.", Kind: "ok"}
 	case backofficesnapshots.NoticeRestoring:
-		return Notice{Text: "Restore started. A pre-restore snapshot of the current data is taken first, then every database but the backoffice users and tokens — unless you ticked the box — is replaced, and the site answers 503 until it ends. If it fails, the pre-restore snapshot is put back.", Kind: "ok"}
+		return Notice{Text: "Restore started. A pre-restore snapshot of the current data is taken first, then every database but the backoffice users and tokens and privacy-db — the privacy settings, the access log, the legal holds — unless you ticked the box, is replaced, and the site answers 503 until it ends. If it fails, the pre-restore snapshot is put back.", Kind: "ok"}
 	case backofficesnapshots.NoticeUploaded:
 		return Notice{Text: "Snapshot uploaded. It can be downloaded or restored now.", Kind: "ok"}
 	case backofficesnapshots.NoticeRemoved:
@@ -85,15 +98,33 @@ func backupSnapshotRow(sandbox *api.Sandbox, snapshot backup.SnapshotRecord) Bac
 // with the notice code notice above it, and what starts a job disabled while
 // busy.
 func RenderBackupSnapshotsPage(sandbox *api.Sandbox, response *serverdeps.Response, status int, user *backoffice_db.BackofficeUserRecord, listed []backup.SnapshotRecord, busy bool, prefix string, notice string) error {
+	retentions, err := privacyadmin.CurrentRetentions(sandbox)
+	if err != nil {
+		return err
+	}
+	past, err := privacyadmin.PastRetention(sandbox)
+	if err != nil {
+		return err
+	}
+	old := map[int64]bool{}
+	for _, snapshot := range past {
+		old[snapshot.Id] = true
+	}
 	rows := []BackupSnapshotRow{}
 	refresh := busy
 	for _, snapshot := range listed {
 		row := backupSnapshotRow(sandbox, snapshot)
+		row.PastRetention = old[snapshot.Id]
 		refresh = refresh || row.IsCreating
 		rows = append(rows, row)
 	}
 
 	return RenderHTML(sandbox, response, status, "backoffice/backup_snapshots.html", BackupSnapshotsPage{
+		PastRetention:      len(past),
+		Shortest:           privacy.DescribeRetention(sandbox, retentions.Shortest()),
+		BackupRetention:    privacy.DescribeRetention(sandbox, retentions.Backup),
+		BackupForever:      retentions.Backup == privacy.Forever,
+		PrivacyHref:        privacy.SettingsPath,
 		Viewer:             viewerOf(sandbox, user),
 		Notice:             backupSnapshotNoticeOf(sandbox, notice),
 		Prefix:             sandbox.Deps.StringsDeps.TrimSpace(prefix),

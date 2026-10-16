@@ -7,6 +7,36 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
+// The outcome codes a page shows after a hold.
+const (
+	NoticeHeld        = "held"
+	NoticeHoldRefused = "hold-refused"
+)
+
+// BackOf reads back, the page a hold form returns to: a backoffice path with
+// no query, or with one id= of a record — its letters and digits alone —
+// answered as the path and that param. Anything else is the Privacy page.
+func BackOf(sandbox *api.Sandbox, back string) (string, []visualization.Param) {
+	strings := sandbox.Deps.StringsDeps
+	if !strings.HasPrefix(back, "/admin/") {
+		return privacy.SettingsPath, nil
+	}
+	parts := strings.Split(back, "?")
+	switch {
+	case len(parts) == 1:
+		return back, nil
+	case len(parts) == 2 && strings.HasPrefix(parts[1], "id=") && matchesId(sandbox, parts[1][3:]):
+		return parts[0], []visualization.Param{{Key: "id", Value: parts[1][3:]}}
+	}
+	return privacy.SettingsPath, nil
+}
+
+// matchesId tells whether id is 1 to 64 letters and digits.
+func matchesId(sandbox *api.Sandbox, id string) bool {
+	ok, err := sandbox.Deps.StringsDeps.MatchPattern(`^[0-9A-Za-z]{1,64}$`, id)
+	return err == nil && ok
+}
+
 // canHold refuses user a hold of table: one of access log rows is for its
 // readers alone, as reading them is.
 func canHold(sandbox *api.Sandbox, user *backoffice_db.BackofficeUserRecord, token *backoffice_db.ApiTokenRecord, table string) *privacy.Refusal {

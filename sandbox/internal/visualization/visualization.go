@@ -48,8 +48,10 @@ const (
 	// DefaultRetentionDays is how many days a view is kept before a root
 	// saves the settings.
 	DefaultRetentionDays = 90
-	// MaxRetentionDays is the longest retention a root may set: ten years.
-	MaxRetentionDays = 3650
+	// MaxRetentionDays is the longest retention a root may set: a century,
+	// as every retention of the privacy package. Past 760 days a save asks
+	// for the retention notice; none is refused for being long.
+	MaxRetentionDays = 36500
 	// MaxIgnoredIps is how many ips and ranges the ignored ips hold at most.
 	MaxIgnoredIps = 100
 	// DefaultLimit is how many rows a listing page shows when none is asked.

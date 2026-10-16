@@ -27,7 +27,7 @@ func NewRoute(sandbox *api.Sandbox) *api.Route {
 	self.Pattern = "/admin/root/restore-backup/{Id:integer}"
 	self.Category = "Backoffice Backups"
 	self.Summary = "Starts putting a snapshot back over every database, after a pre-restore snapshot of them, and answers at once"
-	self.Description = ""
+	self.Description = "Root only. backofficedb and privacydb are kept as they are unless include-backoffice=true: the backoffice users, sessions and tokens, and the privacy settings, the access log, its inventory, the legal holds and the erasures. Answers 303 back to the list; every request is answered 503 while the restore runs."
 	self.Examples = []string{}
 	self.Hidden = false
 

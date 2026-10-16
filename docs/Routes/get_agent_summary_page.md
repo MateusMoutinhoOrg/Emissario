@@ -2,7 +2,7 @@
 
 Shows one summary whole
 
-Root and viewer; a root also sees the button that deletes it. An id no summary holds answers 404.
+Root and viewer; a root also sees the buttons that delete and hold it, and the end of the legal hold that keeps it. An id no summary holds answers 404.
 
 ## Try it
 
@@ -15,7 +15,7 @@ curl localhost:3000/admin/get-agent-summary
 With every value it reads:
 
 ```bash
-curl 'localhost:3000/admin/get-agent-summary?id=my-id' \
+curl 'localhost:3000/admin/get-agent-summary?id=my-id&notice=my-notice&count=0&reason=my-reason' \
   -H 'x-client-ip: my-x-client-ip' \
   -H 'x-forwarded-for: my-x-forwarded-for' \
   -H 'x-client-port: my-x-client-port' \
@@ -35,6 +35,9 @@ curl -b "backoffice_session=$SESSION" "localhost:3000/admin/get-agent-summary?id
 | Name | Sent in | What goes there | Required | Example | Description |
 | --- | --- | --- | --- | --- | --- |
 | `id` | query string | text | no | `my-id` | the id of the summary, as /api/agent/summaries answered it |
+| `notice` | query string | text | no | `my-notice` | the outcome code of the last hold |
+| `count` | query string | whole number | no — `0` when left out | `0` | how many summaries the last hold kept |
+| `reason` | query string | text | no | `my-reason` | why the last hold was refused |
 | `x-client-ip` | header | text | no | `my-x-client-ip` | the ip of the connection, set by the server and never by the client — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
 | `x-forwarded-for` | header | text | no | `my-x-forwarded-for` | the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
 | `x-client-port` | header | text | no | `my-x-client-port` | the source port of the visitor's connection, set by the server and never by the client — or by the reverse proxy start-server trusts with --client-port-header — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
@@ -47,6 +50,7 @@ curl -b "backoffice_session=$SESSION" "localhost:3000/admin/get-agent-summary?id
 | Status | Means |
 | --- | --- |
 | `200` | It worked. The answer comes as `text/html`. |
+| `400` | Something you sent is missing or has the wrong type or format. The answer's `field` names it. |
 
 Any route may also answer `404`, `405` or `500`: see [when something goes wrong](doc.md#when-something-goes-wrong).
 

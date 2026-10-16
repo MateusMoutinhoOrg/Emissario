@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commandprops"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacyadmin"
 )
 
 // Handle runs in front of start-server, after every other start-server
@@ -11,7 +12,10 @@ import (
 // key on a new database, so the key exists before the first view is hashed;
 // it trusts the header --client-port-header names for the source port of the
 // visitor's connection — only behind the reverse proxy --allow-x-forwarded-for
-// trusts, under the same rule — and starts the writer of the access log.
+// trusts, under the same rule — and starts the writer of the access log and
+// the retention cleanup: every hour it deletes the contact requests, views,
+// agent summaries, access log rows and snapshots past their retention, and
+// blanks the ips past the IP retention, skipping the rows on a legal hold.
 func Handle(sandbox *api.Sandbox, props *commandprops.CommandProps, input *Input, response *api.CommandResponse) error {
 	if err := privacy.EnsureSettings(sandbox); err != nil {
 		return sandbox.Deps.OpinionatedAgnosCli.Fail(api.ExitFailure, "", "the privacy settings could not be written: "+err.Error())
@@ -25,5 +29,6 @@ func Handle(sandbox *api.Sandbox, props *commandprops.CommandProps, input *Input
 		sandbox.Config.ClientPortHeader = header
 	}
 	privacy.StartAccessLog(sandbox)
+	privacyadmin.StartCleanup(sandbox)
 	return nil
 }

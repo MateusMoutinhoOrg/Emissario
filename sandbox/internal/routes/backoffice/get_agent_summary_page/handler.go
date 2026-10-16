@@ -22,5 +22,5 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 		period, _ := agent.ParsePeriod(sandbox, "", "")
 		return backofficerender.RenderAgentSummariesPage(sandbox, response, api.StatusNotFound, props.User, period.From, period.To, "", "No summary has this id.", nil, visualization.Paging{}, "", 0)
 	}
-	return backofficerender.RenderAgentSummaryPage(sandbox, response, props.User, summary)
+	return backofficerender.RenderAgentSummaryPage(sandbox, response, props.User, summary, input.Notice, input.Reason)
 }
