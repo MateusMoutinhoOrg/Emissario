@@ -1,0 +1,71 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            access_log:
+                type: boolean
+            access_log_inventory:
+                type: boolean
+            access_log_retention_days:
+                maximum: 36500
+                minimum: 1
+                nullable: true
+                type: integer
+            access_log_totp:
+                type: boolean
+            acknowledge:
+                items:
+                    type: string
+                type: array
+            backup_retention_days:
+                maximum: 36500
+                minimum: 1
+                nullable: true
+                type: integer
+            ip_mode:
+                enum:
+                    - hashed
+                    - full
+                type: string
+            ip_retention_days:
+                maximum: 36500
+                minimum: 1
+                nullable: true
+                type: integer
+            notice_draft:
+                enum:
+                    - br
+                    - eu
+                    - br-eu
+                type: string
+            viewer_ip:
+                enum:
+                    - masked
+                    - full
+                type: string
+        required:
+            - access_log
+            - access_log_inventory
+            - access_log_totp
+            - ip_mode
+            - notice_draft
+            - viewer_ip
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: Privacy API
+description: Root only. ip_mode, viewer_ip, access_log, access_log_totp, access_log_inventory and notice_draft are required; ip_retention_days, access_log_retention_days and backup_retention_days are days, null or absent to keep the data until a root deletes it. A value turned to one that needs a notice answers 409 {"error":"acknowledgement-required","field":"acknowledge","notice","notices"} and writes nothing, until every id is in acknowledge. Answers {settings}; 400 for a value refused, with the field.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootSetPrivacySettings
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/set-privacy-settings
+priority: 100
+private: true
+response-type: application/json
+summary: Saves the privacy settings, after the notices they need

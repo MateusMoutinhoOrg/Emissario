@@ -1,0 +1,54 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            access-log:
+                maxLength: 8
+                type: string
+            access-log-inventory:
+                maxLength: 8
+                type: string
+            access-log-retention-days:
+                maxLength: 16
+                type: string
+            access-log-totp:
+                maxLength: 8
+                type: string
+            acknowledge:
+                items:
+                    type: string
+                type: array
+            backup-retention-days:
+                maxLength: 16
+                type: string
+            ip-mode:
+                maxLength: 16
+                type: string
+            ip-retention-days:
+                maxLength: 16
+                type: string
+            notice-draft:
+                maxLength: 16
+                type: string
+            viewer-ip:
+                maxLength: 16
+                type: string
+        type: object
+    max-bytes: 16384
+    required: true
+    type: form
+category: Privacy
+description: Root only. ip-mode hashed or full; viewer-ip masked or full; access-log, access-log-totp and access-log-inventory as 1 or absent; ip-retention-days, access-log-retention-days and backup-retention-days a number of days, blank to keep the data until a root deletes it; notice-draft br, eu or br-eu. A value turned to one that needs a notice (ip-full-v1, viewer-ip-v1, access-log-v1, access-log-no-totp-v1, access-log-no-inventory-v1, a retention notice) answers the page under a 409 with the notices inside the form until every id is sent back as acknowledge; a refused value under a 400; a save answers 303 back with ?notice=saved. Nothing records who saved, nor that a notice was read.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootSetPrivacySettings
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-privacy-settings
+priority: 100
+private: true
+response-type: text/html
+summary: Saves the privacy settings, after the notices they need

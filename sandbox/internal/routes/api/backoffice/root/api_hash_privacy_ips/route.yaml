@@ -1,0 +1,15 @@
+category: Privacy API
+description: 'Root only. Every full IP of the views, contact requests and agent usage becomes its hash, and the full user agents are blanked; the access log is kept as it is. It cannot be undone. Answers {hashed: {views, contact_requests, agent_usage, total}}.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootHashPrivacyIps
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/hash-privacy-ips
+priority: 100
+private: true
+response-type: application/json
+summary: Turns every full IP the records keep into its hash

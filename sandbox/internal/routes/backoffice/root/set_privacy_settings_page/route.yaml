@@ -1,0 +1,35 @@
+category: Privacy
+description: 'Root only. The Privacy page: the preset applied, the encryption at rest, the IP mode, what viewers see of a full IP, the IP retention, the access log (on/off, retention, two-factor for its readers, the inventory of its reads, whether the source port is read) with the Brazil note while it is off, the backup retention, the template of the privacy notice draft, the access log readers, what this server keeps (one row per table of personal data: fields, purpose, a suggested legal basis, retention, rows, oldest), the legal holds with Release, the notices of the settings in use, and the danger zone (hash the IPs stored, rotate the IP key). notice, count and reason tell the outcome of the last action.'
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last action
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many records the last action changed
+      id: Count
+      key: count
+      sources:
+        - query
+      type: integer
+    - description: why the last action was refused
+      id: Reason
+      key: reason
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootSetPrivacySettings
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/set-privacy-settings
+priority: 100
+private: true
+response-type: text/html
+summary: 'Shows the Privacy page: the privacy settings, what this server keeps, the legal holds and the notices'

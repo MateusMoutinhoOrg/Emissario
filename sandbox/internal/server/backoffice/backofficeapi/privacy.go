@@ -117,3 +117,75 @@ func HoldsJSON(sandbox *api.Sandbox, holds []privacy.Hold) *serializabledeps.Ser
 	document.AddItemToObject("holds", list)
 	return document
 }
+
+// PrivacySettingsJSON is the privacy settings: {ip_mode, viewer_ip,
+// access_log, access_log_retention_days, access_log_totp,
+// access_log_inventory, ip_retention_days, backup_retention_days,
+// notice_draft, preset}; a retention of null keeps the data until a root
+// deletes it, and a preset of "" is none.
+func PrivacySettingsJSON(sandbox *api.Sandbox, settings privacy.Settings) *serializabledeps.SerializableObject {
+	item := sandbox.Deps.SerializableDeps.CreateObject()
+	item.AddItemToObject("ip_mode", settings.IpMode)
+	item.AddItemToObject("viewer_ip", settings.ViewerIp)
+	item.AddItemToObject("access_log", settings.AccessLog)
+	item.AddItemToObject("access_log_retention_days", RetentionJSON(sandbox, settings.AccessLogRetentionDays))
+	item.AddItemToObject("access_log_totp", settings.AccessLogTotp)
+	item.AddItemToObject("access_log_inventory", settings.AccessLogInventory)
+	item.AddItemToObject("ip_retention_days", RetentionJSON(sandbox, settings.IpRetentionDays))
+	item.AddItemToObject("backup_retention_days", RetentionJSON(sandbox, settings.BackupRetentionDays))
+	item.AddItemToObject("notice_draft", settings.NoticeDraft)
+	item.AddItemToObject("preset", settings.Preset)
+	return item
+}
+
+// PrivacySettingsResponseJSON is {settings}.
+func PrivacySettingsResponseJSON(sandbox *api.Sandbox, settings privacy.Settings) *serializabledeps.SerializableObject {
+	document := sandbox.Deps.SerializableDeps.CreateObject()
+	document.AddItemToObject("settings", PrivacySettingsJSON(sandbox, settings))
+	return document
+}
+
+// PrivacyStateJSON is {settings, encryption: {encrypted, algorithm, key_id},
+// ip_key_made_at, kept: [{table, fields, purpose, basis, retention, rows,
+// oldest_at}]}: what the Privacy page shows. key_id reveals nothing about
+// the key; oldest_at is null for a table with no row or no time.
+func PrivacyStateJSON(sandbox *api.Sandbox, settings privacy.Settings, ipKeyMadeAt int64, kept []privacyadmin.Kept) *serializabledeps.SerializableObject {
+	encryption := sandbox.Deps.SerializableDeps.CreateObject()
+	encryption.AddItemToObject("encrypted", sandbox.Config.Encrypted)
+	encryption.AddItemToObject("algorithm", "XChaCha20-Poly1305")
+	encryption.AddItemToObject("key_id", sandbox.Config.EncryptionKeyId)
+	tables := sandbox.Deps.SerializableDeps.CreateArray()
+	for _, table := range kept {
+		item := sandbox.Deps.SerializableDeps.CreateObject()
+		item.AddItemToObject("table", table.Table)
+		item.AddItemToObject("fields", table.Fields)
+		item.AddItemToObject("purpose", table.Purpose)
+		item.AddItemToObject("basis", table.Basis)
+		item.AddItemToObject("retention", table.Retention)
+		item.AddItemToObject("rows", table.Count)
+		if table.Oldest > 0 {
+			item.AddItemToObject("oldest_at", table.Oldest)
+		} else {
+			item.AddItemToObject("oldest_at", sandbox.Deps.SerializableDeps.CreateNull())
+		}
+		tables.AddItemToArray(item)
+	}
+	document := sandbox.Deps.SerializableDeps.CreateObject()
+	document.AddItemToObject("settings", PrivacySettingsJSON(sandbox, settings))
+	document.AddItemToObject("encryption", encryption)
+	document.AddItemToObject("ip_key_made_at", ipKeyMadeAt)
+	document.AddItemToObject("kept", tables)
+	return document
+}
+
+// HashedIpsJSON is {hashed: {views, contact_requests, agent_usage, total}}.
+func HashedIpsJSON(sandbox *api.Sandbox, hashed privacyadmin.HashedIps) *serializabledeps.SerializableObject {
+	counts := sandbox.Deps.SerializableDeps.CreateObject()
+	counts.AddItemToObject("views", hashed.Views)
+	counts.AddItemToObject("contact_requests", hashed.Contacts)
+	counts.AddItemToObject("agent_usage", hashed.Usages)
+	counts.AddItemToObject("total", hashed.Total())
+	document := sandbox.Deps.SerializableDeps.CreateObject()
+	document.AddItemToObject("hashed", counts)
+	return document
+}

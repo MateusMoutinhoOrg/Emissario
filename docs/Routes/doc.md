@@ -143,12 +143,16 @@ it prints the address it took. Change it to wherever your server runs.
 | --- | --- |
 | [`POST /api/admin/root/delete-access-log`](api_delete_access_log.md) | Deletes access log rows, to its readers |
 | [`POST /api/admin/root/export-access-log`](api_export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`POST /api/admin/root/get-privacy-settings`](api_get_privacy_settings.md) | Answers the privacy settings, the encryption and what this server keeps |
+| [`POST /api/admin/root/hash-privacy-ips`](api_hash_privacy_ips.md) | Turns every full IP the records keep into its hash |
 | [`POST /api/admin/root/hold-privacy-records`](api_hold_privacy_records.md) | Puts rows on a legal hold |
 | [`POST /api/admin/root/list-access-log`](api_list_access_log.md) | Lists the access log rows a filter keeps, to its readers |
 | [`POST /api/admin/root/list-privacy-access`](api_list_privacy_access.md) | Lists the inventory of the access log reads |
 | [`POST /api/admin/root/list-privacy-holds`](api_list_privacy_holds.md) | Lists the legal holds |
 | [`POST /api/admin/root/release-privacy-hold`](api_release_privacy_hold.md) | Releases a legal hold |
+| [`POST /api/admin/root/rotate-privacy-ip-key`](api_rotate_privacy_ip_key.md) | Replaces the key the IPs are hashed under with a new random one |
 | [`POST /api/admin/root/set-access-log-readers`](api_set_access_log_readers.md) | Names the roots who read the access log |
+| [`POST /api/admin/root/set-privacy-settings`](api_set_privacy_settings.md) | Saves the privacy settings, after the notices they need |
 
 ## Website Source API
 
@@ -220,9 +224,13 @@ it prints the address it took. Change it to wherever your server runs.
 | [`GET /admin/root/access-log`](access_log_page.md) | Shows the access log of the Marco Civil, to its readers |
 | [`POST /admin/root/delete-access-log`](delete_access_log_form.md) | Deletes access log rows, to its readers |
 | [`GET /admin/root/export-access-log`](export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`POST /admin/root/hash-privacy-ips`](hash_privacy_ips_form.md) | Turns every full IP the records keep into its hash |
 | [`POST /admin/root/hold-privacy-records`](hold_privacy_records_form.md) | Puts rows on a legal hold |
 | [`POST /admin/root/release-privacy-hold`](release_privacy_hold_form.md) | Releases a legal hold |
+| [`POST /admin/root/rotate-privacy-ip-key`](rotate_privacy_ip_key_form.md) | Replaces the key the IPs are hashed under with a new random one |
 | [`POST /admin/root/set-access-log-readers`](set_access_log_readers_form.md) | Names the roots who read the access log |
+| [`POST /admin/root/set-privacy-settings`](set_privacy_settings_form.md) | Saves the privacy settings, after the notices they need |
+| [`GET /admin/root/set-privacy-settings`](set_privacy_settings_page.md) | Shows the Privacy page: the privacy settings, what this server keeps, the legal holds and the notices |
 
 ## Backoffice Backups
 

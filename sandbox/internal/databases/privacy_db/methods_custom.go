@@ -20,3 +20,17 @@ func AccessLogRecords(sandbox *api.Sandbox, db *PrivacyDb) ([]databasedeps.Recor
 	}
 	return records, nil
 }
+
+// PrivacyAccessRecords is every row of the inventory of the access log
+// reads, none of its fields read yet.
+func PrivacyAccessRecords(sandbox *api.Sandbox, db *PrivacyDb) ([]databasedeps.Record, error) {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(db.database, "privacy-access")
+	if err != nil {
+		return nil, err
+	}
+	records, failure := collection.ListAll()
+	if failure != nil {
+		return nil, sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	return records, nil
+}

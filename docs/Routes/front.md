@@ -100,6 +100,7 @@ or `403`, for example — or let it through to this route.
 | [`set-agent-url-page`](set_agent_url_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-backoffice-user-page`](set_backoffice_user_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-contact-settings-page`](set_contact_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`set-privacy-settings-page`](set_privacy_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-visualization-settings-page`](set_visualization_settings_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-website-source-page`](set_website_source_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-totp-page`](set_totp_page.md) | depends on the address — `explain-route` gives the exact answer |

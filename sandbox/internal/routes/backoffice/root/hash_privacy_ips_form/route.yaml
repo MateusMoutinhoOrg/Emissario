@@ -1,0 +1,15 @@
+category: Privacy
+description: Root only. Every full IP of visualization-view, contact-request and agent-usage becomes its hash under the current IP key, and the full user agents of the views are blanked; the access log keeps its full IPs. It cannot be undone. Answers 303 to the Privacy page with ?notice=hashed&count=<n>.
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootHashPrivacyIps
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/hash-privacy-ips
+priority: 100
+private: true
+response-type: text/html
+summary: Turns every full IP the records keep into its hash

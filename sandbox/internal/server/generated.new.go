@@ -39,7 +39,9 @@ import (
 	routes_api_export_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_export_contact_requests"
 	routes_api_get_agent_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_agent_settings"
 	routes_api_get_contact_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_contact_settings"
+	routes_api_get_privacy_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_privacy_settings"
 	routes_api_get_visualization_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_visualization_settings"
+	routes_api_hash_privacy_ips "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_hash_privacy_ips"
 	routes_api_hold_privacy_records "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_hold_privacy_records"
 	routes_api_list_access_log "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_access_log"
 	routes_api_list_agent_urls "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_agent_urls"
@@ -57,12 +59,14 @@ import (
 	routes_api_remove_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_contact_requests"
 	routes_api_reset_backoffice_totp "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_reset_backoffice_totp"
 	routes_api_restore_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_restore_backup"
+	routes_api_rotate_privacy_ip_key "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_rotate_privacy_ip_key"
 	routes_api_set_access_log_readers "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_access_log_readers"
 	routes_api_set_agent_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_agent_settings"
 	routes_api_set_agent_source "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_agent_source"
 	routes_api_set_agent_url "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_agent_url"
 	routes_api_set_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_backoffice_user"
 	routes_api_set_contact_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_contact_settings"
+	routes_api_set_privacy_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_privacy_settings"
 	routes_api_set_visualization_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_set_visualization_settings"
 	routes_api_sync_agent_source "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_sync_agent_source"
 	routes_api_sync_website_source "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_sync_website_source"
@@ -104,6 +108,7 @@ import (
 	routes_export_access_log "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_access_log"
 	routes_export_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_contact_requests"
 	routes_export_visualization_views "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_visualization_views"
+	routes_hash_privacy_ips_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/hash_privacy_ips_form"
 	routes_hold_privacy_records_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/hold_privacy_records_form"
 	routes_list_agent_urls_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/list_agent_urls_page"
 	routes_list_backups_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/list_backups_page"
@@ -117,6 +122,7 @@ import (
 	routes_remove_contact_requests_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_contact_requests_form"
 	routes_reset_backoffice_totp_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/reset_backoffice_totp_form"
 	routes_restore_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/restore_backup_form"
+	routes_rotate_privacy_ip_key_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/rotate_privacy_ip_key_form"
 	routes_set_access_log_readers_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_access_log_readers_form"
 	routes_set_agent_settings_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_agent_settings_form"
 	routes_set_agent_settings_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_agent_settings_page"
@@ -128,6 +134,8 @@ import (
 	routes_set_backoffice_user_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_backoffice_user_page"
 	routes_set_contact_settings_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_contact_settings_form"
 	routes_set_contact_settings_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_contact_settings_page"
+	routes_set_privacy_settings_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_privacy_settings_form"
+	routes_set_privacy_settings_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_privacy_settings_page"
 	routes_set_visualization_settings_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_visualization_settings_form"
 	routes_set_visualization_settings_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_visualization_settings_page"
 	routes_set_website_source_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/set_website_source_form"
@@ -198,7 +206,9 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_get_contact_request.NewRoute(sandbox),
 		routes_api_get_contact_settings.NewRoute(sandbox),
 		routes_api_get_current_backoffice_user.NewRoute(sandbox),
+		routes_api_get_privacy_settings.NewRoute(sandbox),
 		routes_api_get_visualization_settings.NewRoute(sandbox),
+		routes_api_hash_privacy_ips.NewRoute(sandbox),
 		routes_api_hold_privacy_records.NewRoute(sandbox),
 		routes_api_list_access_log.NewRoute(sandbox),
 		routes_api_list_agent_summaries.NewRoute(sandbox),
@@ -222,12 +232,14 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_remove_contact_requests.NewRoute(sandbox),
 		routes_api_reset_backoffice_totp.NewRoute(sandbox),
 		routes_api_restore_backup.NewRoute(sandbox),
+		routes_api_rotate_privacy_ip_key.NewRoute(sandbox),
 		routes_api_set_access_log_readers.NewRoute(sandbox),
 		routes_api_set_agent_settings.NewRoute(sandbox),
 		routes_api_set_agent_source.NewRoute(sandbox),
 		routes_api_set_agent_url.NewRoute(sandbox),
 		routes_api_set_backoffice_user.NewRoute(sandbox),
 		routes_api_set_contact_settings.NewRoute(sandbox),
+		routes_api_set_privacy_settings.NewRoute(sandbox),
 		routes_api_set_totp.NewRoute(sandbox),
 		routes_api_set_visualization_settings.NewRoute(sandbox),
 		routes_api_sync_agent_source.NewRoute(sandbox),
@@ -249,6 +261,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_export_visualization_views.NewRoute(sandbox),
 		routes_get_agent_summary_page.NewRoute(sandbox),
 		routes_get_contact_request_page.NewRoute(sandbox),
+		routes_hash_privacy_ips_form.NewRoute(sandbox),
 		routes_health.NewRoute(sandbox),
 		routes_hold_privacy_records_form.NewRoute(sandbox),
 		routes_list_agent_summaries_page.NewRoute(sandbox),
@@ -272,6 +285,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_reset_backoffice_totp_form.NewRoute(sandbox),
 		routes_restore_backup_form.NewRoute(sandbox),
 		routes_revoke_backoffice_api_token_form.NewRoute(sandbox),
+		routes_rotate_privacy_ip_key_form.NewRoute(sandbox),
 		routes_set_access_log_readers_form.NewRoute(sandbox),
 		routes_set_agent_settings_form.NewRoute(sandbox),
 		routes_set_agent_settings_page.NewRoute(sandbox),
@@ -283,6 +297,8 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_set_backoffice_user_page.NewRoute(sandbox),
 		routes_set_contact_settings_form.NewRoute(sandbox),
 		routes_set_contact_settings_page.NewRoute(sandbox),
+		routes_set_privacy_settings_form.NewRoute(sandbox),
+		routes_set_privacy_settings_page.NewRoute(sandbox),
 		routes_set_totp_form.NewRoute(sandbox),
 		routes_set_totp_page.NewRoute(sandbox),
 		routes_set_totp_qr.NewRoute(sandbox),

@@ -1,0 +1,15 @@
+category: Privacy
+description: 'Root only. A new random IP key replaces the old one: the hashes kept no longer match new visits nor an IP typed in a filter or in Find and erase (GDPR art. 11). It cannot be undone. Answers 303 to the Privacy page with ?notice=rotated.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootRotatePrivacyIpKey
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/rotate-privacy-ip-key
+priority: 100
+private: true
+response-type: text/html
+summary: Replaces the key the IPs are hashed under with a new random one
