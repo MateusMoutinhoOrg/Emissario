@@ -36,6 +36,7 @@ func New(sandbox *api.Sandbox) *Backup {
 						{Name: "path", Type: databasedeps.String, Required: true},
 						{Name: "sha", Type: databasedeps.String, Required: true}}},
 					{Name: "status", Type: databasedeps.String, Required: true},
+					{Name: "key-id", Type: databasedeps.String},
 				},
 			},
 		},
@@ -101,6 +102,9 @@ func New(sandbox *api.Sandbox) *Backup {
 	}
 	self.SetSnapshotStatus = func(id int64, value string) error {
 		return SetSnapshotStatus(self.sandbox, &self, id, value)
+	}
+	self.SetSnapshotKeyId = func(id int64, value string) error {
+		return SetSnapshotKeyId(self.sandbox, &self, id, value)
 	}
 	self.RemoveSnapshot = func(id int64) error {
 		return RemoveSnapshot(self.sandbox, &self, id)

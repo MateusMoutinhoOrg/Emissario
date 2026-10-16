@@ -6,3 +6,11 @@
 /data/visualizationdb
 /data/agentdb
 /data/contactdb
+/data/privacydb
+/data/encryption.json
+
+# What `agnos run-examples` writes while it runs an example: the tree the example
+# produced and the copy it asserts. The golden result.yaml beside them is
+# committed; these two are rebuilt from scratch on every run.
+examples/*/*/test-dir/
+examples/*/*/assert-dir/

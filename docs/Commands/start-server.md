@@ -3,7 +3,7 @@
 Start the http server
 
 ```bash
-emissario start-server [--addr <addr>] [--read-timeout-ms <read-timeout-ms>] [--write-timeout-ms <write-timeout-ms>] [--shutdown-timeout-ms <shutdown-timeout-ms>] [--allow-x-forwarded-for] [--insecure-http] [--database <database>] [--help] [--visualization-geoip <visualization-geoip>] [--fonts <fonts>]
+emissario start-server [--addr <addr>] [--read-timeout-ms <read-timeout-ms>] [--write-timeout-ms <write-timeout-ms>] [--shutdown-timeout-ms <shutdown-timeout-ms>] [--allow-x-forwarded-for] [--insecure-http] [--database <database>] [--notencrypt] [--help] [--visualization-geoip <visualization-geoip>] [--fonts <fonts>]
 ```
 
 Opens the port and serves every route declared under sandbox/internal/routes, until the process is stopped. An interrupt (Ctrl+C) or a termination request stops it gracefully: no new request is taken, and the ones in flight get --shutdown-timeout-ms to finish.
@@ -17,6 +17,7 @@ Opens the port and serves every route declared under sandbox/internal/routes, un
 | `--allow-x-forwarded-for` | boolean |  | trust the last entry of X-Forwarded-For as the client ip: turn it on only behind one reverse proxy that appends it (nginx), with the server bound to an address only that proxy reaches (--addr 127.0.0.1:3000) | [backoffice-start-server](backoffice-start-server.md) |
 | `--insecure-http` | boolean |  | serve the backoffice over plain http, for local development only: the session cookie drops Secure and no Strict-Transport-Security is sent | [backoffice-start-server](backoffice-start-server.md) |
 | `--database` | string | `data` | the folder every database lives under, relative to where the command runs, lower-case letters, digits, - and _ (defaults to data) | [database-dir](database-dir.md) |
+| `--notencrypt` | boolean |  | open the databases in clear, without EMISSARIO_ENCRYPT_KEY: for local debugging only, never in production | [database-encryption](database-encryption.md) |
 | `--help`, `-h` | boolean |  | Print the help of the command this command line is for | [help-flag](help-flag.md) |
 | `--visualization-geoip` | string |  | a country database (.mmdb) to look the ip of each page view up in instead of the embedded DB-IP Lite: a newer DB-IP Lite, MaxMind GeoLite2-Country, IPinfo Lite; a file that does not open stops the server at start | [visualization-start-server](visualization-start-server.md) |
 | `--fonts` | string | `EmissarioFonts` | the folder the git sources are cloned into, one folder per source named after it, relative to where the server runs (defaults to EmissarioFonts) | [website-source-start-server](website-source-start-server.md) |
@@ -27,6 +28,7 @@ Opens the port and serves every route declared under sandbox/internal/routes, un
 | [`backoffice-start-server`](backoffice-start-server.md) | always |
 | [`contact-start-server`](contact-start-server.md) | always |
 | [`database-dir`](database-dir.md) | always |
+| [`database-encryption`](database-encryption.md) | always |
 | [`help-flag`](help-flag.md) | always |
 | [`visualization-start-server`](visualization-start-server.md) | always |
 | [`website-source-start-server`](website-source-start-server.md) | always |

@@ -11,6 +11,7 @@ import (
 	argvdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/argvdeps"
 	databasedeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/databasedeps"
 	embeddeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/embeddeps"
+	encryptiondeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/encryptiondeps"
 	envdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/envdeps"
 	geoipdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/geoipdeps"
 	hashdeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/hashdeps"
@@ -44,6 +45,7 @@ type Deps struct {
 	ArgvDeps                 argvdeps.Contract
 	DatabaseDeps             databasedeps.Sandbox
 	EmbedDeps                embeddeps.Contract
+	EncryptionDeps           encryptiondeps.Contract
 	EnvDeps                  envdeps.Contract
 	GeoipDeps                geoipdeps.Contract
 	HashDeps                 hashdeps.Contract

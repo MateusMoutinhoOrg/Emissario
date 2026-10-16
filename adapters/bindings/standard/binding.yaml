@@ -4,7 +4,7 @@ adapters:
     - OpinionatedAgnosFront
     - OpinionatedAgnosServer
     - cryptorand
-    - databasedeps
+    - encryptedkeep
     - goembed
     - golangjwt
     - maxmindgeoip
@@ -25,4 +25,5 @@ adapters:
     - stdsort
     - stdstrings
     - stdtime
+    - xchachaencryption
     - ziparchive

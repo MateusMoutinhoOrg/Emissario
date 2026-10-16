@@ -16,6 +16,8 @@ Runs in front of every command line and answers none of them. It reads --databas
 | [`add-backoffice-user`](add-backoffice-user.md) | always |
 | [`help`](help.md) | always |
 | [`version`](version.md) | always |
+| [`generate-encrypt-key`](generate-encrypt-key.md) | always |
+| [`rotate-encrypt-key`](rotate-encrypt-key.md) | always |
 | [`start-server`](start-server.md) | always |
 
 Middlewares · [every command](doc.md) · [CommandYaml](../CommandYaml/doc.md)

@@ -345,6 +345,22 @@ func SetSnapshotStatus(sandbox *api.Sandbox, self *Backup, id int64, value strin
 	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("status", value))
 }
 
+// SetSnapshotKeyId writes a new key-id on one snapshot record.
+func SetSnapshotKeyId(sandbox *api.Sandbox, self *Backup, id int64, value string) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "snapshot")
+	if err != nil {
+		return err
+	}
+	record, ok, failure := collection.FindByID(id)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("snapshot %d not found", id)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("key-id", value))
+}
+
 // RemoveSnapshot deletes one snapshot record and everything nested under it.
 func RemoveSnapshot(sandbox *api.Sandbox, self *Backup, id int64) error {
 	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "snapshot")
@@ -456,6 +472,7 @@ func newSnapshotFields(props SnapshotInput) map[string]any {
 		"name":   props.Name,
 		"data":   props.Data,
 		"status": props.Status,
+		"key-id": props.KeyId,
 	}
 }
 
@@ -483,6 +500,12 @@ func buildSnapshotRecord(sandbox *api.Sandbox, record databasedeps.Record) (Snap
 	}
 	built.Status = valueStatus
 
+	valueKeyId, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadString(record, "key-id")
+	if err != nil {
+		return built, err
+	}
+	built.KeyId = valueKeyId
+
 	return built, nil
 }
 
@@ -496,6 +519,9 @@ func matchSnapshot(sandbox *api.Sandbox, item SnapshotRecord, filter SnapshotFil
 		return false
 	}
 	if !sandbox.Deps.OpinionatedAgnosDatabase.TextMatches(item.Status, filter.StatusStartsWith, filter.StatusEquals) {
+		return false
+	}
+	if !sandbox.Deps.OpinionatedAgnosDatabase.TextMatches(item.KeyId, filter.KeyIdStartsWith, filter.KeyIdEquals) {
 		return false
 	}
 	return true

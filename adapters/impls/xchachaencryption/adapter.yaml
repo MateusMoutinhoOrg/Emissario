@@ -1,0 +1,5 @@
+dep: encryptiondeps
+help: Encryption at rest with XChaCha20-Poly1305 over golang.org/x/crypto, the key read once from the environment
+module: golang.org/x/crypto@v0.55.0
+name: xchachaencryption
+origin: project

@@ -1,0 +1,14 @@
+args:
+    - end: 0
+      id: Verb
+      start: 0
+      trigger:
+        type: equal
+        value: generate-encrypt-key
+category: Privacy
+description: 'Prints a fresh key for EMISSARIO_ENCRYPT_KEY — 32 random bytes in base64 — on stdout, and on stderr the warning that losing it loses every database and every backup. It opens no database. Keep the key outside the server, in a secret manager, and inject it as the environment variable: a passphrase is never accepted in its place.'
+examples:
+    - generate-encrypt-key
+    - EMISSARIO_ENCRYPT_KEY=$(emissario generate-encrypt-key) emissario start-server
+priority: 100
+summary: Print a new key for EMISSARIO_ENCRYPT_KEY

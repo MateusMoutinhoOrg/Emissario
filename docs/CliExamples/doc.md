@@ -12,6 +12,7 @@ golden holding the output, the exit code and the sha256 of every `assert-dir` fi
 `run-examples` and never by hand. [Workflow](../Workflow/doc.md) has the commands that add and
 remove one; the lib side is [LibExamples](../LibExamples/doc.md).
 
-No example is declared yet: `examples/cli/` is created by the first
-`agnos add-cli-example`.
+| Example | Description | Source |
+|---|---|---|
+| `encryption-startup` |  | [example.sh](../../examples/cli/encryption-startup/example.sh) |
 

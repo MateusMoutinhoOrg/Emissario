@@ -23,6 +23,13 @@ lists the flags of the middlewares in front of it too.
 | [`help`](help.md) | Display help for a command |
 | [`version`](version.md) | Print the installed version |
 
+## Privacy
+
+| Command | Does |
+| --- | --- |
+| [`generate-encrypt-key`](generate-encrypt-key.md) | Print a new key for EMISSARIO_ENCRYPT_KEY |
+| [`rotate-encrypt-key`](rotate-encrypt-key.md) | Re-encrypt every database and backup from an old key to the one in EMISSARIO_ENCRYPT_KEY |
+
 ## Server
 
 | Command | Does |
@@ -39,6 +46,7 @@ Run in front of the commands they match, lowest `priority` first; typed by nobod
 | [`backoffice-start-server`](backoffice-start-server.md) | `start-server` | 50 | `--addr`, `--allow-x-forwarded-for`, `--insecure-http` |
 | [`contact-start-server`](contact-start-server.md) | `start-server` | 54 | — |
 | [`database-dir`](database-dir.md) | `*` | 6 | `--database` |
+| [`database-encryption`](database-encryption.md) | `* !(help|version|generate-encrypt-key|rotate-encrypt-key)` | 7 | `--notencrypt` |
 | [`help-flag`](help-flag.md) | `*` | 5 | `--help`, `-h` |
 | [`visualization-start-server`](visualization-start-server.md) | `start-server` | 52 | `--visualization-geoip` |
 | [`website-source-start-server`](website-source-start-server.md) | `start-server` | 51 | `--fonts` |

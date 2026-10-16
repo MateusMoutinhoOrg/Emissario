@@ -95,3 +95,33 @@ func RemoveSnapshotContent(sandbox *api.Sandbox, db *Backup, snapshotId int64, c
 	}
 	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Remove())
 }
+
+// SetSnapshotContentSha points one content record nested under one snapshot
+// record at another blob: the generated methods add and list the content of
+// a snapshot, never change one of it, and a key rotation reseals every file a
+// snapshot holds, which gives each a new sha.
+func SetSnapshotContentSha(sandbox *api.Sandbox, db *Backup, snapshotId int64, contentId int64, sha string) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(db.database, "snapshot")
+	if err != nil {
+		return err
+	}
+	parent, ok, failure := collection.FindByID(snapshotId)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("snapshot %d not found", snapshotId)
+	}
+	nested, failure := parent.Nested("content")
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	record, ok, failure := nested.FindByID(contentId)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("content %d of snapshot %d not found", contentId, snapshotId)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("sha", sha))
+}

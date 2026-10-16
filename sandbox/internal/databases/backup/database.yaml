@@ -28,4 +28,6 @@ tables:
         - name: status
           required: true
           type: string
+        - name: key-id
+          type: string
       name: snapshot

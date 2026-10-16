@@ -20,6 +20,7 @@
 | `content.path` | `string` | yes |  |
 | `content.sha` | `string` | yes |  |
 | `status` | `string` | yes |  |
+| `key-id` | `string` |  |  |
 
 ## Methods
 
@@ -43,6 +44,7 @@
 | `SetSnapshotName(id int64, value string) error` | writes a new name on one snapshot record |
 | `SetSnapshotData(id int64, value int64) error` | writes a new data on one snapshot record |
 | `SetSnapshotStatus(id int64, value string) error` | writes a new status on one snapshot record |
+| `SetSnapshotKeyId(id int64, value string) error` | writes a new key-id on one snapshot record |
 | `RemoveSnapshot(id int64) error` | deletes one snapshot record and everything nested under it |
 | `AddSnapshotContent(parentId int64, props SnapshotContentInput) (SnapshotContentRecord, error)` | inserts one content record under one snapshot record |
 | `ListSnapshotContents(parentId int64) ([]SnapshotContentRecord, error)` | reads every content record of one snapshot record |

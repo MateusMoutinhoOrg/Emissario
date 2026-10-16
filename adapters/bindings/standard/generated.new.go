@@ -8,7 +8,7 @@ import (
 	OpinionatedAgnosFront "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/OpinionatedAgnosFront"
 	OpinionatedAgnosServer "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/OpinionatedAgnosServer"
 	cryptorand "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/cryptorand"
-	databasedeps "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/databasedeps"
+	encryptedkeep "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/encryptedkeep"
 	goembed "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/goembed"
 	golangjwt "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/golangjwt"
 	maxmindgeoip "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/maxmindgeoip"
@@ -29,6 +29,7 @@ import (
 	stdsort "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdsort"
 	stdstrings "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdstrings"
 	stdtime "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdtime"
+	xchachaencryption "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/xchachaencryption"
 	ziparchive "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/ziparchive"
 	deps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps"
 )
@@ -40,7 +41,7 @@ func New() deps.Deps {
 	OpinionatedAgnosFront.Bind(&deps)
 	OpinionatedAgnosServer.Bind(&deps)
 	cryptorand.Bind(&deps)
-	databasedeps.Bind(&deps)
+	encryptedkeep.Bind(&deps)
 	goembed.Bind(&deps)
 	golangjwt.Bind(&deps)
 	maxmindgeoip.Bind(&deps)
@@ -61,6 +62,7 @@ func New() deps.Deps {
 	stdsort.Bind(&deps)
 	stdstrings.Bind(&deps)
 	stdtime.Bind(&deps)
+	xchachaencryption.Bind(&deps)
 	ziparchive.Bind(&deps)
 	return deps
 }

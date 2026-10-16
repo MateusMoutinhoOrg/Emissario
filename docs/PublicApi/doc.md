@@ -34,6 +34,7 @@ struct of function fields, filled by a binder.
 | [`sandbox/api/generated.server.go`](api.server.md) | `StatusOK`, `StatusCreated`, `StatusNoContent`, `StatusMovedPermanently`, `StatusFound`, `StatusSeeOther`, `StatusNotModified`, `StatusTemporaryRedirect`, `StatusPermanentRedirect`, `StatusBadRequest`, `StatusUnauthorized`, `StatusForbidden`, `StatusNotFound`, `StatusMethodNotAllowed`, `StatusConflict`, `StatusPayloadTooLarge`, `StatusUnsupportedMediaType`, `StatusUnprocessableEntity`, `StatusTooManyRequests`, `StatusInternalServerError`, `StatusServiceUnavailable`, `Server`, `ServeProps` |
 | [`sandbox/api/generated.serversandbox.go`](api.serversandbox.md) | `ServerSandbox` |
 | [`sandbox/api/generated.trigger.go`](api.trigger.md) | `TriggerEqual`, `TriggerPrefix`, `TriggerTextPrefix`, `TriggerSuffix`, `TriggerRegex`, `TriggerOneOf`, `TriggerType`, `Trigger` |
+| [`sandbox/api/privacyconfig.go`](api.privacyconfig.md) | `PrivacyConfig` |
 | [`sandbox/api/projectconfig.go`](api.projectconfig.md) | `DefaultFontsDir`, `ProjectConfig` |
 | [`sandbox/api/projectsandbox.go`](api.projectsandbox.md) | `ProjectSandbox` |
 | [`sandbox/api/visualizationconfig.go`](api.visualizationconfig.md) | `VisualizationConfig` |
@@ -53,6 +54,7 @@ field is that package's `Sandbox` struct, filled by `adapters/impls/<name>.Bind(
 | [`deps.ArgvDeps`](deps.argvdeps.md) | `Contract`, `Parser` |
 | [`deps.DatabaseDeps`](deps.databasedeps.md) | `Config`, `Key`, `Int`, `Nested`, `Float`, `String`, `Link`, `Bytes`, `KeyConflict`, `NoValue`, `MissingField`, `InvalidField`, `Internal`, `Removed`, `InvalidSchema`, `InvalidArgument`, `Field`, `Schema`, `Props`, `Error`, `Record`, `Collection`, `Database`, `Databases`, `Info`, `ProjectConfig`, `ProjectSandbox`, `Sandbox` |
 | [`deps.EmbedDeps`](deps.embeddeps.md) | `Contract` |
+| [`deps.EncryptionDeps`](deps.encryptiondeps.md) | `Contract` |
 | [`deps.EnvDeps`](deps.envdeps.md) | `Contract` |
 | [`deps.GeoipDeps`](deps.geoipdeps.md) | `Contract`, `Database` |
 | [`deps.HashDeps`](deps.hashdeps.md) | `Contract` |

@@ -213,7 +213,7 @@ func record(sandbox *api.Sandbox, db *backup.Backup, name string, prefix string,
 	if _, taken := db.FindSnapshotByName(name); taken {
 		return backup.SnapshotRecord{}, OutcomeNameTaken, nil
 	}
-	snapshot, err := db.AddSnapshot(backup.SnapshotInput{Name: name, Data: nowSeconds(sandbox), Status: status})
+	snapshot, err := db.AddSnapshot(backup.SnapshotInput{Name: name, Data: nowSeconds(sandbox), Status: status, KeyId: currentKeyId(sandbox)})
 	if err != nil {
 		return backup.SnapshotRecord{}, "", err
 	}
@@ -239,7 +239,7 @@ func create(sandbox *api.Sandbox, db *backup.Backup, prefix string) (backup.Snap
 func begin(sandbox *api.Sandbox, db *backup.Backup, prefix string, status string) (backup.SnapshotRecord, error) {
 	now := nowSeconds(sandbox)
 	name := uniqueName(sandbox, db, prefix+"-"+sandbox.Deps.TimeDeps.FormatUnix(now, NameLayout))
-	return db.AddSnapshot(backup.SnapshotInput{Name: name, Data: now, Status: status})
+	return db.AddSnapshot(backup.SnapshotInput{Name: name, Data: now, Status: status, KeyId: currentKeyId(sandbox)})
 }
 
 // finish stores every file of DataDir under snapshot and records how that
@@ -324,13 +324,14 @@ func collect(sandbox *api.Sandbox) []collected {
 }
 
 // kept tells whether the file at path belongs in a snapshot: the store names
-// its temporary files with a leading "." and its locks with keepLockSuffix,
-// which no file of a record ever carries.
+// its temporary files with a leading "." and its locks with keepLockSuffix —
+// and the guard of a lock takeover after it — while the name of a file of a
+// record never holds a '.', since the store spells one %2E.
 func kept(sandbox *api.Sandbox, path string) bool {
 	strings := sandbox.Deps.StringsDeps
 	slashed := strings.ReplaceAll(path, "\\", "/")
 	name := slashed[strings.LastIndex(slashed, "/")+1:]
-	return !strings.HasPrefix(name, ".") && !strings.HasSuffix(name, keepLockSuffix)
+	return !strings.Contains(name, ".")
 }
 
 // relative is path, the host path of a file under dir — a database directory

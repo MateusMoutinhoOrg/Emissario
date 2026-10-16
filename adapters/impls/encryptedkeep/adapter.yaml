@@ -1,0 +1,5 @@
+dep: databasedeps
+help: Keep built over its own file storage wrapped by the encryption at rest of xchachaencryption
+module: github.com/MateusMoutinhoOrg/Keep@v0.10.0
+name: encryptedkeep
+origin: project

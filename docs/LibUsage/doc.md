@@ -87,6 +87,7 @@ The contracts available to patch:
 | `deps.ArgvDeps` | `sandbox/deps/argvdeps` |
 | `deps.DatabaseDeps` | `sandbox/deps/databasedeps` |
 | `deps.EmbedDeps` | `sandbox/deps/embeddeps` |
+| `deps.EncryptionDeps` | `sandbox/deps/encryptiondeps` |
 | `deps.EnvDeps` | `sandbox/deps/envdeps` |
 | `deps.GeoipDeps` | `sandbox/deps/geoipdeps` |
 | `deps.HashDeps` | `sandbox/deps/hashdeps` |
@@ -118,6 +119,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/OpinionatedAgnosServer` | `OpinionatedAgnosServer.Bind(&deps)` |
 | `adapters/impls/cryptorand` | `cryptorand.Bind(&deps)` |
 | `adapters/impls/databasedeps` | `databasedeps.Bind(&deps)` |
+| `adapters/impls/encryptedkeep` | `encryptedkeep.Bind(&deps)` |
 | `adapters/impls/goembed` | `goembed.Bind(&deps)` |
 | `adapters/impls/golangjwt` | `golangjwt.Bind(&deps)` |
 | `adapters/impls/maxmindgeoip` | `maxmindgeoip.Bind(&deps)` |
@@ -138,6 +140,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/stdsort` | `stdsort.Bind(&deps)` |
 | `adapters/impls/stdstrings` | `stdstrings.Bind(&deps)` |
 | `adapters/impls/stdtime` | `stdtime.Bind(&deps)` |
+| `adapters/impls/xchachaencryption` | `xchachaencryption.Bind(&deps)` |
 | `adapters/impls/ziparchive` | `ziparchive.Bind(&deps)` |
 
 Starting from `standard.New()` is the safe default: an unfilled field is a nil func that

@@ -88,6 +88,9 @@ func restore(sandbox *api.Sandbox, db *backup.Backup, target backup.SnapshotReco
 		}
 	}()
 
+	if refused := keyRefusal(sandbox, target.KeyId); refused != "" {
+		return sandbox.Deps.StdDeps.Errorf("%s, nothing was restored", refused)
+	}
 	all, err := db.ListSnapshotContents(target.Id)
 	if err != nil {
 		return err
@@ -161,8 +164,9 @@ func scoped(sandbox *api.Sandbox, contents []backup.SnapshotContentRecord, inclu
 }
 
 // checkContents answers why contents cannot be written over DataDir, nil when
-// they can: every path SafePath accepts, every content stored, and no path a
-// folder another one needs.
+// they can: every path SafePath accepts, every content stored — sealed under
+// the current key, in an encrypted folder — and no path a folder another one
+// needs.
 func checkContents(sandbox *api.Sandbox, db *backup.Backup, contents []backup.SnapshotContentRecord) error {
 	paths := []string{}
 	for _, content := range contents {
@@ -175,6 +179,15 @@ func checkContents(sandbox *api.Sandbox, db *backup.Backup, contents []backup.Sn
 		}
 		if !stored {
 			return sandbox.Deps.StdDeps.Errorf("the content of %s is missing", content.Path)
+		}
+		if currentKeyId(sandbox) != "" {
+			blob, ok := db.FindBlobBySha(content.Sha)
+			if !ok {
+				return sandbox.Deps.StdDeps.Errorf("the content of %s is missing", content.Path)
+			}
+			if refused := contentRefusal(sandbox, content.Path, blob.Value); refused != "" {
+				return sandbox.Deps.StdDeps.Errorf("%s", refused)
+			}
 		}
 		paths = append(paths, content.Path)
 	}

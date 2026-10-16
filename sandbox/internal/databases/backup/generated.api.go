@@ -42,6 +42,7 @@ type SnapshotRecord struct {
 	Name   string
 	Data   int64
 	Status string
+	KeyId  string
 }
 
 // SnapshotInput is one insert into snapshot: the fields a new record carries.
@@ -49,6 +50,7 @@ type SnapshotInput struct {
 	Name   string
 	Data   int64
 	Status string
+	KeyId  string
 }
 
 // SnapshotFilter narrows a ListSnapshot. Every plain field is here, because
@@ -61,6 +63,8 @@ type SnapshotFilter struct {
 	DataMax          int64
 	StatusStartsWith string
 	StatusEquals     string
+	KeyIdStartsWith  string
+	KeyIdEquals      string
 }
 
 // SnapshotContentRecord is one stored content record: its permanent id and every
@@ -121,6 +125,8 @@ type Backup struct {
 	SetSnapshotData func(id int64, value int64) error
 	// SetSnapshotStatus writes a new status on one snapshot record.
 	SetSnapshotStatus func(id int64, value string) error
+	// SetSnapshotKeyId writes a new key-id on one snapshot record.
+	SetSnapshotKeyId func(id int64, value string) error
 	// RemoveSnapshot deletes one snapshot record and everything nested under it.
 	RemoveSnapshot func(id int64) error
 	// AddSnapshotContent inserts one content record under one snapshot record.

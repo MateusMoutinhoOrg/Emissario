@@ -14,9 +14,12 @@ import (
 	backoffice_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/backoffice_start_server"
 	contact_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/contact_start_server"
 	database_dir "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/database_dir"
+	database_encryption "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/database_encryption"
 	help_flag "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/help_flag"
 	visualization_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/visualization_start_server"
 	website_source_start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/middleware/website_source_start_server"
+	generate_encrypt_key "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/privacy/generate_encrypt_key"
+	rotate_encrypt_key "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/privacy/rotate_encrypt_key"
 	start_server "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/server/start_server"
 )
 
@@ -33,13 +36,16 @@ func NewCli(sandbox *api.Sandbox) api.Cli {
 	cli.Commands = []*api.Command{
 		help_flag.NewCommand(sandbox),
 		database_dir.NewCommand(sandbox),
+		database_encryption.NewCommand(sandbox),
 		backoffice_start_server.NewCommand(sandbox),
 		website_source_start_server.NewCommand(sandbox),
 		visualization_start_server.NewCommand(sandbox),
 		agent_start_server.NewCommand(sandbox),
 		contact_start_server.NewCommand(sandbox),
 		add_backoffice_user.NewCommand(sandbox),
+		generate_encrypt_key.NewCommand(sandbox),
 		help.NewCommand(sandbox),
+		rotate_encrypt_key.NewCommand(sandbox),
 		start_server.NewCommand(sandbox),
 		version.NewCommand(sandbox),
 	}
