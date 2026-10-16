@@ -126,7 +126,9 @@ type PrivacySettingsPage struct {
 	FindHref     string
 	DraftHref    string
 	TotpHref     string
-	Zone         string
+	// NoticeDraft is the privacy notice draft of the settings in use.
+	NoticeDraft string
+	Zone        string
 }
 
 // privacyNotice is how the Privacy page words an outcome code.
@@ -225,6 +227,12 @@ func RenderPrivacySettingsPage(sandbox *api.Sandbox, response *serverdeps.Respon
 			Until:  visualization.DayOf(sandbox, hold.Until-1),
 		})
 	}
+
+	draft, err := privacyadmin.NoticeDraft(sandbox)
+	if err != nil {
+		return err
+	}
+	page.NoticeDraft = draft
 
 	inUse, err := noticesInUse(sandbox, settings)
 	if err != nil {

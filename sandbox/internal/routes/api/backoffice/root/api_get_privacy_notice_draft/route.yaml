@@ -1,0 +1,15 @@
+category: Privacy API
+description: 'Root only. Answers {template, text}: template is br (pt-BR), eu (en) or br-eu (both), as privacy-setting.notice-draft says; text is Markdown built from the settings in use — what is kept, why, for how long, the access log, the model provider, no cookie, the rights — with [placeholders] for the controller, the contact and the encarregado or DPO. It is a draft to review, not legal advice.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootGetPrivacyNoticeDraft
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/get-privacy-notice-draft
+priority: 100
+private: true
+response-type: application/json
+summary: Answers the privacy notice draft of the settings in use

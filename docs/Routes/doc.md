@@ -143,6 +143,7 @@ it prints the address it took. Change it to wherever your server runs.
 | --- | --- |
 | [`POST /api/admin/root/delete-access-log`](api_delete_access_log.md) | Deletes access log rows, to its readers |
 | [`POST /api/admin/root/export-access-log`](api_export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`POST /api/admin/root/get-privacy-notice-draft`](api_get_privacy_notice_draft.md) | Answers the privacy notice draft of the settings in use |
 | [`POST /api/admin/root/get-privacy-settings`](api_get_privacy_settings.md) | Answers the privacy settings, the encryption and what this server keeps |
 | [`POST /api/admin/root/hash-privacy-ips`](api_hash_privacy_ips.md) | Turns every full IP the records keep into its hash |
 | [`POST /api/admin/root/hold-privacy-records`](api_hold_privacy_records.md) | Puts rows on a legal hold |

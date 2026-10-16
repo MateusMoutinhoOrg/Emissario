@@ -737,6 +737,7 @@
     .danger-row .grow { flex: 1 1 280px; }
     .danger-row + .danger-row { border-top: 1px solid var(--border); padding-top: 1rem; }
     .table-card .card-head { padding: 0.75rem 1.5rem 0; }
+    textarea.draft { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82rem; line-height: 1.5; margin-top: 0.5rem; }
     .section-links { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1.25rem; }
   </style>
 </head>
@@ -785,6 +786,7 @@
       {{if .AccessLogHref}}<a class="btn btn-small" href="{{.AccessLogHref}}">Access log</a>{{end}}
       <a class="btn btn-small" href="{{.PresetsHref}}">Presets</a>
       <a class="btn btn-small" href="#kept">What this server keeps</a>
+      <a class="btn btn-small" href="#notice-draft">Privacy notice draft</a>
       <a class="btn btn-small" href="#holds">Legal holds</a>
       <a class="btn btn-small" href="#notices">Notices</a>
     </nav>
@@ -898,6 +900,12 @@
           </tr>{{end}}
         </tbody>
       </table>
+    </div>
+
+    <div class="card" id="notice-draft">
+      <div class="card-head"><h2>Privacy notice draft</h2></div>
+      <p class="hint"><strong>Draft — review it.</strong> Built from the settings in use: what is kept, why, for how long, the access log, the model provider, that no cookie is set and the chat history stays in the visitor's browser, the rights and the time to answer them. Fill in the [brackets] — the controller, the contact, the encarregado or DPO — and publish it on your website. Its template is set above.</p>
+      <textarea class="draft" readonly rows="24" spellcheck="false">{{.NoticeDraft}}</textarea>
     </div>
 
     <div class="card table-card" id="holds">

@@ -39,6 +39,7 @@ import (
 	routes_api_export_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_export_contact_requests"
 	routes_api_get_agent_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_agent_settings"
 	routes_api_get_contact_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_contact_settings"
+	routes_api_get_privacy_notice_draft "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_privacy_notice_draft"
 	routes_api_get_privacy_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_privacy_settings"
 	routes_api_get_visualization_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_visualization_settings"
 	routes_api_hash_privacy_ips "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_hash_privacy_ips"
@@ -206,6 +207,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_get_contact_request.NewRoute(sandbox),
 		routes_api_get_contact_settings.NewRoute(sandbox),
 		routes_api_get_current_backoffice_user.NewRoute(sandbox),
+		routes_api_get_privacy_notice_draft.NewRoute(sandbox),
 		routes_api_get_privacy_settings.NewRoute(sandbox),
 		routes_api_get_visualization_settings.NewRoute(sandbox),
 		routes_api_hash_privacy_ips.NewRoute(sandbox),
