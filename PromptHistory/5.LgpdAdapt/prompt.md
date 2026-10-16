@@ -45,12 +45,12 @@ The one exception is the encryption key, which comes from the environment.
 ---
 
 ## 2. Principles
-- **Private by default** (GDPR art. 25; LGPD art. 46 §2): a new install stores no contact request, no
+- **Private by default** (GDPR art. 25; LGPD art. 46 §2): an install stores no contact request, no
   summary and no full IP.
 - **Fail closed**: a missing or wrong key stops the program, and an unacknowledged notice leaves the
   feature off. Nothing silently downgrades.
-- **Never destroy on upgrade**: an existing install keeps its data and its features. Banners ask the root
-  to decide. Nothing is deleted until a root saves a retention.
+- **No backward compatibility**: Emissario is in alpha. A database from an earlier version is not
+  migrated: start a new one. Every install starts with the defaults of **§5**.
 - **Accountability** (LGPD art. 6 X; GDPR art. 5(2)): each acknowledgement and each privacy setting change
   is recorded with who made it, when, and which notice version they read.
 - **Need to know**: a viewer never sees a full IP anywhere. Today contact requests show the whole IP to
@@ -84,15 +84,14 @@ after `database-dir`, in the same way `database-dir` reads `--database`. It read
 
 | Database folder | Key set | `--notencrypt` | Result |
 |---|---|---|---|
-| empty (new install) | yes | – | encrypted. Writes `<database>/encryption.json` |
-| empty | no | yes | plaintext, with the warning |
+| empty | yes | – | encrypted. Writes `<database>/encryption.json` |
+| empty or plaintext | no | yes | plaintext, with the warning |
 | any | no | no | exit 1: *set EMISSARIO_ENCRYPT_KEY (`emissario generate-encrypt-key`) or pass --notencrypt* |
 | any | yes | yes | exit 1: contradictory |
 | encrypted | the right key | – | runs |
 | encrypted | another key | – | exit 1: *key does not match this database* |
 | encrypted | no | yes | exit 1: an encrypted database cannot be opened without its key |
-| plaintext with data (upgrade) | yes | – | exit 1: *run `emissario encrypt-database` first* |
-| plaintext with data | no | yes | runs, with the warning |
+| plaintext | yes | – | exit 1: *this database was created with --notencrypt; start a new one* |
 
 `encryption.json` holds `{"version":1,"algorithm":"AES-256-GCM","key_id":"<first 8 bytes of HMAC(key-check, "emissario")>"}`.
 It reveals nothing about the key.
@@ -125,16 +124,16 @@ memory after `Read`, so they keep working unchanged.
   `key` field, because its unsalted SHA-256 would be a file name.
 - In an encrypted database, a value without the `0xE1` header is an error, not data.
 
-### Migration and rotation — `emissario encrypt-database`
-- `EMISSARIO_ENCRYPT_KEY=<new> emissario encrypt-database` encrypts a plaintext database.
-- `--old-key-env <VAR>` re-encrypts from an old key to a new one. This is the rotation path after a leak.
+### Rotation — `emissario rotate-encrypt-key`
+- `EMISSARIO_ENCRYPT_KEY=<new> emissario rotate-encrypt-key --old-key-env <VAR>` re-encrypts from an old
+  key to a new one. This is the path after a leak. There is no plaintext → encrypted migration.
 - Before it writes, it takes a backup snapshot. It works record by record and can be resumed, and it
   writes `encryption.json` last.
 
 ### Backups
 Snapshots copy the files as they are on disk, so they stay **encrypted**. A downloaded zip opens only on a
 server with the same key. Restoring checks the snapshot's `encryption.json` and refuses one with another
-key, or a plaintext one into an encrypted database: run `encrypt-database` on it first.
+key, or a plaintext one into an encrypted database.
 
 ### What encryption does and does not do
 It protects a stolen disk, a stolen backup, or a misconfigured volume. In those cases it usually means
@@ -173,14 +172,14 @@ goroutine.
 
 ## 5. Defaults
 
-| Thing | New install | Existing install (upgrade) |
-|---|---|---|
-| Encryption | key required (**§3**) | refuses to start until `encrypt-database` runs, or `--notencrypt` is passed |
-| `POST /api/contact-requests` | **off** → `503 disabled` | keeps its state. Banner until a root acknowledges and sets a retention. Nothing is deleted before that |
-| IP mode | **`hashed`** | **`full`**, because the stored IPs are full. Banner asks the root to choose. Switching to `hashed` offers *Hash the IPs already stored* (irreversible, confirmed) |
-| `POST /api/agent/summaries` | **off** → `503 summaries-disabled` | as contact requests |
-| Agent | off (as today) | keeps its state. Banner until the agent notice is acknowledged |
-| Full user agent in views | stored only in `full` mode | as the IP mode |
+| Thing | Default |
+|---|---|
+| Encryption | key required, or `--notencrypt` for debugging (**§3**) |
+| `POST /api/contact-requests` | **off** → `503 disabled` |
+| IP mode | **`hashed`** |
+| `POST /api/agent/summaries` | **off** → `503 summaries-disabled` |
+| Agent | off (as today) |
+| Full user agent in views | stored only in `full` mode |
 
 ---
 
@@ -195,7 +194,7 @@ goroutine.
 - **IP key:** 32 random bytes, created on the first start and kept in `privacy-setting.ip-key`. It is
   encrypted by the storage layer like every value, so a stolen disk or backup without
   `EMISSARIO_ENCRYPT_KEY` does not reveal it. It is **not derived** from `EMISSARIO_ENCRYPT_KEY`:
-  rotating that key with `encrypt-database` must not change the hashes.
+  rotating that key with `rotate-encrypt-key` must not change the hashes.
   - This is the password scheme with its two differences made explicit: the salt is **one for all rows**,
     so the same IP gives the same value, and it is **secret**, kept apart from the hashes.
   - **Do not reuse `passworddeps` (`pbkdf2password`).** Its fresh random salt per hash gives the same IP
@@ -364,7 +363,7 @@ JSON twins under `/api/admin/root/`, named `api-` + the last path segment, as in
 `export-contact-requests`.
 
 **Banners** on every backoffice page (root): running `--notencrypt` · a feature on without its current
-acknowledgement · a retention not set · snapshots holding data past retention.
+acknowledgement · snapshots holding data past retention.
 
 ---
 
@@ -387,7 +386,7 @@ New fields: `contact-setting.retention-days` · `agent-setting.summaries-enabled
 | Keep `encryptedstorage`, or `adapters/impls/<encrypted-keep>/` | the storage wrapper (**§3**) |
 | `sandbox/internal/commands/middleware/database_encryption/` | key / `--notencrypt` in front of every command |
 | `sandbox/internal/commands/middleware/privacy_start_server/` | the retention goroutine |
-| `sandbox/internal/commands/…/generate_encrypt_key/`, `…/encrypt_database/` | the two new commands |
+| `sandbox/internal/commands/…/generate_encrypt_key/`, `…/rotate_encrypt_key/` | the two new commands |
 | `sandbox/internal/databases/privacy_db/` | **§11** |
 | `assets/privacy/notices/*.md`, `assets/privacy/privacy-notice-draft.md` | notice texts, draft template |
 | `assets/backoffice/privacy_*.html`, `backofficerender/privacy_*.go`, `backofficeapi/privacy.go` | pages and JSON |
@@ -406,7 +405,7 @@ because losing it loses the data.
 - `git` started by the sync has no `EMISSARIO_ENCRYPT_KEY` in its environment.
 - With the default settings: contact requests → `503 disabled`, summaries → `503 summaries-disabled`,
   views hold `h:` hashes and no user agent.
-- The same IP always gives the same hash, also after a restart and after `encrypt-database` rotates
+- The same IP always gives the same hash, also after a restart and after `rotate-encrypt-key` rotates
   `EMISSARIO_ENCRYPT_KEY`. After *Rotate IP key* it gives another. Two IPv6 addresses in one `/64` give
   one hash. `ip-key` never appears in clear in an encrypted `data/`.
 - An IP hash older than the IP retention is blanked by the cleanup.
@@ -416,8 +415,6 @@ because losing it loses the data.
   blanked and its record kept.
 - A viewer never receives a full IP from any page or API.
 - An encrypted backup restores on the same key and is refused on another.
-- Upgrade: a plaintext database with contacts on still runs (with `--notencrypt`) or migrates
-  (`encrypt-database`), and nothing is deleted before a root saves a retention.
 
 ## Important
 - Every yaml through agnos commands (`add-database`, `add-table-field`, `add-route`,
