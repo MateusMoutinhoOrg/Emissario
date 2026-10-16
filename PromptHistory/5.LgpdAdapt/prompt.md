@@ -8,7 +8,9 @@ every piece of personal data deleted when its retention ends, and every risky ch
 notice that names the law and is acknowledged on record.
 
 Every privacy choice is made by a root **in the backoffice** (a page and its `/api/admin` JSON twin).
-The one exception is the encryption key, which comes from the environment.
+The one exception is the encryption key, which comes from the environment. **Presets** (**§11**) apply a
+whole policy in one step (LGPD, GDPR, both, or the company's own), with the same notices. They are
+exported to configure other servers the same way, and they show when a server drifts from its policy.
 
 > The notices written below are product information, not legal advice. The operator of the website is
 > the **controller** (LGPD art. 5 VI; GDPR art. 4(7)). Emissario helps them comply and cannot comply for
@@ -34,7 +36,7 @@ The one exception is the encryption key, which comes from the environment.
 | **LGPD** — Lei 13.709/2018 (BR) | 3 (scope: data collected in Brazil or offer to people in Brazil) · 5 I, III, VI · 6 III (necessity), VI (transparency), VII (security), X (accountability) · 7 I, V, VI, IX (legal bases) · 9 (information to the data subject) · 10 (legitimate interest: balancing, transparency) · 12 (anonymised data) · 15–16 (end of processing, deletion) · 18 (rights) · 33 (international transfer) · 37 (records of processing) · 41 (encarregado) · 46 §2 (security from the design phase) · 48 (incidents) · 52 (fines: up to 2% of revenue in Brazil, capped at R$ 50 million per infraction) |
 | **ANPD resolutions** | CD/ANPD 2/2022 (small-scale agents: simplified records, no encarregado required but a contact channel required) · CD/ANPD 15/2024 (incident communication within **3 business days**) · CD/ANPD 19/2024 (international transfers, standard contractual clauses) · Legitimate interest guide (2024) |
 | **Marco Civil da Internet** — Lei 12.965/2014 (BR) | 5 VIII (access log = date/time of use from an IP) · 10 (confidentiality, disclosure only on a court order) · 15 (6 months of access logs for for-profit legal entities) · 16 II (no data beyond the purpose) |
-| **GDPR** — Reg. (EU) 2016/679 | 3(2) (applies to a non-EU site that targets people in the EU) · 4(1), 4(5) · 5(1)(b)(c)(e)(f), 5(2) · 6(1)(a)(b)(f) · 11 (no duty to re-identify) · 13 (information at collection) · 15–21 (rights) · 25 (data protection by design and by default) · 27 (EU representative) · 28 (processor contract) · 30 (records) · 32 (security, encryption) · 33 (72 h breach notification) · 34(3)(a) (no need to tell people when the data was encrypted) · 44–49 (transfers) · 83 (fines up to €20 million or 4%) |
+| **GDPR** — Reg. (EU) 2016/679 | 3(2) (applies to a non-EU site that targets people in the EU) · 4(1), 4(5) · 5(1)(b)(c)(e)(f), 5(2) · 6(1)(a)(b)(f) · 11 (no duty to re-identify) · 13 (information at collection) · 15–21 (rights) · 25 (data protection by design and by default) · 27 (EU representative) · 28 (processor contract) · 30 (records) · 32 (security, encryption) · 33 (72 h breach notification) · 34(3)(a) (no need to tell people when the data was encrypted) · 37–39 (DPO, when required) · 44–49 (transfers) · 83 (fines up to €20 million or 4%) |
 | **CJEU** | C-582/14 *Breyer* (2016): a dynamic IP is personal data for a website operator · C-413/23 P *EDPS v SRB* (2025): pseudonymised data stays personal for whoever can re-identify it |
 | **ePrivacy Directive** 2002/58/EC art. 5(3) | Emissario writes no cookie and runs no script on visitors' devices, so its analytics needs no consent banner. A chat history the website keeps in the browser is strictly necessary for the service the visitor asked for. |
 | **EU AI Act** — Reg. (EU) 2024/1689 | art. 50(1): tell people they are interacting with an AI, applicable since 2 Aug 2026 · art. 99(4): fines up to €15 million or 3% |
@@ -331,6 +333,8 @@ Generated from **§4**: *You set N days. Above T days, the references below ask 
 ## 10. Privacy page — `/admin/root/set-privacy-settings` (root)
 Linked from the top bar (root) and from the home page.
 
+- **Preset** (**§11**), first on the page: *Preset: LGPD v1, applied on 2026-10-15 by maria*, or *No
+  preset (install defaults)*. It lists the settings that differ from it and links to the Presets page.
 - **Encryption** (read only): on/off, `key_id`, algorithm.
 - **IP mode** and **IP retention**, with the Brazil note (**§6**). Danger zone, each irreversible and
   confirmed with `data-confirm`: *Hash the IPs already stored* · *Rotate IP key*.
@@ -340,12 +344,15 @@ Linked from the top bar (root) and from the home page.
 - **Privacy notice draft**: text built from the current settings. It covers what is kept, why, for how
   long, the model provider's host, that no cookie is set, the rights, and placeholders for the
   controller, the contact and the encarregado/DPO. The root copies it into the website. It is marked
-  *draft — review it*.
+  *draft — review it*. Its template is `privacy-setting.notice-draft`: `br` (pt-BR: controlador,
+  encarregado, ANPD, Marco Civil logs), `eu` (en: controller, DPO, EU representative, supervisory
+  authority) or `br-eu` (both, the default). A preset sets it (**§11**).
 - **Find and erase a person** (LGPD art. 18; GDPR arts. 15, 17): an IP (hashed with the current IP key
   in `hashed` mode) or a text (email, phone). It shows the matches in contact requests, views and agent
   usage, with **Export JSON** and **Delete all** (confirmed). Hashes made before a *Rotate IP key* no
   longer match, and the page says so (GDPR art. 11).
-- **History**: the acknowledgements and privacy setting changes, newest first.
+- **History**: the acknowledgements (`privacy-acknowledgement`) and the privacy setting changes, preset
+  applications and checklist ticks (`privacy-change`), newest first.
 - **Backup retention** (**§4**).
 
 | Route name | Method and path |
@@ -363,34 +370,181 @@ JSON twins under `/api/admin/root/`, named `api-` + the last path segment, as in
 `export-contact-requests`.
 
 **Banners** on every backoffice page (root): running `--notencrypt` · a feature on without its current
-acknowledgement · snapshots holding data past retention.
+acknowledgement · snapshots holding data past retention · settings that differ from the active preset ·
+a new version of the active preset (**§11**).
 
 ---
 
-## 11. Database — `privacy-db` (key-prefix `privacydb`)
+## 11. Presets — `/admin/root/privacy-presets` (root)
+
+A large customer asks two things of a privacy setup: *prove that this server follows our policy* and *set
+up the other servers the same way*. A **preset** is a named, versioned and complete set of values for the
+privacy settings, each value with its reference. Applying one **is** saving those settings. It goes
+through the same ranges (**§4**), the same notices (**§9**) and the same record. It is a shortcut and a
+proof, never a way around them. It does not make the operator compliant, and the checklist below lists
+what is left to them.
+
+### What a preset sets
+| Sets | Never sets |
+|---|---|
+| `privacy-setting.ip-mode`, `ip-retention-days`, `backup-retention-days`, `notice-draft` · `contact-setting.retention-days` · `visualization-setting.retention-days` · `agent-setting.summary-retention-days` | **Whether** data is collected: `contact-setting.enabled`, `agent-setting.enabled` and `agent-setting.summaries-enabled` stay as they are. A preset says how data is kept, and a root still decides whether to keep it (**§2**). The keys (`EMISSARIO_ENCRYPT_KEY`, `ip-key`). Rate limits and sizes |
+
+A preset holds **every** setting of the left column, so applying it always gives a known state. A preset
+with a missing or unknown setting is refused.
+
+### Built-in presets — `assets/privacy/presets/<id>.json`
+| Setting | `lgpd` v1 — for-profit company in Brazil | `gdpr` v1 — EU | `lgpd-gdpr` v1 — Brazilian company that also serves the EU |
+|---|---|---|---|
+| IP mode | **`full`**: Marco Civil art. 15 requires the access log, and a hash cannot answer a court order for the IP (art. 10) | `hashed`: minimisation and privacy by default (GDPR arts. 5(1)(c), 25) | **`full`** (Marco Civil art. 15) |
+| IP retention | 184: at least 6 months (Marco Civil art. 15) | 184: CNIL 2021-122, 6 months–1 year | 184: the span that meets both |
+| Contact request | 180 | 180 | 180 |
+| Visualization view | 90 | 90 | 90 |
+| Agent summary | 90 | 90 | 90 |
+| Backup snapshot | 90: data in a snapshot lives up to its retention + 90 days (184 + 90 < 1 year) | 90 | 90 |
+| Notice draft (**§10**) | `br` | `eu` | `br-eu` |
+| Notices asked when applied | `ip-full-v1` | – | `ip-full-v1` |
+
+Neither law sets a number of days (**§1**), so the retentions are the same in all three. The presets
+differ where the laws differ: the IP mode, the notice draft and the checklist. A Brazilian company that
+keeps the access logs in its reverse proxy instead (**§6**) saves a custom preset from `lgpd` with
+`hashed`.
+
+### Controller checklist
+Each preset carries the obligations that Emissario cannot fulfil for the operator. The Presets page lists
+the items of the active preset. A root marks each one done with an **evidence** text (where the document
+is, a ticket, a link), and each tick is a `privacy-change` row. Emissario does not verify the items, and
+the page says *your own record, not a certification*. Items marked `agent` show only while the agent is
+on.
+
+| Item | `lgpd` | `gdpr` | `lgpd-gdpr` |
+|---|---|---|---|
+| Privacy notice published on the website (draft in **§10**) | art. 9 | art. 13 | both |
+| Encarregado / DPO named, and their contact published | art. 41 (small-scale agents: a contact channel, Res. CD/ANPD 2/2022) | arts. 37–39, when required | both |
+| Records of processing (start from *What this server keeps*, **§10**) | art. 37 | art. 30 | both |
+| Legitimate interest balancing test for IPs and analytics | art. 10, ANPD guide 2024 | art. 6(1)(f) | both |
+| Incident response plan | ANPD within 3 business days (Res. CD/ANPD 15/2024) | authority within 72 h (art. 33) | both |
+| Access logs disclosed only on a court order | Marco Civil art. 10 | – | Marco Civil art. 10 |
+| EU representative, if established outside the EU | – | art. 27 | art. 27 |
+| `agent` · Processing terms signed with the model provider, transfer checked | art. 33, Res. CD/ANPD 19/2024 | arts. 28, 44–49 | both |
+| `agent` · The chat UI tells visitors they are talking to an AI | – | AI Act art. 50(1) | AI Act art. 50(1) |
+
+### Applying a preset
+1. **Preview** (`preview-privacy-preset-page`): every setting with its current value, the preset's
+   value and the reference. Equal values are greyed out. The preview also says what happens to stored
+   data:
+   - a shorter retention: *N contact requests, M views, K snapshots… will be deleted at the next
+     cleanup*, counted now with the same rules as the cleanup (**§4**);
+   - `full` → `hashed`: new IPs are hashed, and stored full IPs stay until their retention ends or until
+     *Hash the IPs already stored* (**§10**);
+   - `hashed` → `full`: only new IPs are stored in full, and stored hashes stay hashes.
+2. **Apply**, confirmed with `data-confirm` when something will be deleted. Every value is validated
+   (**§4**) before any is written. The notices that the new values need are shown together in one panel.
+   The JSON twin answers the `409` of **§9** with a list, `"notices":[…]`, and expects all of them in
+   `acknowledge`.
+3. **Record**: `privacy-setting.preset` = `lgpd@1`, with `preset-applied-at` and `preset-applied-by`,
+   and one `privacy-change` row with source `preset:lgpd@1` and the values before and after.
+
+**Automation** (provisioning many servers) goes through the JSON twin with a root API token:
+`apply-privacy-preset {"preset":"lgpd@1","acknowledge":["ip-full-v1"]}`. The acknowledgement is recorded
+under the token's user, like any other.
+
+### Active preset and drift
+- A preset is a starting point, not a lock. A setting it covers can still be changed on its own page.
+  When one differs, the Privacy page and a root banner say *2 settings differ from LGPD v1*, with the
+  list, and offer **Re-apply** or **Detach**. Detaching makes the server *Custom* and is recorded.
+- `GET /api/admin/root/check-privacy-preset` gives the state in one call, for an operator that watches
+  many servers:
+  `{"preset":"lgpd@1","conform":false,"differences":[{"setting":"ip-retention-days","preset":184,"current":90}],"checklist":{"done":5,"total":7},"encrypted":true,"pending-notices":[]}`
+
+### Custom presets
+A company's DPO usually has a policy of their own: a shorter retention, `hashed` with the reverse proxy
+keeping the logs, more checklist items.
+- **Save current settings as preset**: a name and a description. The checklist is copied from the active
+  preset (`lgpd-gdpr` when there is none), and the root can add items (text and reference).
+- **Export** (`export-privacy-preset`) downloads the JSON. **Import** (paste or upload) checks it against
+  the format, the ranges (**§4**) and the known drafts, then stores it without applying it.
+- Versions never change. Editing a preset saves `v2`, so the history and the drift check always point to
+  fixed values. Built-in presets are read only.
+- A custom preset that is not active can be deleted. Its values stay in the `privacy-change` rows of the
+  history.
+- A custom preset cannot add notices, settings or drafts. Those are code (**§9**, **§10**).
+
+### Format
+```json
+{
+  "format": 1,
+  "id": "lgpd",
+  "version": 1,
+  "name": "LGPD — for-profit company in Brazil",
+  "description": "…",
+  "jurisdictions": ["BR"],
+  "values": {
+    "ip-mode":                {"value": "full", "reference": "Marco Civil art. 15 …"},
+    "ip-retention-days":      {"value": 184,    "reference": "…"},
+    "contact-retention-days": {"value": 180,    "reference": "…"},
+    "view-retention-days":    {"value": 90,     "reference": "…"},
+    "summary-retention-days": {"value": 90,     "reference": "…"},
+    "backup-retention-days":  {"value": 90,     "reference": "…"},
+    "notice-draft":           {"value": "br"}
+  },
+  "checklist": [{"id": "encarregado", "text": "…", "reference": "LGPD art. 41", "when": "always"}],
+  "changes": "First version."
+}
+```
+`when` is `always` or `agent`. Unknown keys are refused.
+
+### New versions of the built-in presets
+When the law or a regulator's reference changes (for example PL 2338/2023 or the EU data omnibus, **§1**),
+a release ships a new version (`lgpd@2`) with `changes` filled in. A server on `lgpd@1` keeps its
+values and shows the banner *LGPD v2 is available* with the differences. Nothing is applied
+automatically: the law changes, and the root decides.
+
+| Route name | Method and path |
+|---|---|
+| `privacy-presets-page` | `GET /admin/root/privacy-presets` |
+| `preview-privacy-preset-page` | `GET /admin/root/preview-privacy-preset` |
+| `apply-privacy-preset-form` | `POST /admin/root/apply-privacy-preset` |
+| `save-privacy-preset-form` | `POST /admin/root/save-privacy-preset` |
+| `import-privacy-preset-form` | `POST /admin/root/import-privacy-preset` |
+| `export-privacy-preset` | `GET /admin/root/export-privacy-preset` |
+| `delete-privacy-preset-form` | `POST /admin/root/delete-privacy-preset` |
+| `detach-privacy-preset-form` | `POST /admin/root/detach-privacy-preset` |
+| `set-privacy-checklist-form` | `POST /admin/root/set-privacy-checklist` |
+
+JSON twins under `/api/admin/root/`: `list-privacy-presets`, `preview-privacy-preset`,
+`apply-privacy-preset`, `save-privacy-preset`, `import-privacy-preset`, `export-privacy-preset`,
+`delete-privacy-preset`, `detach-privacy-preset`, `check-privacy-preset`, `set-privacy-checklist`.
+
+---
+
+## 12. Database — `privacy-db` (key-prefix `privacydb`)
 | Table | Fields |
 |---|---|
-| `privacy-setting` (one record) | `ip-mode` (`hashed`/`full`), `ip-key` (bytes, 32), `ip-key-rotated-at`, `ip-retention-days`, `backup-retention-days` |
+| `privacy-setting` (one record) | `ip-mode` (`hashed`/`full`), `ip-key` (bytes, 32), `ip-key-rotated-at`, `ip-retention-days`, `backup-retention-days`, `notice-draft` (`br`/`eu`/`br-eu`), `preset` (`<id>@<version>`, blank = none), `preset-applied-at`, `preset-applied-by` |
 | `privacy-acknowledgement` | `at`, `user-id`, `username`, `notice` (`contacts-v1`…), `values` (JSON of what was saved) |
+| `privacy-change` | `at`, `user-id`, `username`, `source` (`manual`, `preset:<id>@<version>`, `detach`, `checklist`), `before` (JSON), `after` (JSON). Every privacy setting change writes one, from any page (**§2**) |
+| `privacy-preset` (custom only, the built-ins are in `assets/`) | `preset-id`, `version`, `name`, `json` (the whole preset), `created-at`, `created-by` |
+| `privacy-checklist` | `item`, `done`, `evidence`, `at`, `user-id`, `username` |
 
 New fields: `contact-setting.retention-days` · `agent-setting.summaries-enabled`,
 `agent-setting.summary-retention-days`.
 
 ---
 
-## 12. Where it lives
+## 13. Where it lives
 | Path | What |
 |---|---|
-| `sandbox/internal/privacy/` | modes, IP key and HMAC, retention rules and cleanup, notices and acknowledgements, notice draft, find/erase |
+| `sandbox/internal/privacy/` | modes, IP key and HMAC, retention rules and cleanup, notices and acknowledgements, notice draft, find/erase, presets (load, validate, preview, apply, drift, checklist) |
 | `sandbox/internal/encryption/` | key parsing, HKDF, value format, `encryption.json` check |
 | Keep `encryptedstorage`, or `adapters/impls/<encrypted-keep>/` | the storage wrapper (**§3**) |
 | `sandbox/internal/commands/middleware/database_encryption/` | key / `--notencrypt` in front of every command |
 | `sandbox/internal/commands/middleware/privacy_start_server/` | the retention goroutine |
 | `sandbox/internal/commands/…/generate_encrypt_key/`, `…/rotate_encrypt_key/` | the two new commands |
-| `sandbox/internal/databases/privacy_db/` | **§11** |
-| `assets/privacy/notices/*.md`, `assets/privacy/privacy-notice-draft.md` | notice texts, draft template |
-| `assets/backoffice/privacy_*.html`, `backofficerender/privacy_*.go`, `backofficeapi/privacy.go` | pages and JSON |
-| `docs/Privacy/doc.md` | the doc, with the law tables of **§1** |
+| `sandbox/internal/databases/privacy_db/` | **§12** |
+| `assets/privacy/notices/*.md`, `assets/privacy/notice-drafts/{br,eu,br-eu}.md` | notice texts, draft templates |
+| `assets/privacy/presets/{lgpd,gdpr,lgpd-gdpr}.json` | built-in presets (**§11**); a new version is a new file, the old one stays |
+| `assets/backoffice/privacy_*.html`, `backofficerender/privacy_*.go`, `backofficeapi/privacy.go` | pages and JSON, presets included |
+| `docs/Privacy/doc.md` | the doc, with the law tables of **§1** and the presets of **§11** |
 
 Update `docs/ContactRequests`, `docs/Visualization`, `docs/Agent` and `docs/Backups`, and the README
 quick start, which needs `EMISSARIO_ENCRYPT_KEY=$(emissario generate-encrypt-key)`. Store the key safely,
@@ -398,7 +552,7 @@ because losing it loses the data.
 
 ---
 
-## 13. Acceptance
+## 14. Acceptance
 - `ls`/`cat` on `data/` shows no IP, email, contact body, summary or api key in clear. A test greps the
   data folder after inserting known values.
 - Each row of the start-up table (**§3**) has a test, including the wrong key and both key and flag set.
@@ -415,6 +569,22 @@ because losing it loses the data.
   blanked and its record kept.
 - A viewer never receives a full IP from any page or API.
 - An encrypted backup restores on the same key and is refused on another.
+- Presets:
+  - `apply-privacy-preset {"preset":"lgpd@1"}` without `acknowledge` → `409` listing `ip-full-v1`, and
+    nothing is written. With it → `200`, every setting equals the preset, `privacy-setting.preset` is
+    `lgpd@1`, and there is one `privacy-change` row and one `privacy-acknowledgement` row.
+  - `gdpr@1` on a fresh install needs no notice.
+  - Applying never changes `contact-setting.enabled`, `agent-setting.enabled` or
+    `agent-setting.summaries-enabled`.
+  - An imported preset with one value out of range, a missing setting or an unknown key is refused, and
+    nothing is written.
+  - Changing `ip-retention-days` by hand after applying → `check-privacy-preset` gives `conform:false`
+    with that difference. *Re-apply* → `conform:true`. *Detach* → `preset` blank and a `privacy-change`
+    row.
+  - The counts in the preview equal what the next cleanup deletes.
+  - Export on one server, import and apply on another → the same settings on both.
+  - A built-in preset cannot be edited or deleted, a saved version cannot be changed in place, and the
+    active preset cannot be deleted.
 
 ## Important
 - Every yaml through agnos commands (`add-database`, `add-table-field`, `add-route`,
@@ -422,7 +592,7 @@ because losing it loses the data.
   `agnos build`.
 - Never log a decrypted value, a key, an IP or a contact body. Errors name the field, not the value.
 - Suggested order: encryption → `privacy-db` and notices → IP modes → contacts → agent and summaries →
-  retention and backups → Privacy page → docs.
+  retention and backups → Privacy page → presets → docs.
 
 ## Out of scope
 - A cookie banner or consent manager: Emissario sets no cookie on visitors.
@@ -430,5 +600,9 @@ because losing it loses the data.
 - A blocklist by IP hash (*Block* on a visitor, contact request or usage row → `403` for that hash). The
   stable hash of **§6** makes it possible later.
 - KMS, HSM or a key server: the key comes from the environment.
-- Automatic per-country configuration, and laws other than BR/EU (UK GDPR, US state laws).
+- Choosing a preset automatically by country: a root chooses it (**§11**).
+- Built-in presets, notices and drafts for laws other than BR/EU (UK GDPR, US state laws). A custom
+  preset can hold their values, but not their notices.
+- Locking a server to a preset (refusing changes that leave it). The drift check and
+  `check-privacy-preset` show those changes instead of blocking them.
 - Legal advice: the notices inform, and the operator decides.
