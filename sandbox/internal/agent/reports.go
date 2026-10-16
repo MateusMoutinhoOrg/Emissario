@@ -3,6 +3,7 @@ package agent
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/agent_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -202,7 +203,7 @@ func Usage(sandbox *api.Sandbox, period Period, root bool) (UsageReport, error) 
 		if row.Ip == "" {
 			continue
 		}
-		key := IpKey(sandbox, row.Ip)
+		key := privacy.StoredKey(sandbox, row.Ip)
 		ip, ok := ips[key]
 		if !ok {
 			ip = &UsageIp{Ip: key}
@@ -277,7 +278,7 @@ func todayTally(sandbox *api.Sandbox) Tally {
 		used := row.InputTokens + row.OutputTokens
 		tally.Total += used
 		if row.Ip != "" {
-			tally.ByIp[IpKey(sandbox, row.Ip)] += used
+			tally.ByIp[privacy.StoredKey(sandbox, row.Ip)] += used
 		}
 	}
 	return tally

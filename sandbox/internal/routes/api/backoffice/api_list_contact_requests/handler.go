@@ -6,6 +6,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeapi"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeauth"
 )
 
 // Handle answers POST /api/admin/list-contact-requests, the JSON twin of the
@@ -31,5 +32,5 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 	if err != nil {
 		return err
 	}
-	return sandbox.Deps.OpinionatedAgnosServer.WriteJSON(sandbox.Deps.SerializableDeps, *response, api.StatusOK, backofficeapi.ContactRequestsJSON(sandbox, requests, paging))
+	return sandbox.Deps.OpinionatedAgnosServer.WriteJSON(sandbox.Deps.SerializableDeps, *response, api.StatusOK, backofficeapi.ContactRequestsJSON(sandbox, requests, paging, backofficeauth.Role(props.User.Role) == backofficeauth.RoleRoot))
 }

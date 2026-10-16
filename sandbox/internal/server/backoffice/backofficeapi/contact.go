@@ -9,15 +9,16 @@ import (
 )
 
 // ContactRequestJSON is one contact request: {id, at, ip, country, archived,
-// size, body, body_text}. body is the JSON value it holds — the text as sent,
+// size, body, body_text}. ip is as stored to a root — a hash, or the ip in
+// the full mode — and shown as privacy.ShowIp shows it to a viewer. body is the JSON value it holds — the text as sent,
 // were it ever not to parse — read back the way JSON is: its keys sorted and
 // its numbers as doubles, so an integer past 2^53 is rounded; body_text is
 // the text exactly as it was sent.
-func ContactRequestJSON(sandbox *api.Sandbox, request contact_db.ContactRequestRecord) *serializabledeps.SerializableObject {
+func ContactRequestJSON(sandbox *api.Sandbox, request contact_db.ContactRequestRecord, root bool) *serializabledeps.SerializableObject {
 	item := sandbox.Deps.SerializableDeps.CreateObject()
 	item.AddItemToObject("id", request.Ref)
 	item.AddItemToObject("at", request.At)
-	item.AddItemToObject("ip", request.Ip)
+	item.AddItemToObject("ip", visualization.ShownIp(sandbox, request.Ip, root))
 	item.AddItemToObject("country", request.Country)
 	item.AddItemToObject("archived", request.Archived != 0)
 	item.AddItemToObject("size", request.Size)
@@ -31,18 +32,18 @@ func ContactRequestJSON(sandbox *api.Sandbox, request contact_db.ContactRequestR
 }
 
 // ContactRequestResponseJSON is {contact_request}.
-func ContactRequestResponseJSON(sandbox *api.Sandbox, request contact_db.ContactRequestRecord) *serializabledeps.SerializableObject {
+func ContactRequestResponseJSON(sandbox *api.Sandbox, request contact_db.ContactRequestRecord, root bool) *serializabledeps.SerializableObject {
 	document := sandbox.Deps.SerializableDeps.CreateObject()
-	document.AddItemToObject("contact_request", ContactRequestJSON(sandbox, request))
+	document.AddItemToObject("contact_request", ContactRequestJSON(sandbox, request, root))
 	return document
 }
 
 // ContactRequestsJSON is one page of the contact requests: {contact_requests,
 // total, page, pages, limit}.
-func ContactRequestsJSON(sandbox *api.Sandbox, requests []contact_db.ContactRequestRecord, paging visualization.Paging) *serializabledeps.SerializableObject {
+func ContactRequestsJSON(sandbox *api.Sandbox, requests []contact_db.ContactRequestRecord, paging visualization.Paging, root bool) *serializabledeps.SerializableObject {
 	list := sandbox.Deps.SerializableDeps.CreateArray()
 	for _, request := range requests {
-		list.AddItemToArray(ContactRequestJSON(sandbox, request))
+		list.AddItemToArray(ContactRequestJSON(sandbox, request, root))
 	}
 	document := sandbox.Deps.SerializableDeps.CreateObject()
 	document.AddItemToObject("contact_requests", list)

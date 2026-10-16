@@ -6,6 +6,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routeprops"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeapi"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeauth"
 )
 
 // Handle answers POST /api/admin/get-contact-request, the JSON twin of one
@@ -20,5 +21,5 @@ func Handle(sandbox *api.Sandbox, props *routeprops.RouteProps, input *Input, re
 	if !ok {
 		return sandbox.Deps.OpinionatedAgnosServer.Fail(api.StatusNotFound, "id", "no contact request has this id")
 	}
-	return sandbox.Deps.OpinionatedAgnosServer.WriteJSON(sandbox.Deps.SerializableDeps, *response, api.StatusOK, backofficeapi.ContactRequestResponseJSON(sandbox, request))
+	return sandbox.Deps.OpinionatedAgnosServer.WriteJSON(sandbox.Deps.SerializableDeps, *response, api.StatusOK, backofficeapi.ContactRequestResponseJSON(sandbox, request, backofficeauth.Role(props.User.Role) == backofficeauth.RoleRoot))
 }

@@ -3,7 +3,7 @@ package visualization
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/visualization_db"
-	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficehttp"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 )
 
 // Every page and every api of the visualization reads the same filters, under
@@ -61,6 +61,8 @@ type Filter struct {
 	Ip string
 	// IpRange is true when Ip is a CIDR range.
 	IpRange bool
+	// IpMatch matches Ip against what a view stores: a hash, or an ip.
+	IpMatch privacy.IpFilter
 	// Country is one ISO code, upper case.
 	Country string
 	// Device, Browser and Os are one value of Devices, Browsers and
@@ -138,11 +140,11 @@ func ParseFilter(sandbox *api.Sandbox, raw RawFilter, root bool) (Filter, *Refus
 		if !root {
 			return filter, &Refusal{Status: api.StatusForbidden, Field: KeyIp, Message: "Only a root filters the views by ip."}
 		}
-		canonical, ok := backofficehttp.CanonicalIpOrRange(sandbox, ip)
-		if !ok {
-			return filter, refuse(KeyIp, "ip is one ip (203.0.113.7) or one CIDR range (203.0.113.0/24).")
+		match, refusal := privacy.ParseIpFilter(sandbox, KeyIp, ip)
+		if refusal != nil {
+			return filter, &Refusal{Status: refusal.Status, Field: refusal.Field, Message: refusal.Message}
 		}
-		filter.Ip, filter.IpRange = canonical, strings.Contains(canonical, "/")
+		filter.Ip, filter.IpRange, filter.IpMatch = match.Text, match.Range, match
 	}
 
 	if country := strings.ToUpper(strings.TrimSpace(raw.Country)); country != "" {
@@ -260,7 +262,7 @@ func matches(sandbox *api.Sandbox, filter Filter, view visualization_db.Visualiz
 		return false
 	case filter.Status != 0 && view.Status != filter.Status:
 		return false
-	case filter.Ip != "" && !backofficehttp.IpMatches(sandbox, filter.Ip, view.Ip):
+	case filter.Ip != "" && !filter.IpMatch.Matches(sandbox, view.Ip):
 		return false
 	}
 	return true

@@ -2,6 +2,7 @@ package visualization
 
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficehttp"
 )
 
@@ -29,29 +30,19 @@ func Unrouted(sandbox *api.Sandbox, ip string) bool {
 
 // MaskIp is ip as a viewer reads it: an IPv4 one without its last byte
 // (203.0.113.xxx), an IPv6 one with its first 48 bits alone
-// (2001:db8:1:xxxx:…). A root reads every ip whole.
+// (2001:db8:1:xxxx:…).
 func MaskIp(sandbox *api.Sandbox, ip string) string {
-	address, ok := backofficehttp.ParseIp(sandbox, ip)
-	if !ok {
-		return "xxx"
-	}
-	strings := sandbox.Deps.StringsDeps
-	full := backofficehttp.FormatIp(sandbox, address)
-	if !strings.Contains(full, ":") {
-		return full[:strings.LastIndex(full, ".")] + ".xxx"
-	}
-	groups := []string{}
-	for index := 0; index < 3; index++ {
-		group := int64(address[2*index])<<8 | int64(address[2*index+1])
-		groups = append(groups, strings.FormatInt(group, 16))
-	}
-	return strings.Join(groups, ":") + ":xxxx:…"
+	return privacy.MaskIp(sandbox, ip)
 }
 
-// ShownIp is ip as the reader reads it: whole to a root, masked to a viewer.
+// ShownIp is ip — an ip or a hash, as a view stores it — as the reader gets
+// it from a listing: as stored to a root, who filters by it, and as
+// privacy.ShowIp shows it to a viewer — a hash shortened, an ip masked unless
+// the settings show viewers full IPs. A page shows a root's through
+// privacy.ShowIp too.
 func ShownIp(sandbox *api.Sandbox, ip string, root bool) string {
 	if root {
 		return ip
 	}
-	return MaskIp(sandbox, ip)
+	return privacy.ShowIp(sandbox, ip, false)
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serializabledeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/contact_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficehttp"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/snapshots"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
@@ -63,7 +64,8 @@ func Admit(sandbox *api.Sandbox, ip string, origin string, host string) (Setting
 
 // Receive checks body — at most settings.MaxBytes bytes of any JSON value —
 // and hands it to the writer as a contact request from ip, exactly as it was
-// sent, with the country of ip. It answers the id of the contact request:
+// sent, with the country of ip; the request keeps ip as the IP mode says,
+// hashed by default. It answers the id of the contact request:
 // 413 for a body too large, 400 for one that is not JSON, 503 with the queue
 // full.
 func Receive(sandbox *api.Sandbox, settings Settings, ip string, body []byte) (string, *Refusal) {
@@ -77,10 +79,14 @@ func Receive(sandbox *api.Sandbox, settings Settings, ip string, body []byte) (s
 	if err != nil {
 		return "", failed(sandbox, "the id of a contact request could not be drawn", err)
 	}
+	stored, err := privacy.Store(sandbox, ip)
+	if err != nil {
+		return "", failed(sandbox, "the ip of a contact request could not be hashed", err)
+	}
 	queued := enqueue(sandbox, contact_db.ContactRequestInput{
 		Ref:     ref,
 		At:      NowSeconds(sandbox),
-		Ip:      ip,
+		Ip:      stored,
 		Country: visualization.Country(sandbox, ip),
 		Body:    string(body),
 		Size:    int64(len(body)),
@@ -101,18 +107,7 @@ func CreatedJSON(sandbox *api.Sandbox, ref string) *serializabledeps.Serializabl
 // ipKey is the key ip counts under: an IPv4 ip whole, an IPv6 one its /64
 // (2001:db8:1:2::/64).
 func ipKey(sandbox *api.Sandbox, ip string) string {
-	address, ok := backofficehttp.ParseIp(sandbox, ip)
-	if !ok {
-		return ip
-	}
-	full := backofficehttp.FormatIp(sandbox, address)
-	if !sandbox.Deps.StringsDeps.Contains(full, ":") {
-		return full
-	}
-	for index := 8; index < 16; index++ {
-		address[index] = 0
-	}
-	return backofficehttp.FormatIp(sandbox, address) + "/64"
+	return privacy.GroupKey(sandbox, ip)
 }
 
 // secondsToMidnight is how many seconds the day of the server has left.

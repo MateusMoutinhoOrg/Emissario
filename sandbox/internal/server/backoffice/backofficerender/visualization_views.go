@@ -5,6 +5,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/visualization_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -81,7 +82,7 @@ func RenderVisualizationViewsPage(sandbox *api.Sandbox, response *serverdeps.Res
 			Path:      view.Path,
 			Status:    sandbox.Deps.StringsDeps.FormatInt(view.Status, 10),
 			NotFound:  view.Status == visualization.StatusNotFound,
-			Ip:        view.Ip,
+			Ip:        privacy.ShowIp(sandbox, view.Ip, true),
 			Flag:      visualization.CountryFlag(sandbox, view.Country),
 			Country:   view.Country,
 			Device:    visualizationDevice(sandbox, view.Device),
@@ -97,7 +98,7 @@ func RenderVisualizationViewsPage(sandbox *api.Sandbox, response *serverdeps.Res
 	}
 	if visitor != nil {
 		card := &VisualizationVisitorCard{
-			Ip:      visitor.Ip,
+			Ip:      privacy.ShowIp(sandbox, visitor.Ip, true),
 			FirstAt: formatInstant(sandbox, visitor.FirstAt),
 			LastAt:  formatInstant(sandbox, visitor.LastAt),
 			Views:   formatCount(sandbox, visitor.Views),

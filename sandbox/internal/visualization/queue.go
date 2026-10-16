@@ -3,6 +3,7 @@ package visualization
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/visualization_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/snapshots"
 )
 
@@ -116,24 +117,39 @@ func holdForBackups(sandbox *api.Sandbox) {
 }
 
 // store writes hit as a visualization-view, unless tracking is off or its ip
-// is ignored.
+// is ignored. The country and the ignored ips read the raw ip, in memory;
+// the view keeps it as the IP mode says — hashed by default, with no user
+// agent but its device, browser and os — and the full user agent only in
+// the full mode.
 func store(sandbox *api.Sandbox, hit Hit) error {
 	settings := currentSettings(sandbox)
 	if !settings.Enabled || Ignored(sandbox, settings, hit.Ip) {
 		return nil
 	}
+	privacySettings, err := privacy.CurrentSettings(sandbox)
+	if err != nil {
+		return err
+	}
+	ip, err := privacy.StoredIp(sandbox, privacySettings, hit.Ip)
+	if err != nil {
+		return err
+	}
+	userAgent := ""
+	if privacySettings.IpMode == privacy.IpModeFull {
+		userAgent = truncate(hit.UserAgent, MaxUserAgentLength)
+	}
 	agent := ParseUserAgent(sandbox, hit.UserAgent)
-	_, err := visualization_db.New(sandbox).AddVisualizationView(visualization_db.VisualizationViewInput{
+	_, err = visualization_db.New(sandbox).AddVisualizationView(visualization_db.VisualizationViewInput{
 		At:        hit.At,
 		Path:      CleanPath(sandbox, hit.Path),
 		Page:      CanonicalPage(sandbox, hit.Path, hit.Status),
 		Status:    int64(hit.Status),
-		Ip:        hit.Ip,
+		Ip:        ip,
 		Country:   Country(sandbox, hit.Ip),
 		Device:    agent.Device,
 		Browser:   agent.Browser,
 		Os:        agent.Os,
-		UserAgent: truncate(hit.UserAgent, MaxUserAgentLength),
+		UserAgent: userAgent,
 		Referrer:  Referrer(sandbox, hit.Referer, hit.Host),
 	})
 	return err

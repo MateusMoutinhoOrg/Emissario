@@ -6,6 +6,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/contact_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -72,12 +73,12 @@ type ContactRequestLine struct {
 }
 
 // contactRequestLine is request as the list at params shows it.
-func contactRequestLine(sandbox *api.Sandbox, request contact_db.ContactRequestRecord, params []visualization.Param) ContactRequestLine {
+func contactRequestLine(sandbox *api.Sandbox, request contact_db.ContactRequestRecord, params []visualization.Param, root bool) ContactRequestLine {
 	return ContactRequestLine{
 		Id:          request.Ref,
 		Href:        contact.RequestPath + "?id=" + request.Ref,
 		At:          formatInstant(sandbox, request.At),
-		Ip:          request.Ip,
+		Ip:          privacy.ShowIp(sandbox, request.Ip, root),
 		Country:     visualization.CountryName(sandbox, request.Country),
 		Flag:        visualization.CountryFlag(sandbox, request.Country),
 		CountryHref: visualization.Href(sandbox, contact.RequestsPath, visualization.SetParam(visualization.SetParam(params, contact.KeyCountry, request.Country), "page", "")),
@@ -233,7 +234,7 @@ func RenderContactRequestsPage(sandbox *api.Sandbox, response *serverdeps.Respon
 		Today:  visualization.Today(sandbox),
 	}
 	for _, request := range requests {
-		page.Rows = append(page.Rows, contactRequestLine(sandbox, request, params))
+		page.Rows = append(page.Rows, contactRequestLine(sandbox, request, params, viewer.IsRoot))
 	}
 	page.Pager = visualizationPager(sandbox, contact.RequestsPath, params, paging, len(requests))
 	if viewer.IsRoot {
@@ -290,7 +291,7 @@ func RenderContactRequestPage(sandbox *api.Sandbox, response *serverdeps.Respons
 		Notice:      contactNotice(sandbox, notice, count),
 		Id:          request.Ref,
 		At:          formatInstant(sandbox, request.At),
-		Ip:          request.Ip,
+		Ip:          privacy.ShowIp(sandbox, request.Ip, viewer.IsRoot),
 		Country:     visualization.CountryName(sandbox, request.Country),
 		Flag:        visualization.CountryFlag(sandbox, request.Country),
 		CountryHref: visualization.Href(sandbox, contact.RequestsPath, visualization.SetParam(statusParams, contact.KeyCountry, request.Country)),

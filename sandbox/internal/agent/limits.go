@@ -3,7 +3,7 @@ package agent
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/agent_db"
-	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficehttp"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -38,34 +38,18 @@ var today = tally{byIp: map[string]int64{}, reservedByIp: map[string]int64{}}
 // tallyLock is held while today is read or written.
 var tallyLock = make(chan struct{}, 1)
 
-// IpKey is the key ip counts under: an IPv4 ip whole, an IPv6 one its /64
-// (2001:db8:1:2::/64); "" for no ip.
+// IpKey is the key ip counts under in the rate limit of every minute, in
+// memory: an IPv4 ip whole, an IPv6 one its /64 (2001:db8:1:2::/64); "" for
+// no ip.
 func IpKey(sandbox *api.Sandbox, ip string) string {
-	address, ok := backofficehttp.ParseIp(sandbox, ip)
-	if !ok {
-		return ip
-	}
-	full := backofficehttp.FormatIp(sandbox, address)
-	if !sandbox.Deps.StringsDeps.Contains(full, ":") {
-		return full
-	}
-	for index := 8; index < 16; index++ {
-		address[index] = 0
-	}
-	return backofficehttp.FormatIp(sandbox, address) + "/64"
+	return privacy.GroupKey(sandbox, ip)
 }
 
-// ShownKey is key as a viewer reads it — masked like the ips of visualization —
-// or whole to a root.
+// ShownKey is key — a hash, an ip or a /64 — as the reader reads it: a hash
+// shortened for everyone, an ip whole to a root and masked to a viewer
+// unless the settings show viewers full IPs.
 func ShownKey(sandbox *api.Sandbox, key string, root bool) string {
-	if root || key == "" {
-		return key
-	}
-	strings := sandbox.Deps.StringsDeps
-	if strings.HasSuffix(key, "/64") {
-		return visualization.MaskIp(sandbox, strings.TrimSuffix(key, "/64"))
-	}
-	return visualization.MaskIp(sandbox, key)
+	return privacy.ShowIp(sandbox, key, root)
 }
 
 // CheckRate counts one request of ip and refuses it — 429 rate-limit, retry
@@ -172,7 +156,7 @@ func LoadTally(sandbox *api.Sandbox) error {
 		used := row.InputTokens + row.OutputTokens
 		total += used
 		if row.Ip != "" {
-			byIp[IpKey(sandbox, row.Ip)] += used
+			byIp[privacy.StoredKey(sandbox, row.Ip)] += used
 		}
 	}
 	tallyLock <- struct{}{}

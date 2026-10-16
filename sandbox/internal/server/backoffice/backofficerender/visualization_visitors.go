@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -59,7 +60,7 @@ func RenderVisualizationVisitorsPage(sandbox *api.Sandbox, response *serverdeps.
 	})
 	for _, row := range rows {
 		line := VisualizationVisitorLine{
-			Ip:      row.Ip,
+			Ip:      privacy.ShowIp(sandbox, row.Ip, true),
 			Flag:    visualization.CountryFlag(sandbox, row.Country),
 			Country: visualization.CountryName(sandbox, row.Country),
 			Device:  visualizationDevice(sandbox, row.Device),

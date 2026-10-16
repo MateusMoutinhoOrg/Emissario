@@ -2,6 +2,7 @@ package agent
 
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 )
 
 // systemPromptAsset is the mandatory part of the system prompt, embedded:
@@ -73,11 +74,13 @@ func Reply(sandbox *api.Sandbox, ip string, messages []Message) (string, *Refusa
 
 // call is one provider call of the visitor at ip, limited: refused when it
 // could pass a daily limit, its max-tokens reserved while it runs, and its
-// tokens counted and queued as an agent-usage of kind once it answered. A
-// summary is recorded with no ip — its ip only counts in memory, toward the
-// limit of today.
+// tokens counted and queued as an agent-usage of kind once it answered,
+// keeping ip as the IP mode says — hashed by default. A summary is recorded
+// with no ip — its ip only counts in memory, toward the limit of today. The
+// tally counts a visitor under the key a stored row reads back as
+// (privacy.TallyKey), so the limits hold across a restart.
 func call(sandbox *api.Sandbox, settings Settings, ip string, kind string, request completionRequest) (Completion, *Refusal) {
-	key := IpKey(sandbox, ip)
+	key := privacy.TallyKey(sandbox, ip)
 	if refusal := reserve(sandbox, settings, key); refusal != nil {
 		return Completion{}, refusal
 	}
@@ -87,7 +90,11 @@ func call(sandbox *api.Sandbox, settings Settings, ip string, kind string, reque
 		return Completion{}, refusal
 	}
 	release(sandbox, settings, key, completion.InputTokens+completion.OutputTokens)
-	recorded := ip
+	recorded, err := privacy.Store(sandbox, ip)
+	if err != nil {
+		sandbox.Deps.StdDeps.Eprintf("warning: the ip of an agent call could not be hashed: %s\n", err.Error())
+		recorded = ""
+	}
 	if kind == KindSummary {
 		recorded = ""
 	}

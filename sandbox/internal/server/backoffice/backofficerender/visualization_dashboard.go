@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/visualization"
 )
 
@@ -161,7 +162,7 @@ func RenderVisualizationDashboardPage(sandbox *api.Sandbox, response *serverdeps
 		topTable(sandbox, "Not-found paths", "Path", top.NotFound, func(value string) string {
 			return visualization.Href(sandbox, visualization.DashboardPath, visualization.SetParam(visualization.SetParam(params, visualization.KeyPath, value), visualization.KeyStatus, "404"))
 		}, labelAsIs, visualization.Href(sandbox, visualization.PagesPath, visualization.SetParam(params, visualization.KeyStatus, "404")), "Every not-found page"),
-		topTable(sandbox, "Top visitors", "Visitor", top.Visitors, visitorLink, labelAsIs, visualization.Href(sandbox, visualization.VisitorsPath, params), "Every visitor"),
+		topTable(sandbox, "Top visitors", "Visitor", top.Visitors, visitorLink, labelIp, visualization.Href(sandbox, visualization.VisitorsPath, params), "Every visitor"),
 	}
 	return RenderHTML(sandbox, response, status, "backoffice/visualization_dashboard.html", page)
 }
@@ -286,4 +287,10 @@ func niceCeiling(value int) int {
 			}
 		}
 	}
+}
+
+// labelIp shows a visitor's ip as privacy.ShowIp does: a hash shortened, an
+// ip as the listing gave it.
+func labelIp(sandbox *api.Sandbox, value string) (string, string, bool) {
+	return privacy.ShowIp(sandbox, value, true), "", false
 }
