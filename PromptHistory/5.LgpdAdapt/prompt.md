@@ -3,12 +3,16 @@
 ## Objective
 Make Emissario **private by default** and give the root what they need to run it lawfully under the
 LGPD (Brazil), the Marco Civil da Internet, the GDPR (EU) and the laws next to them: the database
-encrypted at rest, IPs always hashed in the records, full IPs only in a separate **access log** that a
-root turns on (as the Marco Civil requires of Brazilian companies) and that only named readers open,
-contact requests and agent summaries off until a root turns them on, every piece of personal data deleted
-when its retention ends but never before a legal obligation or a legal hold allows it, every read of the
-access log and every erasure on record, and every risky choice preceded by a notice that names the law
-and is acknowledged on record.
+encrypted at rest, IPs hashed in the records unless a root asks for them in full, a separate **access
+log** with full IPs and source ports that a root turns on (as the Marco Civil requires of Brazilian
+companies) and that only named readers open, contact requests and agent summaries off until a root turns
+them on, every piece of personal data deleted when its retention ends, data kept by law or on a legal
+hold spared from erasure unless a root chooses otherwise, and every risky choice preceded by a notice
+that names the law.
+
+Emissario is open source and enterprise first. The defaults are the private and lawful choice, and every
+other lawful choice stays open to the root: Emissario warns and lets them do it. It keeps no record of who
+chose what, and it never builds evidence against its own user.
 
 Every privacy choice is made by a root **in the backoffice** (a page and its `/api/admin` JSON twin).
 The one exception is the encryption key, which comes from the environment. **Presets** (**§11**) apply a
@@ -28,9 +32,9 @@ exported to configure other servers the same way, and they show when a server dr
 | Storing contacts / IPs **violates** the law | Storing them is lawful when there is a legal basis, transparency, a limited retention, security and a way for people to exercise their rights. The obligations fall on the operator. | The popups list the **obligations** the root takes on, not "violations". |
 | Warn when retention is **higher than the law** | Neither the LGPD nor the GDPR sets a number of days. They require "no longer than necessary" (LGPD arts. 15–16; GDPR art. 5(1)(e)). The numbers come from regulators' references and from other laws. | Each retention has a default, an allowed range and a **warning threshold** with its source (**§4**). |
 | Hash IPs with a fast hash, "like a password" (`hash(ip + salt + secret)`) | It holds when the hash is **keyed** with a secret kept outside the readable data: whoever has only the database cannot reverse it. Without a key, IPv4's 2³² addresses are all hashed in seconds. A salt must be global to keep the hash deterministic, so salt + secret amount to one key. Whoever holds the key (the server, or whoever breaks into it) can still hash every address or confirm one IP. A stable value also singles a visitor out over time. So it is **pseudonymous** personal data, with retention and rights like any other (GDPR art. 4(5) and recital 26; EDPB Guidelines 01/2025; CJEU C-413/23 P *SRB*, 4 Sep 2025). | `HMAC-SHA256(ip-key, ip)` with a **fixed random key** stored encrypted in the database. The hash is deterministic, so it counts visitors over any period and can match an abuser later. It cannot be reversed without the key. It is blanked when the IP retention ends (**§6**). |
-| Hashing IPs by default is always the safe side | In Brazil, Marco Civil da Internet (Lei 12.965/2014) **art. 15** *requires* a company that runs an internet application for profit to keep access logs (IP + date/time) for **6 months**, confidential, in a controlled and secure environment, and disclosed only on a court order (art. 10). Decreto 8.771/2016 **art. 13** says how: access limited to named people, an authentication that individualises who reads (two-factor is its example), an **inventory of every access** to the logs, and encryption. Using these logs for statistics is another purpose (LGPD art. 6 I–III). | Records always hold the hash. A separate **access log** keeps the full IP, the source port and the UTC time for 184 days when a root turns it on, readable only by named readers with two-factor sign-in, each read recorded (**§6**). The `lgpd` preset turns it on (**§11**). |
+| Hashing IPs by default is always the safe side | In Brazil, Marco Civil da Internet (Lei 12.965/2014) **art. 15** *requires* a company that runs an internet application for profit to keep access logs (IP + date/time) for **6 months**, confidential, in a controlled and secure environment, and disclosed only on a court order (art. 10). Decreto 8.771/2016 **art. 13** says how: access limited to named people, an authentication that individualises who reads (two-factor is its example), an **inventory of every access** to the logs, and encryption. Using these logs for statistics is another purpose (LGPD art. 6 I–III). | Records hold the hash by default, and a root may keep full IPs in them (`full`, **§6**). A separate **access log** keeps the full IP, the source port and the UTC time for 184 days when a root turns it on, readable only by named readers with two-factor sign-in and the inventory of reads the Decreto asks for (**§6**). The `lgpd` preset turns it on (**§11**). |
 | An access log is the IP with its date and time | Behind carrier-grade NAT, common in Brazil, many customers share one IPv4 address. The STJ (3rd Panel, 2019, *TIM v. Google*) ordered an application provider to give the **source port** with the IP, and court orders ask for IP, port, date, time and time zone. | The access log stores the source port and the time in UTC (**§6**). |
-| A deletion request deletes everything | Data kept to meet a legal obligation is not erased on request (LGPD art. 16 I; GDPR art. 17(3)(b)), nor data kept for a legal claim (LGPD art. 7 VI; GDPR art. 17(3)(e)). The police, an administrative authority or the Public Prosecutor may ask for access logs to be kept longer than 6 months (Marco Civil art. 15 §2). | *Find and erase* never deletes the access log during its term, nor rows on a **legal hold**, and the cleanup skips held rows (**§4**, **§10**). |
+| A deletion request deletes everything | Data kept to meet a legal obligation is not erased on request (LGPD art. 16 I; GDPR art. 17(3)(b)), nor data kept for a legal claim (LGPD art. 7 VI; GDPR art. 17(3)(e)). The police, an administrative authority or the Public Prosecutor may ask for access logs to be kept longer than 6 months (Marco Civil art. 15 §2). | By default *Find and erase* keeps the access log during its term and the rows on a **legal hold**, and the cleanup skips held rows. A root can still delete the access log rows, behind a notice that names the duty (**§4**, **§10**). |
 | Encrypted data needs no notification | GDPR art. 34(3)(a) spares telling *the people* when the data was unintelligible to the intruder. LGPD art. 48 §3 only weighs encryption when judging how serious the incident is. Res. CD/ANPD 15/2024 asks to tell the ANPD **and the data subjects** within 3 business days when the incident may bring relevant risk or harm, and to **record every incident, even one not communicated, for 5 years** (art. 10). GDPR art. 33(5) also documents every breach. | **§3** and the notices say so, and the checklist asks for an incident register (**§11**). |
 | Summaries: "AI can make mistakes" | That is true, and two more facts apply. The whole conversation goes to the model provider, which is a processor and often an international transfer. Since **2 Aug 2026** the EU AI Act (Reg. 2024/1689) **art. 50(1)** requires that people be told when they are talking to an AI. The AI omnibus (Reg. (EU) 2026/1744, in force since 27 Jul 2026) postponed the high-risk rules, not this one, and the free and open-source exemption (art. 2(12)) does not cover art. 50. | The summary notice and a new agent notice cover both, and the agent says it is an AI by default (**§8**). |
 | Encrypt "on start server" | `add-backoffice-user` and every other command that opens a database writes to it too. | The key is required by **every command that touches a database** (**§3**). |
@@ -59,18 +63,30 @@ exported to configure other servers the same way, and they show when a server dr
 ## 2. Principles
 - **Private by default** (GDPR art. 25; LGPD art. 46 §2): an install stores no contact request, no
   summary and no full IP.
+- **Freedom**: the root is the controller and decides. Every lawful choice a default rules out (full
+  IPs, full IPs for viewers, a longer or endless retention, the access log without two-factor or without
+  its inventory, erasing rows kept by law) stays possible behind a notice that names the law. Emissario
+  warns, and never forbids. The only hard stops keep data from being lost or exposed without anyone
+  choosing it: a missing or wrong key (**§3**) and a notice not confirmed.
 - **Fail closed**: a missing or wrong key stops the program, and an unacknowledged notice leaves the
   feature off. Nothing silently downgrades.
 - **No backward compatibility**: Emissario is in alpha. A database from an earlier version is not
   migrated: start a new one. Every install starts with the defaults of **§5**.
-- **Accountability** (LGPD art. 6 X; GDPR art. 5(2)): each acknowledgement, each privacy setting change,
-  each read of the access log and each erasure is recorded with who made it, when, and which notice
-  version they read.
-- **The law outranks erasure**: data kept to meet a legal obligation (the access log, **§6**) or on a
-  legal hold is not erased on request nor by the cleanup before its term (LGPD art. 16 I; GDPR art.
-  17(3)(b)(e)), and it is deleted as soon as the term ends (Decreto 8.771 art. 13 §2).
-- **Need to know**: records hold only IP hashes. A full IP shows only in the access log, to its named
-  readers (**§6**). Today contact requests show the whole IP to viewers, and this plan changes that.
+- **Protection of the user, and no evidence against them**: Emissario gives the controller the tools to
+  comply (private defaults, notices, presets, the access log, erasure, holds) and keeps nothing that could
+  be held against them: no record of who changed a setting, applied a preset, held or erased data, no
+  record that a notice was shown or confirmed, no compliance status. It keeps only the state it needs to
+  work: the current settings, the active holds, and the ids of erased rows until no backup could bring
+  them back. Demonstrating compliance (LGPD art. 6 X; GDPR art. 5(2)) stays with the controller's own
+  documents, kept where they choose. The one log of people is the inventory of access log reads that
+  Decreto 8.771 art. 13 III asks of Brazilian companies, and a root can turn it off (**§6**).
+- **The law outranks erasure, by default**: data kept to meet a legal obligation (the access log,
+  **§6**) or on a legal hold is not erased on request nor by the cleanup before its term (LGPD art. 16 I;
+  GDPR art. 17(3)(b)(e)), and it is deleted as soon as the term ends (Decreto 8.771 art. 13 §2). A root
+  who knows the duty does not apply to them deletes it behind a notice (**§9**).
+- **Need to know, by default**: records hold IP hashes, and in `full` mode viewers see IPs masked. A
+  root may show full IPs to viewers, behind a notice (**§6**). Today contact requests show the whole IP
+  to viewers, and this plan changes that default.
 
 ---
 
@@ -173,23 +189,25 @@ against an attacker inside the running server, which holds the key in memory. Sa
 
 ## 4. Retention: defaults and thresholds
 
-| Data | Default | Allowed | Warning (needs acknowledgement) | Reference for the threshold |
-|---|---|---|---|---|
-| Contact request | **180 days** | 1–1825 | > 365 | No legal number. Keep it while you answer it and while the relationship lasts (LGPD 15–16; GDPR 5(1)(e)). CNIL: prospects ≤ 3 years after the last contact. 5 years ≈ the Brazilian consumer limitation period (CDC art. 27), as the outer bound for a legal defence (LGPD art. 7 VI) |
-| Access log, when on (`access-log-retention-days`) | **184 days** (the longest 6-month span) | 1–1095 | < 184 (BR) **and** > 365 (EU) | Marco Civil art. 15: at least 6 months for BR for-profit companies, then deleted (Decreto 8.771 art. 13 §2). CNIL 2021-122: 6 months–1 year, up to 3 years only with a documented need |
-| IP hash in records (`ip-retention-days`) | **184 days** | 1–1095 | > 365 | CNIL 2021-122 as above. A hash is still personal data (**§1**), so it has a limit like any other |
-| Visualization view | 90 (as today) | 1–3650, blank = forever (as today) | > 760 or blank | CNIL audience measurement: ≤ 25 months |
-| Agent summary | **90 days** | 1–1825 | > 365 | as contact requests |
-| Backup snapshot | blank (kept) | 1–3650 | blank, or longer than the longest retention above | Data that retention removes from the database lives on in the snapshots taken before |
+| Data | Default | Warning (needs the notice) | Reference for the threshold |
+|---|---|---|---|
+| Contact request | **180 days** | > 365 or blank | No legal number. Keep it while you answer it and while the relationship lasts (LGPD 15–16; GDPR 5(1)(e)). CNIL: prospects ≤ 3 years after the last contact. 5 years ≈ the Brazilian consumer limitation period (CDC art. 27), as the outer bound for a legal defence (LGPD art. 7 VI) |
+| Access log, when on (`access-log-retention-days`) | **184 days** (the longest 6-month span) | < 184 (BR), > 365 (EU) or blank | Marco Civil art. 15: at least 6 months for BR for-profit companies, then deleted (Decreto 8.771 art. 13 §2). CNIL 2021-122: 6 months–1 year, up to 3 years only with a documented need |
+| IP in records, hash or full (`ip-retention-days`) | **184 days** | > 365 or blank | CNIL 2021-122 as above. A hash is still personal data (**§1**), so it has a limit like any other |
+| Visualization view | 90 (as today) | > 760 or blank | CNIL audience measurement: ≤ 25 months |
+| Agent summary | **90 days** | > 365 or blank | as contact requests |
+| Backup snapshot | blank (kept) | blank, or longer than the longest retention above | Data that retention removes from the database lives on in the snapshots taken before |
 
-- An `ip` hash older than the IP retention is **blanked**. The record stays until its own retention
-  ends: a contact request kept 180 days with an IP retention of 30 days loses its hash on day 30.
+- An `ip` field older than the IP retention is **blanked**, hash or full IP. The record stays until its
+  own retention ends: a contact request kept 180 days with an IP retention of 30 days loses its IP on
+  day 30.
 - The access log has its own retention, apart from the records it points to: with the `lgpd` preset a
   view is gone at 90 days and its access log row stays until day 184.
 - Rows on a **legal hold** (**§10**) are skipped until the hold ends or is released, then follow their
   retention again.
 - Retention is counted from `at`, in days of the server's time zone.
-- Above the maximum → `400`. Above the warning → the acknowledgement of **§9** with the reference text.
+- A retention is a number of days ≥ 1, or blank for forever. Below 1 → `400`. Above the warning, or
+  blank, → the notice of **§9** with the reference text. No retention is refused for being long (**§2**).
 
 ### Retention cleanup
 A goroutine in `privacy-start-server` runs every hour. The visualization cleanup that runs today moves
@@ -210,21 +228,26 @@ goroutine.
 |---|---|
 | Encryption | key required, or `--notencrypt` for debugging (**§3**) |
 | `POST /api/contact-requests` | **off** → `503 disabled` |
-| IPs in records | always the hash (**§6**) |
-| Access log | **off** |
+| IP mode | **`hashed`** (**§6**) |
+| Full IPs for viewers | masked |
+| Access log | **off**. When on: two-factor for its readers and the inventory of reads |
 | `POST /api/agent/summaries` | **off** → `503 summaries-disabled` |
 | Agent | off (as today) |
-| Full user agent in views | never stored (device, browser and os are) |
+| Full user agent in views | stored only in `full` mode |
 
 ---
 
 ## 6. IPs
 
-### In the records — always the hash
-`visualization-view.ip`, `contact-request.ip` and `agent-usage.ip` hold `h:` + hex of the first 16 bytes
-of `HMAC-SHA256(ip-key, ip)`. IPv4 whole, IPv6 by its `/64`, the same grouping as the rate limits, so an
-attacker cannot dodge a match by rotating inside their `/64`. Blanked after the IP retention (**§4**). No
-setting puts a full IP in a record: the full IP lives only in the access log (below).
+### Modes — `privacy-setting.ip-mode`
+| Mode | Stored in `visualization-view.ip`, `contact-request.ip`, `agent-usage.ip` |
+|---|---|
+| `hashed` (default) | `h:` + hex of the first 16 bytes of `HMAC-SHA256(ip-key, ip)`. IPv4 whole, IPv6 by its `/64`, the same grouping as the rate limits, so an attacker cannot dodge a match by rotating inside their `/64`. Blanked after the IP retention (**§4**) |
+| `full` (notice `ip-full-v1`) | the IP as it came, IPv6 whole, and the full `user-agent` in views. Blanked after the IP retention (**§4**) |
+
+A mode applies to new rows. *Hash the IPs already stored* (Privacy page, danger zone) turns the full IPs
+kept into hashes. `full` does not replace the access log below: it has no source port and goes with its
+record.
 
 - **IP key:** 32 random bytes, created on the first start and kept in `privacy-setting.ip-key`. It is
   encrypted by the storage layer like every value, so a stolen disk or backup without
@@ -248,19 +271,22 @@ setting puts a full IP in a record: the full IP lives only in the access log (be
   warning says so.
 - **Done before hashing, on the raw IP, in memory:** the country lookup, the ignored IPs, the rate
   limits per minute and per day (in memory, as today), and the access log row when it is on.
-- **What the hash gives and changes, documented in Visualization:**
+- **What `hashed` gives and changes, documented in Visualization:**
   - Unique visitors are exact over any period within the retention.
   - The Visitors page groups by hash, with country, device, browser, os, views and first/last seen as
     today.
-  - The root's `ip` filter takes a typed IP and filters by its hash over the whole retention. A CIDR
-    filter is refused: a range cannot be hashed. Access log readers filter by CIDR in the access log.
+  - The `ip` filter takes a typed IP and filters by its hash over the whole retention. A CIDR filter is
+    refused in `hashed` mode, because a range cannot be hashed. It works in `full` mode and in the
+    access log.
   - `agent-usage` per-IP daily limits keep working.
-  - The full `user-agent` is not stored. Device, browser and os are. Together with a stable hash, the
-    full string adds fingerprinting without serving any feature.
+  - The full `user-agent` is not stored, only device, browser and os: with a stable hash, the full
+    string adds fingerprinting without serving any feature. `full` mode stores it.
 - **Blocking:** the hash is stable, so an abuser seen in Visitors, a contact request or agent usage can be
   matched again later. The blocklist is out of scope here (see **Out of scope**). Volumetric DDoS is
   stopped before Emissario (reverse proxy, firewall, CDN), not by a lookup per request inside it.
-- Every page and API shows a hash as `h:3fa9…`. A full IP shows only in the access log.
+- **Who sees full IPs** in `full` mode: roots. Viewers see them masked (`203.0.113.xxx`, IPv6 `/48`) on
+  every page and API, unless a root sets `privacy-setting.viewer-ip` to `full` (notice `viewer-ip-v1`).
+  A hash shows as `h:3fa9…` to everyone.
 - Backoffice users' own IPs (`api-token.last-used-ip`, `ips`) are a security log of staff, not of
   visitors. They are not hashed, since they serve to spot a stolen token, and are encrypted with the
   rest.
@@ -285,26 +311,31 @@ When a root turns it on (notice `access-log-v1`, **§9**), every page view the V
   it keeps it in its own logs, which then follow the same 6 months and the same rules.
 - **Clock:** the doc asks for the server's clock synced by NTP.
 - **Who reads it** (Decreto 8.771 art. 13):
-  - **Named readers (I):** only roots that a root marks `access-log-reader`, each change a
-    `privacy-change` row. Viewers and other roots never see it.
-  - **Two-factor sign-in (II):** a reader must have TOTP on (RFC 6238, 6 digits, 30 s), set up on their
-    own account page from a QR code drawn by the server and the base32 secret. Sign-in then asks for the
-    code. Turning TOTP on revokes the user's API tokens, so every token of a reader was made after a
-    two-factor sign-in. A root resets another user's TOTP (recorded), and
+  - **Named readers (I):** only roots that a root marks `access-log-reader`. Viewers and other roots
+    never see it.
+  - **Two-factor sign-in (II):** by default a reader must have TOTP on (RFC 6238, 6 digits, 30 s), set
+    up on their own account page from a QR code drawn by the server and the base32 secret. Sign-in then
+    asks for the code. Turning TOTP on revokes the user's API tokens, so every token of a reader was made
+    after a two-factor sign-in. A root resets another user's TOTP, and
     `emissario reset-backoffice-totp --username <u>` does it from the host. A root banner lists the roots
-    without TOTP.
-  - **Inventory of accesses (III):** every list, search or export of the access log, from a page or the
-    API, writes a `privacy-access` row: when it started and ended, who, what (`access-log-list`,
-    `access-log-export`…), the filter and how many rows came back. *Find and erase* and the contact
-    export write one too (**§7**, **§10**).
-  - **Encryption (IV):** the storage layer (**§3**). The access log cannot be turned on with
-    `--notencrypt`.
+    without TOTP. A root may drop the requirement (`privacy-setting.access-log-totp` = `0`, notice
+    `access-log-no-totp-v1`), for example behind a proxy that already asks for single sign-on.
+  - **Inventory of accesses (III):** by default every list, search or export of the access log, from a
+    page or the API, writes a `privacy-access` row: when it started and ended, who, what
+    (`access-log-list`, `access-log-export`…), the filter and how many rows came back. The Decreto asks
+    for exactly this, the identity of who read included. It is the only log of people in this plan, it
+    covers the access log alone, and it stays in the client's own encrypted database. A root may turn it
+    off (`privacy-setting.access-log-inventory` = `0`, notice `access-log-no-inventory-v1`).
+  - **Encryption (IV):** the storage layer (**§3**). With `--notencrypt` the debug banner says the access
+    log is in clear.
 - **Page** `/admin/root/access-log` (readers): filter by IP (exact or CIDR), period and `kind`, **Export**
-  (JSON, CSV) to answer a court order, and **Hold** the rows shown (**§10**). The page says *disclose
-  only on a court order (Marco Civil art. 10 §1)*.
-- **Not erasable during its term:** no erasure and no delete reaches a row younger than the access log
-  retention (LGPD art. 16 I; GDPR art. 17(3)(b)). The cleanup deletes it when the retention ends, unless
-  it is held (**§4**).
+  (JSON, CSV) to answer a court order, **Hold** the rows shown (**§10**) and **Delete** them. The page
+  says *disclose only on a court order (Marco Civil art. 10 §1)*.
+- **Kept during its term, by default:** *Find and erase* leaves a row younger than the access log
+  retention (LGPD art. 16 I; GDPR art. 17(3)(b)). A root deletes such rows on purpose, from this page
+  or from *Find and erase*, with the notice `erase-kept-v1`: the duty may not apply to them (an EU or
+  non-profit website). A held row is deleted only after its hold is released. The cleanup deletes rows
+  when the retention ends, unless held (**§4**).
 - **Turning it off** stops new rows. The rows already kept stay until their retention ends, because
   they were kept under the obligation.
 - **Brazil note on the Privacy page, while it is off:** *If this website is run by a company for profit,
@@ -315,16 +346,16 @@ When a root turns it on (notice `access-log-v1`, **§9**), every page view the V
 ---
 
 ## 7. Contact requests
-- `contact-setting` gains `retention-days` (**§4**). There is no "forever".
+- `contact-setting` gains `retention-days` (**§4**). Blank keeps them forever, with the retention notice.
 - Turning `enabled` on requires the **contacts** notice (**§9**). Saving a retention above 365 requires
   the retention notice.
 - The settings page shows: *Your website must say in its privacy notice what the form keeps, why, for how
   long, and how to ask for deletion*, with a link to the draft (**§10**).
-- A contact request keeps a hash of the IP (**§6**). With the access log on, a reader finds its full IP
-  and source port through the `ref` of its access log row.
+- A contact request keeps the IP as the IP mode says, a hash by default (**§6**). With the access log
+  on, a reader finds its full IP and source port through the `ref` of its access log row.
 - **Export** (root): `GET /admin/root/export-contact-requests` → JSON of the filtered or selected ones.
-  This serves access and portability requests (LGPD art. 18 II, V; GDPR arts. 15, 20). Each export
-  writes a `privacy-access` row. Twin: `root/export-contact-requests`.
+  This serves access and portability requests (LGPD art. 18 II, V; GDPR arts. 15, 20). Twin:
+  `root/export-contact-requests`.
 
 ---
 
@@ -350,21 +381,24 @@ When a root turns it on (notice `access-log-v1`, **§9**), every page view the V
 
 The backoffice CSP runs no inline script, so the notice is **rendered by the server**:
 
-1. The root saves a setting that needs a notice without having acknowledged its current version.
+1. The root saves a setting, or runs an action, that needs a notice.
 2. The page comes back with the notice panel: the text, the laws, a required checkbox *I have read this
-   and I am responsible for this processing as controller*, and **Confirm**.
+   notice*, and **Confirm**.
 3. The server, not the browser, checks the checkbox. A JSON client cannot skip it:
    `409 {"error":"acknowledgement-required","field":"acknowledge","notice":{"id":"contacts-v1","text":"…"}}`
    until it sends `"acknowledge": ["contacts-v1"]`.
-4. The acknowledgement is stored in `privacy-acknowledgement`.
+4. The server keeps nothing about it: not who confirmed, not when, not that the notice was shown. The
+   notice comes back every time the setting is turned to that value again, and at every use of an
+   action (`erase-kept-v1`).
 
-Notices live in `assets/privacy/notices/<id>.md`, versioned in their id (`contacts-v1`). A new version
-asks again: a banner shows until the root acknowledges it, and the feature stays on.
+Notices live in `assets/privacy/notices/<id>.md`, versioned in their id (`contacts-v1`). The Privacy page
+shows, next to each setting in use, its current notice to read again. A new version is shown there and
+asks nothing.
 
 ### `contacts-v1`
 > Turning on contact requests makes this server store what visitors send through your form (names,
-> emails, phones, messages) with its time and a hash of the visitor's IP. **You are the controller of
-> this data.** That is lawful as long as you:
+> emails, phones, messages) with its time and the visitor's IP, hashed unless you chose `full`. **You are
+> the controller of this data.** That is lawful as long as you:
 > - **tell visitors** in your privacy notice what is kept, why, for how long and how to ask for its
 >   deletion (LGPD art. 9; GDPR art. 13);
 > - have a **legal basis**: steps the visitor asked for before a contract (LGPD art. 7 V; GDPR art.
@@ -393,15 +427,48 @@ asks again: a banner shows until the root acknowledges it, and the feature stays
 > - **Brazil:** a company running this website for profit **must** keep it 6 months (Marco Civil art.
 >   15), and that **legal obligation** is its legal basis (LGPD art. 7 II). Keep it confidential,
 >   disclose it only on a court order (art. 10), and use it for nothing else: statistics and blocking
->   use the hash (LGPD art. 6 I–III). An authority may ask you to keep rows longer (art. 15 §2): put
+>   use the records (LGPD art. 6 I–III). An authority may ask you to keep rows longer (art. 15 §2): put
 >   them on hold, and keep the request confidential (art. 13 §4).
 > - **EU:** there is no general duty to keep IPs. Turn it on only for a security need, under a
 >   legitimate interest with a documented balancing test (GDPR art. 6(1)(f)), within the CNIL's 6
 >   months to 1 year.
 >
-> Emissario applies Decreto 8.771/2016 art. 13 for you: named readers, two-factor sign-in, every read
-> recorded, encryption. During its term a row cannot be erased on request (LGPD art. 16 I; GDPR art.
-> 17(3)(b)).
+> By default Emissario applies Decreto 8.771/2016 art. 13 for you: named readers, two-factor sign-in, an
+> inventory of reads, encryption. During its term a row is kept even when its person asks for erasure
+> (LGPD art. 16 I; GDPR art. 17(3)(b)).
+
+### `ip-full-v1`
+> Full IPs identify visitors. A dynamic IP is personal data (CJEU C-582/14 *Breyer*; LGPD art. 5 I).
+> Keeping them in views, contact requests and agent usage, with the full user agent of each view, needs
+> a legal basis, usually a legitimate interest in security, fraud prevention or statistics with a
+> documented balancing test (LGPD art. 10; GDPR art. 6(1)(f)), the shortest retention that serves it
+> (LGPD art. 6 III; GDPR art. 5(1)(c)), and a line in your privacy notice.
+> - A full IP with its time is also an access log (Marco Civil art. 5 VIII): keep it confidential and
+>   disclose it only on a court order (art. 10).
+> - It does not replace the access log of Marco Civil art. 15: it has no source port and goes with its
+>   record. A for-profit company in Brazil still turns the access log on.
+> - Viewers see these IPs masked unless you choose otherwise.
+
+### `viewer-ip-v1`
+> Viewers will see visitors' full IPs on every page and API. The laws ask you to give personal data only
+> to whoever needs it for their job, and to keep it from an indefinite number of people by default (LGPD
+> arts. 6 III and 46; GDPR arts. 5(1)(c), 25(2) and 32(4)).
+
+### `access-log-no-totp-v1`
+> Decreto 8.771/2016 art. 13 II asks for an authentication that individualises who reads the access
+> log, and names two-factor as its example. Without it, one stolen password opens every visitor's IP.
+> Use another measure that does the same, such as single sign-on with two factors at your proxy.
+
+### `access-log-no-inventory-v1`
+> Decreto 8.771/2016 art. 13 III asks a company that keeps Marco Civil access logs for a detailed
+> inventory of every access to them: when, for how long, who and what. Without this one, keep that
+> inventory by other means, because the duty stays.
+
+### `erase-kept-v1` (asked at every use)
+> You are deleting access log rows inside their term. A company that runs this website for profit in
+> Brazil must keep them 6 months (Marco Civil art. 15), and the laws do not require erasing them on a
+> person's request (LGPD art. 16 I; GDPR art. 17(3)(b)). Delete them when that duty does not apply to
+> you, such as an EU or non-profit website.
 
 ### `summaries-v1`
 > Summaries are written by an AI model from the visitor's conversation and stored here. The model is
@@ -435,53 +502,59 @@ Generated from **§4**: *You set N days. Above T days, the references below ask 
 ## 10. Privacy page — `/admin/root/set-privacy-settings` (root)
 Linked from the top bar (root) and from the home page.
 
-- **Preset** (**§11**), first on the page: *Preset: LGPD v1, applied on 2026-10-15 by maria*, or *No
+- **Preset** (**§11**), first on the page: *Preset: LGPD v1*, or *No
   preset (install defaults)*. It lists the settings that differ from it and links to the Presets page.
 - **Encryption** (read only): on/off, `key_id`, algorithm.
-- **Access log** (on/off, retention, readers, whether the source port is read) and **IP retention**, with
-  the Brazil note (**§6**). Danger zone, irreversible and confirmed with `data-confirm`: *Rotate IP key*.
+- **IP mode** (`hashed`/`full`), **full IPs for viewers** (masked/full), **IP retention**, and the
+  **access log** (on/off, retention, readers, two-factor, inventory, whether the source port is read),
+  with the Brazil note (**§6**). Danger zone, each irreversible and confirmed with `data-confirm`: *Hash
+  the IPs already stored* · *Rotate IP key*.
 - **What this server keeps**: one row per table holding personal data, with the fields, the purpose, a
   suggested legal basis, the retention, the count and the oldest record. This is the base of the
   records of processing (LGPD art. 37; GDPR art. 30).
 - **Privacy notice draft**: text built from the current settings. It covers what is kept, why, for how
   long, the access log and its legal obligation, the model provider's host, that no cookie is set and
   the chat history stays in the visitor's browser (`localStorage`), the rights and the time to answer
-  them, and placeholders for the controller, the contact and the encarregado/DPO. The root copies it into the website. It is marked
-  *draft — review it*. Its template is `privacy-setting.notice-draft`: `br` (pt-BR: controlador,
+  them, and placeholders for the controller, the contact and the encarregado/DPO. The root copies it
+  into the website. It is marked *draft — review it*. Its template is `privacy-setting.notice-draft`: `br` (pt-BR: controlador,
   encarregado, ANPD, Marco Civil logs), `eu` (en: controller, DPO, EU representative, supervisory
   authority) or `br-eu` (both, the default). A preset sets it (**§11**).
 - **Find and erase a person** (LGPD arts. 18–19; GDPR arts. 15, 17): an IP (hashed with the current IP
-  key) or a text (email, phone, name). It shows the matches in contact requests, views, agent usage and
+  key in `hashed` mode) or a text (email, phone, name). It shows the matches in contact requests, views, agent usage and
   agent summaries, with **Export JSON** and **Delete all** (confirmed). Hashes made before a *Rotate IP
   key* no longer match, and the page says so (GDPR art. 11).
   - It also lists the matching access log rows (to readers) and the held rows, marked *kept*. *Delete
-    all* leaves them: the access log for its legal obligation (LGPD art. 16 I; GDPR art. 17(3)(b)), a
-    held row until its hold ends. The page gives no hold's reason, because a preservation request is
-    confidential (Marco Civil art. 13 §4).
-  - Every search and export writes a `privacy-access` row. Every erasure writes a `privacy-erasure` row
-    with the table and the ids deleted, and no personal data.
+    all* leaves them by default: the access log for its legal obligation (LGPD art. 16 I; GDPR art.
+    17(3)(b)), a held row until its hold ends. Ticking *also delete the access log rows* deletes those
+    too, with the notice `erase-kept-v1`. A held row needs its hold released first. The page gives no
+    hold's reason, because a preservation request is confidential (Marco Civil art. 13 §4).
+  - An erasure of contact requests, views, agent usage or summaries keeps the table and the ids deleted
+    in `privacy-erasure`, with no personal data and no user, so that a restore can replay it. The entry
+    is deleted once no snapshot older than it remains. Deleting access log rows keeps nothing: a restore
+    never rolls the access log back (**§12**).
   - **Backups:** an erased row lives on in the snapshots taken before, until the backup retention
-    removes them (**§4**), and the page says so. Restoring a snapshot re-applies every erasure recorded
+    removes them (**§4**), and the page says so. Restoring a snapshot re-applies every erasure kept
     after it was taken, so erased data does not come back (**§12**).
 - **Legal holds**: a root holds rows selected in contact requests or agent summaries, and a reader in
   the access log, with a reason (*Ofício nº …*, a lawsuit) and an end date. For a Marco Civil art. 15
   §2 request the end date defaults to 60 days, the time the authority has to go to court (art. 13 §3),
   and a court order extends it. Held rows are skipped by the cleanup and by *Find and erase*. A hold is
-  released by hand or on its end date, and each hold and release is a `privacy-change` row.
-- **History**: the acknowledgements (`privacy-acknowledgement`), the privacy setting changes, preset
-  applications, checklist ticks, holds and readers (`privacy-change`), the erasures (`privacy-erasure`)
-  and the reads of personal data (`privacy-access`), newest first.
+  released by hand or on its end date.
+- **Notices**: the current notice of each setting in use, to read again. Nothing records that it was
+  read.
 - **Backup retention** (**§4**).
 
 | Route name | Method and path |
 |---|---|
 | `set-privacy-settings-page` | `GET /admin/root/set-privacy-settings` |
 | `set-privacy-settings-form` | `POST /admin/root/set-privacy-settings` |
+| `hash-privacy-ips-form` | `POST /admin/root/hash-privacy-ips` |
 | `find-privacy-subject-page` | `GET /admin/root/find-privacy-subject` |
 | `erase-privacy-subject-form` | `POST /admin/root/erase-privacy-subject` |
 | `export-contact-requests` | `GET /admin/root/export-contact-requests` |
 | `access-log-page` | `GET /admin/root/access-log` |
 | `export-access-log` | `GET /admin/root/export-access-log` |
+| `delete-access-log-form` | `POST /admin/root/delete-access-log` |
 | `set-access-log-readers-form` | `POST /admin/root/set-access-log-readers` |
 | `hold-privacy-records-form` | `POST /admin/root/hold-privacy-records` |
 | `release-privacy-hold-form` | `POST /admin/root/release-privacy-hold` |
@@ -490,14 +563,13 @@ Linked from the top bar (root) and from the home page.
 
 JSON twins under `/api/admin/root/`, named `api-` + the last path segment, as in Visualization:
 `get-privacy-settings`, `set-privacy-settings`, `find-privacy-subject`, `erase-privacy-subject`,
-`get-privacy-notice-draft`, `list-privacy-acknowledgements`, `export-contact-requests`, `list-access-log`,
-`export-access-log`, `set-access-log-readers`, `hold-privacy-records`, `release-privacy-hold`,
+`get-privacy-notice-draft`, `hash-privacy-ips`, `export-contact-requests`, `list-access-log`,
+`export-access-log`, `delete-access-log`, `set-access-log-readers`, `hold-privacy-records`, `release-privacy-hold`,
 `list-privacy-holds`, `list-privacy-access`, `reset-backoffice-totp`. `set-totp` is under `/api/admin/`.
 
-**Banners** on every backoffice page (root): running `--notencrypt` · a feature on without its current
-acknowledgement · snapshots holding data past retention · settings that differ from the active preset ·
-a new version of the active preset (**§11**) · the access log on without a source port · roots without
-two-factor sign-in.
+**Banners** on every backoffice page (root): running `--notencrypt` · snapshots holding data past retention · settings that differ from the active preset ·
+a new version of the active preset (**§11**) · the access log on without a source port, without its
+two-factor requirement or without its inventory · roots without two-factor sign-in.
 
 ---
 
@@ -506,14 +578,14 @@ two-factor sign-in.
 A large customer asks two things of a privacy setup: *prove that this server follows our policy* and *set
 up the other servers the same way*. A **preset** is a named, versioned and complete set of values for the
 privacy settings, each value with its reference. Applying one **is** saving those settings. It goes
-through the same ranges (**§4**), the same notices (**§9**) and the same record. It is a shortcut and a
+through the same ranges (**§4**) and the same notices (**§9**). It is a shortcut and a
 proof, never a way around them. It does not make the operator compliant, and the checklist below lists
 what is left to them.
 
 ### What a preset sets
 | Sets | Never sets |
 |---|---|
-| `privacy-setting.access-log`, `access-log-retention-days`, `ip-retention-days`, `backup-retention-days`, `notice-draft` · `contact-setting.retention-days` · `visualization-setting.retention-days` · `agent-setting.summary-retention-days` | **Whether** data is collected: `contact-setting.enabled`, `agent-setting.enabled` and `agent-setting.summaries-enabled` stay as they are. A preset says how data is kept, and a root still decides whether to keep it (**§2**). The keys (`EMISSARIO_ENCRYPT_KEY`, `ip-key`). The access log readers and two-factor sign-in. Rate limits and sizes |
+| `privacy-setting.ip-mode`, `access-log`, `access-log-retention-days`, `ip-retention-days`, `backup-retention-days`, `notice-draft` · `contact-setting.retention-days` · `visualization-setting.retention-days` · `agent-setting.summary-retention-days` | **Whether** data is collected: `contact-setting.enabled`, `agent-setting.enabled` and `agent-setting.summaries-enabled` stay as they are. A preset says how data is kept, and a root still decides whether to keep it (**§2**). The keys (`EMISSARIO_ENCRYPT_KEY`, `ip-key`). Who sees full IPs (`viewer-ip`), the access log readers, its two-factor requirement and its inventory. Rate limits and sizes |
 
 A preset holds **every** setting of the left column, so applying it always gives a known state. A preset
 with a missing or unknown setting is refused. The access log is the one collection a preset turns on:
@@ -522,9 +594,10 @@ in Brazil it is an obligation, not a choice, and it still asks for its notice.
 ### Built-in presets — `assets/privacy/presets/<id>.json`
 | Setting | `lgpd` v1 — for-profit company in Brazil | `gdpr` v1 — EU | `lgpd-gdpr` v1 — Brazilian company that also serves the EU |
 |---|---|---|---|
+| IP mode | `hashed`: the access log answers the court orders, so the records stay minimal (LGPD art. 6 III) | `hashed`: minimisation and privacy by default (GDPR arts. 5(1)(c), 25) | `hashed` |
 | Access log | **on**: Marco Civil art. 15 requires it, and a hash cannot answer a court order for the IP (art. 10) | off: no general duty in the EU, minimisation and privacy by default (GDPR arts. 5(1)(c), 25) | **on** (Marco Civil art. 15) |
 | Access log retention | 184: at least 6 months (Marco Civil art. 15) | 184, used if a root turns it on for security: CNIL 2021-122, 6 months–1 year | 184: the span that meets both |
-| IP hash retention | 184: CNIL 2021-122, 6 months–1 year | 184 | 184 |
+| IP retention in records | 184: CNIL 2021-122, 6 months–1 year | 184 | 184 |
 | Contact request | 180 | 180 | 180 |
 | Visualization view | 90 | 90 | 90 |
 | Agent summary | 90 | 90 | 90 |
@@ -539,9 +612,9 @@ the access log off, and those logs then follow Decreto 8.771 art. 13 on their ow
 
 ### Controller checklist
 Each preset carries the obligations that Emissario cannot fulfil for the operator. The Presets page lists
-the items of the active preset. A root marks each one done with an **evidence** text (where the document
-is, a ticket, a link), and each tick is a `privacy-change` row. Emissario does not verify the items, and
-the page says *your own record, not a certification*. Items marked `agent` show only while the agent is
+the items of the active preset. It is a reminder: Emissario stores no status for them,
+done or not, so the list holds nothing that could be read as an admission. The controller keeps their
+evidence in their own documents. Items marked `agent` show only while the agent is
 on.
 
 | Item | `lgpd` | `gdpr` | `lgpd-gdpr` |
@@ -566,37 +639,37 @@ on.
    - a shorter retention: *N contact requests, M views, K snapshots… will be deleted at the next
      cleanup*, counted now with the same rules as the cleanup (**§4**);
    - access log turned on: *from now on every view and public API call writes an access log row*;
-   - access log turned off: *no new rows; the N rows kept stay until their retention ends* (**§6**).
+   - access log turned off: *no new rows; the N rows kept stay until their retention ends* (**§6**);
+   - `full` → `hashed`: new IPs are hashed, and stored full IPs stay until their retention ends or until
+     *Hash the IPs already stored* (**§10**);
+   - `hashed` → `full`: only new IPs are stored in full, and stored hashes stay hashes.
 2. **Apply**, confirmed with `data-confirm` when something will be deleted. Every value is validated
    (**§4**) before any is written. The notices that the new values need are shown together in one panel.
    The JSON twin answers the `409` of **§9** with a list, `"notices":[…]`, and expects all of them in
    `acknowledge`.
-3. **Record**: `privacy-setting.preset` = `lgpd@1`, with `preset-applied-at` and `preset-applied-by`,
-   and one `privacy-change` row with source `preset:lgpd@1` and the values before and after.
+3. **State**: `privacy-setting.preset` = `lgpd@1`, and nothing else: not who applied it, not when.
 
 **Automation** (provisioning many servers) goes through the JSON twin with a root API token:
-`apply-privacy-preset {"preset":"lgpd@1","acknowledge":["access-log-v1"]}`. The acknowledgement is recorded
-under the token's user, like any other.
+`apply-privacy-preset {"preset":"lgpd@1","acknowledge":["access-log-v1"]}`.
 
 ### Active preset and drift
 - A preset is a starting point, not a lock. A setting it covers can still be changed on its own page.
   When one differs, the Privacy page and a root banner say *2 settings differ from LGPD v1*, with the
-  list, and offer **Re-apply** or **Detach**. Detaching makes the server *Custom* and is recorded.
+  list, and offer **Re-apply** or **Detach**. Detaching makes the server *Custom*.
 - `GET /api/admin/root/check-privacy-preset` gives the state in one call, for an operator that watches
   many servers:
-  `{"preset":"lgpd@1","conform":false,"differences":[{"setting":"ip-retention-days","preset":184,"current":90}],"checklist":{"done":5,"total":7},"encrypted":true,"pending-notices":[]}`
+  `{"preset":"lgpd@1","conform":false,"differences":[{"setting":"ip-retention-days","preset":184,"current":90}],"encrypted":true}`
 
 ### Custom presets
-A company's DPO usually has a policy of their own: a shorter retention, the access log off with the
-reverse proxy keeping the logs, more checklist items.
+A company's DPO usually has a policy of their own: a shorter retention, `full` IPs for fraud review,
+the access log off with the reverse proxy keeping the logs, more checklist items.
 - **Save current settings as preset**: a name and a description. The checklist is copied from the active
   preset (`lgpd-gdpr` when there is none), and the root can add items (text and reference).
 - **Export** (`export-privacy-preset`) downloads the JSON. **Import** (paste or upload) checks it against
   the format, the ranges (**§4**) and the known drafts, then stores it without applying it.
 - Versions never change. Editing a preset saves `v2`, so the history and the drift check always point to
   fixed values. Built-in presets are read only.
-- A custom preset that is not active can be deleted. Its values stay in the `privacy-change` rows of the
-  history.
+- A custom preset that is not active can be deleted.
 - A custom preset cannot add notices, settings or drafts. Those are code (**§9**, **§10**).
 
 ### Format
@@ -609,13 +682,14 @@ reverse proxy keeping the logs, more checklist items.
   "description": "…",
   "jurisdictions": ["BR"],
   "values": {
-    "access-log":                {"value": true, "reference": "Marco Civil art. 15 …"},
-    "access-log-retention-days": {"value": 184,  "reference": "…"},
-    "ip-retention-days":         {"value": 184,  "reference": "…"},
-    "contact-retention-days":    {"value": 180,  "reference": "…"},
-    "view-retention-days":       {"value": 90,   "reference": "…"},
-    "summary-retention-days":    {"value": 90,   "reference": "…"},
-    "backup-retention-days":     {"value": 90,   "reference": "…"},
+    "ip-mode":                   {"value": "hashed", "reference": "LGPD art. 6 III …"},
+    "access-log":                {"value": true,     "reference": "Marco Civil art. 15 …"},
+    "access-log-retention-days": {"value": 184,      "reference": "…"},
+    "ip-retention-days":         {"value": 184,      "reference": "…"},
+    "contact-retention-days":    {"value": 180,      "reference": "…"},
+    "view-retention-days":       {"value": 90,       "reference": "…"},
+    "summary-retention-days":    {"value": 90,       "reference": "…"},
+    "backup-retention-days":     {"value": 90,       "reference": "…"},
     "notice-draft":              {"value": "br"}
   },
   "checklist": [{"id": "encarregado", "text": "…", "reference": "LGPD art. 41", "when": "always"}],
@@ -640,30 +714,30 @@ automatically: the law changes, and the root decides.
 | `export-privacy-preset` | `GET /admin/root/export-privacy-preset` |
 | `delete-privacy-preset-form` | `POST /admin/root/delete-privacy-preset` |
 | `detach-privacy-preset-form` | `POST /admin/root/detach-privacy-preset` |
-| `set-privacy-checklist-form` | `POST /admin/root/set-privacy-checklist` |
 
 JSON twins under `/api/admin/root/`: `list-privacy-presets`, `preview-privacy-preset`,
 `apply-privacy-preset`, `save-privacy-preset`, `import-privacy-preset`, `export-privacy-preset`,
-`delete-privacy-preset`, `detach-privacy-preset`, `check-privacy-preset`, `set-privacy-checklist`.
+`delete-privacy-preset`, `detach-privacy-preset`, `check-privacy-preset`.
 
 ---
 
 ## 12. Database — `privacy-db` (key-prefix `privacydb`)
 | Table | Fields |
 |---|---|
-| `privacy-setting` (one record) | `access-log` (`0`/`1`), `access-log-retention-days`, `ip-key` (bytes, 32), `ip-key-rotated-at`, `ip-retention-days`, `backup-retention-days`, `notice-draft` (`br`/`eu`/`br-eu`), `preset` (`<id>@<version>`, blank = none), `preset-applied-at`, `preset-applied-by` |
-| `privacy-acknowledgement` | `at`, `user-id`, `username`, `notice` (`contacts-v1`…), `values` (JSON of what was saved) |
-| `privacy-change` | `at`, `user-id`, `username`, `source` (`manual`, `preset:<id>@<version>`, `detach`, `checklist`, `hold`, `release`, `readers`), `before` (JSON), `after` (JSON). Every privacy setting change writes one, from any page (**§2**) |
-| `privacy-preset` (custom only, the built-ins are in `assets/`) | `preset-id`, `version`, `name`, `json` (the whole preset), `created-at`, `created-by` |
-| `privacy-checklist` | `item`, `done`, `evidence`, `at`, `user-id`, `username` |
+| `privacy-setting` (one record) | `ip-mode` (`hashed`/`full`), `viewer-ip` (`masked`/`full`), `access-log` (`0`/`1`), `access-log-retention-days`, `access-log-totp` (`0`/`1`, default `1`), `access-log-inventory` (`0`/`1`, default `1`), `ip-key` (bytes, 32), `ip-key-rotated-at`, `ip-retention-days`, `backup-retention-days`, `notice-draft` (`br`/`eu`/`br-eu`), `preset` (`<id>@<version>`, blank = none) |
+| `privacy-preset` (custom only, the built-ins are in `assets/`) | `preset-id`, `version`, `name`, `json` (the whole preset), `created-at` |
 | `access-log` | `at` (UTC, ms), `ip`, `port`, `kind` (`view`/`contact-request`/`agent`), `ref`. No field is a `key` (**§3** rule): searches scan |
-| `privacy-access` | `at`, `ended-at`, `user-id`, `username`, `action`, `filter` (JSON), `rows` |
-| `privacy-hold` | `at`, `user-id`, `username`, `reason`, `until`, `table`, `ids` (JSON), `released-at`, `released-by` |
-| `privacy-erasure` | `at`, `user-id`, `username`, `table`, `ids` (JSON) |
+| `privacy-access` (only while `access-log-inventory` is on) | `at`, `ended-at`, `user-id`, `username`, `action`, `filter` (JSON), `rows` |
+| `privacy-hold` | `reason`, `until`, `table`, `ids` (JSON). Released → deleted |
+| `privacy-erasure` | `at`, `table`, `ids` (JSON). Only for the tables a restore rolls back, deleted once no older snapshot remains |
+
+No table records who changed a setting, applied a preset, held or erased data, nor that a notice was
+shown or a checklist item done (**§2**).
+`user-id` and `username` appear only in `privacy-access`, the inventory the Decreto asks for.
 
 A restore never rolls back what happened after the snapshot: it keeps the live `access-log`,
-`privacy-acknowledgement`, `privacy-change`, `privacy-access`, `privacy-hold` and `privacy-erasure`, then
-re-applies the erasures recorded after the snapshot was taken.
+`privacy-access`, `privacy-hold` and `privacy-erasure`, then re-applies the erasures kept after the
+snapshot was taken.
 
 New fields: `contact-setting.retention-days` · `agent-setting.summaries-enabled`,
 `agent-setting.summary-retention-days` · on the backoffice user: `totp-secret`, `totp-enabled-at`,
@@ -674,7 +748,7 @@ New fields: `contact-setting.retention-days` · `agent-setting.summaries-enabled
 ## 13. Where it lives
 | Path | What |
 |---|---|
-| `sandbox/internal/privacy/` | IP key and HMAC, access log (rows, readers, page), retention rules and cleanup, legal holds, notices and acknowledgements, notice draft, find/erase and its replay after a restore, access inventory, presets (load, validate, preview, apply, drift, checklist) |
+| `sandbox/internal/privacy/` | IP key and HMAC, access log (rows, readers, page), retention rules and cleanup, legal holds, notices and the versions read, notice draft, find/erase and its replay after a restore, access inventory, presets (load, validate, preview, apply, drift, checklist) |
 | `sandbox/internal/totp/` | TOTP (RFC 6238) and its QR code, used by the backoffice sign-in |
 | `sandbox/internal/encryption/` | key parsing, HKDF, value format, `encryption.json` check |
 | Keep `encryptedstorage`, or `adapters/impls/<encrypted-keep>/` | the storage wrapper (**§3**) |
@@ -708,22 +782,31 @@ because losing it loses the data.
   `EMISSARIO_ENCRYPT_KEY`. After *Rotate IP key* it gives another. Two IPv6 addresses in one `/64` give
   one hash. `ip-key` never appears in clear in an encrypted `data/`.
 - An IP hash older than the IP retention is blanked by the cleanup.
-- `set-contact-settings {enabled:true}` without `acknowledge` → `409`. With it → `200` and one
-  `privacy-acknowledgement` row.
-- Retention: a record past retention is gone after one cleanup run. An IP hash past the IP retention is
-  blanked and its record kept.
+- `set-privacy-settings {ip-mode: full}` without `acknowledge` → `409` listing `ip-full-v1`. With it, new
+  views hold the full IP and user agent, roots see them, and viewers see `203.0.113.xxx` until
+  `viewer-ip` is `full` (notice `viewer-ip-v1`). *Hash the IPs already stored* turns them into `h:`
+  hashes.
+- `set-contact-settings {enabled:true}` without `acknowledge` → `409`. With it → `200`, and no database
+  holds anything about the confirmation. Turning it off and on again asks again.
+- No table of `privacy-db` but `privacy-access` has a `user-id` or `username` field. A test lists them.
+- Retention: a record past retention is gone after one cleanup run. An IP past the IP retention is
+  blanked and its record kept. A blank retention (forever) or one above the warning is saved after its
+  notice, and `0` → `400`.
 - Access log:
   - With it on, a view, a contact request and an agent call each write one row: `at` in UTC, the full
     IP, the source port from the connection, or from `--client-port-header` behind a proxy, and the
     `ref` of their record.
   - With the `lgpd` preset, a view 100 days old is gone and its access log row is still there. At 185
     days the row is gone too.
-  - No page or API but the access log returns a full IP. The access log answers `403` to a viewer, to a
-    root who is not a reader, to a reader without TOTP and to a token made before TOTP was turned on.
-  - Every list, search and export writes one `privacy-access` row.
-  - It cannot be turned on with `--notencrypt`.
+  - The access log answers `403` to a viewer, to a root who is not a reader, and, while two-factor is
+    required, to a reader without TOTP and to a token made before TOTP was turned on. With
+    `access-log-totp` `0` (after its notice), a reader without TOTP gets `200`.
+  - With the inventory on, every list, search and export writes one `privacy-access` row. With it off,
+    none.
 - *Find and erase* finds a text in agent summaries, deletes the matches, leaves the access log rows and
-  the held rows and lists them as kept, and writes one `privacy-erasure` row.
+  the held rows and lists them as kept, and writes one `privacy-erasure` row with no user. With *also
+  delete the access log rows* it asks `erase-kept-v1` every time and deletes them too, never a held row,
+  and leaves no row anywhere about that deletion.
 - A held row survives a cleanup past its retention. After its release it is gone at the next cleanup.
 - Restoring a snapshot taken before an erasure re-applies it, and keeps the live access log and record
   tables (**§12**).
@@ -732,15 +815,14 @@ because losing it loses the data.
 - Presets:
   - `apply-privacy-preset {"preset":"lgpd@1"}` without `acknowledge` → `409` listing `access-log-v1`, and
     nothing is written. With it → `200`, every setting equals the preset, `privacy-setting.preset` is
-    `lgpd@1`, and there is one `privacy-change` row and one `privacy-acknowledgement` row.
+    `lgpd@1`, and nothing records who applied it or when.
   - `gdpr@1` on a fresh install needs no notice.
   - Applying never changes `contact-setting.enabled`, `agent-setting.enabled` or
     `agent-setting.summaries-enabled`.
   - An imported preset with one value out of range, a missing setting or an unknown key is refused, and
     nothing is written.
   - Changing `ip-retention-days` by hand after applying → `check-privacy-preset` gives `conform:false`
-    with that difference. *Re-apply* → `conform:true`. *Detach* → `preset` blank and a `privacy-change`
-    row.
+    with that difference. *Re-apply* → `conform:true`. *Detach* → `preset` blank.
   - The counts in the preview equal what the next cleanup deletes.
   - Export on one server, import and apply on another → the same settings on both.
   - A built-in preset cannot be edited or deleted, a saved version cannot be changed in place, and the
@@ -761,7 +843,9 @@ because losing it loses the data.
   stable hash of **§6** makes it possible later.
 - KMS, HSM or a key server: the key comes from the environment.
 - SSO (SAML, OIDC) for the backoffice: TOTP covers the access log readers.
-- An incident register inside Emissario: the checklist asks the operator to keep one (**§11**).
+- An incident register inside Emissario: the checklist reminds the operator to keep one (**§11**).
+- A compliance status kept by Emissario (items done, dates, who): the controller keeps their own
+  evidence, where they choose (**§2**).
 - Choosing a preset automatically by country: a root chooses it (**§11**).
 - Built-in presets, notices and drafts for laws other than BR/EU (UK GDPR, US state laws). A custom
   preset can hold their values, but not their notices.
