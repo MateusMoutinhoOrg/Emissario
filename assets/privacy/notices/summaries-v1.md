@@ -1,0 +1,3 @@
+# Agent summaries
+
+Summaries are written by an AI model from the visitor's conversation and stored here. The model is told to remove names, contacts, documents, places and dates, and a filter then removes CPF, CNPJ, emails, phones and card numbers. **AI makes mistakes.** A summary can still hold personal data, or details that identify someone when read together (LGPD art. 12; GDPR recital 26). Treat summaries as personal data: they are encrypted, kept for the retention you set, and deleted after it. To write one, the **whole conversation is sent to your model provider** (see the agent notice). Tell visitors about summaries in your privacy notice. *Find and erase* on the Privacy page searches summaries too.

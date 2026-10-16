@@ -418,6 +418,22 @@ func SetContactSettingIpDailyLimit(sandbox *api.Sandbox, self *ContactDb, id int
 	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("ip-daily-limit", value))
 }
 
+// SetContactSettingRetentionDays writes a new retention-days on one contact-setting record.
+func SetContactSettingRetentionDays(sandbox *api.Sandbox, self *ContactDb, id int64, value int64) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "contact-setting")
+	if err != nil {
+		return err
+	}
+	record, ok, failure := collection.FindByID(id)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("contact-setting %d not found", id)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("retention-days", value))
+}
+
 // RemoveContactSetting deletes one contact-setting record and everything nested under it.
 func RemoveContactSetting(sandbox *api.Sandbox, self *ContactDb, id int64) error {
 	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "contact-setting")
@@ -532,6 +548,7 @@ func newContactSettingFields(props ContactSettingInput) map[string]any {
 		"max-bytes":       props.MaxBytes,
 		"rate-per-minute": props.RatePerMinute,
 		"ip-daily-limit":  props.IpDailyLimit,
+		"retention-days":  props.RetentionDays,
 	}
 }
 
@@ -565,6 +582,12 @@ func buildContactSettingRecord(sandbox *api.Sandbox, record databasedeps.Record)
 	}
 	built.IpDailyLimit = valueIpDailyLimit
 
+	valueRetentionDays, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadInt(record, "retention-days")
+	if err != nil {
+		return built, err
+	}
+	built.RetentionDays = valueRetentionDays
+
 	return built, nil
 }
 
@@ -581,6 +604,9 @@ func matchContactSetting(sandbox *api.Sandbox, item ContactSettingRecord, filter
 		return false
 	}
 	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.IpDailyLimit, filter.IpDailyLimitMin, filter.IpDailyLimitMax) {
+		return false
+	}
+	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.RetentionDays, filter.RetentionDaysMin, filter.RetentionDaysMax) {
 		return false
 	}
 	return true

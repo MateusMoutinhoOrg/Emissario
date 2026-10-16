@@ -173,6 +173,70 @@ func SetBackofficeUserRole(sandbox *api.Sandbox, self *BackofficeDb, id int64, v
 	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("role", value))
 }
 
+// SetBackofficeUserTotpSecret writes a new totp-secret on one backoffice-user record.
+func SetBackofficeUserTotpSecret(sandbox *api.Sandbox, self *BackofficeDb, id int64, value string) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "backoffice-user")
+	if err != nil {
+		return err
+	}
+	record, ok, failure := collection.FindByID(id)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("backoffice-user %d not found", id)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("totp-secret", value))
+}
+
+// SetBackofficeUserTotpEnabledAt writes a new totp-enabled-at on one backoffice-user record.
+func SetBackofficeUserTotpEnabledAt(sandbox *api.Sandbox, self *BackofficeDb, id int64, value int64) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "backoffice-user")
+	if err != nil {
+		return err
+	}
+	record, ok, failure := collection.FindByID(id)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("backoffice-user %d not found", id)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("totp-enabled-at", value))
+}
+
+// SetBackofficeUserTotpLastStep writes a new totp-last-step on one backoffice-user record.
+func SetBackofficeUserTotpLastStep(sandbox *api.Sandbox, self *BackofficeDb, id int64, value int64) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "backoffice-user")
+	if err != nil {
+		return err
+	}
+	record, ok, failure := collection.FindByID(id)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("backoffice-user %d not found", id)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("totp-last-step", value))
+}
+
+// SetBackofficeUserAccessLogReader writes a new access-log-reader on one backoffice-user record.
+func SetBackofficeUserAccessLogReader(sandbox *api.Sandbox, self *BackofficeDb, id int64, value int64) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "backoffice-user")
+	if err != nil {
+		return err
+	}
+	record, ok, failure := collection.FindByID(id)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("backoffice-user %d not found", id)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("access-log-reader", value))
+}
+
 // RemoveBackofficeUser deletes one backoffice-user record and everything nested under it.
 func RemoveBackofficeUser(sandbox *api.Sandbox, self *BackofficeDb, id int64) error {
 	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "backoffice-user")
@@ -517,10 +581,14 @@ func RemoveApiToken(sandbox *api.Sandbox, self *BackofficeDb, id int64) error {
 // newBackofficeUserFields is one insert into backoffice-user as the stored field map.
 func newBackofficeUserFields(props BackofficeUserInput) map[string]any {
 	return map[string]any{
-		"username":      props.Username,
-		"email":         props.Email,
-		"password-hash": props.PasswordHash,
-		"role":          props.Role,
+		"username":          props.Username,
+		"email":             props.Email,
+		"password-hash":     props.PasswordHash,
+		"role":              props.Role,
+		"totp-secret":       props.TotpSecret,
+		"totp-enabled-at":   props.TotpEnabledAt,
+		"totp-last-step":    props.TotpLastStep,
+		"access-log-reader": props.AccessLogReader,
 	}
 }
 
@@ -554,6 +622,30 @@ func buildBackofficeUserRecord(sandbox *api.Sandbox, record databasedeps.Record)
 	}
 	built.Role = valueRole
 
+	valueTotpSecret, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadString(record, "totp-secret")
+	if err != nil {
+		return built, err
+	}
+	built.TotpSecret = valueTotpSecret
+
+	valueTotpEnabledAt, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadInt(record, "totp-enabled-at")
+	if err != nil {
+		return built, err
+	}
+	built.TotpEnabledAt = valueTotpEnabledAt
+
+	valueTotpLastStep, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadInt(record, "totp-last-step")
+	if err != nil {
+		return built, err
+	}
+	built.TotpLastStep = valueTotpLastStep
+
+	valueAccessLogReader, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadInt(record, "access-log-reader")
+	if err != nil {
+		return built, err
+	}
+	built.AccessLogReader = valueAccessLogReader
+
 	return built, nil
 }
 
@@ -570,6 +662,18 @@ func matchBackofficeUser(sandbox *api.Sandbox, item BackofficeUserRecord, filter
 		return false
 	}
 	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.Role, filter.RoleMin, filter.RoleMax) {
+		return false
+	}
+	if !sandbox.Deps.OpinionatedAgnosDatabase.TextMatches(item.TotpSecret, filter.TotpSecretStartsWith, filter.TotpSecretEquals) {
+		return false
+	}
+	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.TotpEnabledAt, filter.TotpEnabledAtMin, filter.TotpEnabledAtMax) {
+		return false
+	}
+	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.TotpLastStep, filter.TotpLastStepMin, filter.TotpLastStepMax) {
+		return false
+	}
+	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.AccessLogReader, filter.AccessLogReaderMin, filter.AccessLogReaderMax) {
 		return false
 	}
 	return true

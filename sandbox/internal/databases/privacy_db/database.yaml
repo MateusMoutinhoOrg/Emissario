@@ -1,0 +1,90 @@
+key-prefix: privacydb
+name: privacy-db
+tables:
+    - fields:
+        - name: ip-mode
+          type: string
+        - name: viewer-ip
+          type: string
+        - name: access-log
+          type: integer
+        - name: access-log-retention-days
+          type: integer
+        - name: access-log-totp
+          type: integer
+        - name: access-log-inventory
+          type: integer
+        - name: ip-key
+          type: bytes
+        - name: ip-key-rotated-at
+          type: integer
+        - name: ip-retention-days
+          type: integer
+        - name: backup-retention-days
+          type: integer
+        - name: notice-draft
+          type: string
+        - name: preset
+          type: string
+      name: privacy-setting
+    - fields:
+        - name: preset-id
+          type: string
+        - name: version
+          type: integer
+        - name: name
+          type: string
+        - name: json
+          type: string
+        - name: created-at
+          type: integer
+      name: privacy-preset
+    - fields:
+        - name: at
+          required: true
+          type: integer
+        - name: ip
+          type: string
+        - name: port
+          type: integer
+        - name: kind
+          type: string
+        - name: ref
+          type: integer
+      name: access-log
+    - fields:
+        - name: at
+          required: true
+          type: integer
+        - name: ended-at
+          type: integer
+        - name: user-id
+          type: integer
+        - name: username
+          type: string
+        - name: action
+          type: string
+        - name: filter
+          type: string
+        - name: rows
+          type: integer
+      name: privacy-access
+    - fields:
+        - name: reason
+          type: string
+        - name: until
+          type: integer
+        - name: table
+          type: string
+        - name: ids
+          type: string
+      name: privacy-hold
+    - fields:
+        - name: at
+          required: true
+          type: integer
+        - name: table
+          type: string
+        - name: ids
+          type: string
+      name: privacy-erasure

@@ -14,19 +14,27 @@ import (
 // BackofficeUserRecord is one stored backoffice-user record: its permanent id and every
 // plain field the declaration gives it.
 type BackofficeUserRecord struct {
-	Id           int64
-	Username     string
-	Email        string
-	PasswordHash string
-	Role         int64
+	Id              int64
+	Username        string
+	Email           string
+	PasswordHash    string
+	Role            int64
+	TotpSecret      string
+	TotpEnabledAt   int64
+	TotpLastStep    int64
+	AccessLogReader int64
 }
 
 // BackofficeUserInput is one insert into backoffice-user: the fields a new record carries.
 type BackofficeUserInput struct {
-	Username     string
-	Email        string
-	PasswordHash string
-	Role         int64
+	Username        string
+	Email           string
+	PasswordHash    string
+	Role            int64
+	TotpSecret      string
+	TotpEnabledAt   int64
+	TotpLastStep    int64
+	AccessLogReader int64
 }
 
 // BackofficeUserFilter narrows a ListBackofficeUser. Every plain field is here, because
@@ -41,6 +49,14 @@ type BackofficeUserFilter struct {
 	PasswordHashEquals     string
 	RoleMin                int64
 	RoleMax                int64
+	TotpSecretStartsWith   string
+	TotpSecretEquals       string
+	TotpEnabledAtMin       int64
+	TotpEnabledAtMax       int64
+	TotpLastStepMin        int64
+	TotpLastStepMax        int64
+	AccessLogReaderMin     int64
+	AccessLogReaderMax     int64
 }
 
 // BackofficeUserSessionRecord is one stored session record: its permanent id and every
@@ -133,6 +149,14 @@ type BackofficeDb struct {
 	SetBackofficeUserPasswordHash func(id int64, value string) error
 	// SetBackofficeUserRole writes a new role on one backoffice-user record.
 	SetBackofficeUserRole func(id int64, value int64) error
+	// SetBackofficeUserTotpSecret writes a new totp-secret on one backoffice-user record.
+	SetBackofficeUserTotpSecret func(id int64, value string) error
+	// SetBackofficeUserTotpEnabledAt writes a new totp-enabled-at on one backoffice-user record.
+	SetBackofficeUserTotpEnabledAt func(id int64, value int64) error
+	// SetBackofficeUserTotpLastStep writes a new totp-last-step on one backoffice-user record.
+	SetBackofficeUserTotpLastStep func(id int64, value int64) error
+	// SetBackofficeUserAccessLogReader writes a new access-log-reader on one backoffice-user record.
+	SetBackofficeUserAccessLogReader func(id int64, value int64) error
 	// RemoveBackofficeUser deletes one backoffice-user record and everything nested under it.
 	RemoveBackofficeUser func(id int64) error
 	// AddBackofficeUserSession inserts one session record under one backoffice-user record.

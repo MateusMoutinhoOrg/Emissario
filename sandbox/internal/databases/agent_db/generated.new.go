@@ -31,6 +31,8 @@ func New(sandbox *api.Sandbox) *AgentDb {
 					{Name: "daily-limit", Type: databasedeps.Int},
 					{Name: "ip-daily-limit", Type: databasedeps.Int},
 					{Name: "rate-per-minute", Type: databasedeps.Int},
+					{Name: "summaries-enabled", Type: databasedeps.Int},
+					{Name: "summary-retention-days", Type: databasedeps.Int},
 				},
 			},
 			{
@@ -112,6 +114,12 @@ func New(sandbox *api.Sandbox) *AgentDb {
 	}
 	self.SetAgentSettingRatePerMinute = func(id int64, value int64) error {
 		return SetAgentSettingRatePerMinute(self.sandbox, &self, id, value)
+	}
+	self.SetAgentSettingSummariesEnabled = func(id int64, value int64) error {
+		return SetAgentSettingSummariesEnabled(self.sandbox, &self, id, value)
+	}
+	self.SetAgentSettingSummaryRetentionDays = func(id int64, value int64) error {
+		return SetAgentSettingSummaryRetentionDays(self.sandbox, &self, id, value)
 	}
 	self.RemoveAgentSetting = func(id int64) error {
 		return RemoveAgentSetting(self.sandbox, &self, id)

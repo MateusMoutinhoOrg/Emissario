@@ -23,6 +23,7 @@
 | `max-bytes` | `integer` |  |  |
 | `rate-per-minute` | `integer` |  |  |
 | `ip-daily-limit` | `integer` |  |  |
+| `retention-days` | `integer` |  |  |
 
 ## Methods
 
@@ -51,6 +52,7 @@
 | `SetContactSettingMaxBytes(id int64, value int64) error` | writes a new max-bytes on one contact-setting record |
 | `SetContactSettingRatePerMinute(id int64, value int64) error` | writes a new rate-per-minute on one contact-setting record |
 | `SetContactSettingIpDailyLimit(id int64, value int64) error` | writes a new ip-daily-limit on one contact-setting record |
+| `SetContactSettingRetentionDays(id int64, value int64) error` | writes a new retention-days on one contact-setting record |
 | `RemoveContactSetting(id int64) error` | deletes one contact-setting record and everything nested under it |
 
 A query this page does not list goes in `methods_custom.go`, hand-written beside these and

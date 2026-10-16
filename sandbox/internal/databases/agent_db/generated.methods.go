@@ -237,6 +237,38 @@ func SetAgentSettingRatePerMinute(sandbox *api.Sandbox, self *AgentDb, id int64,
 	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("rate-per-minute", value))
 }
 
+// SetAgentSettingSummariesEnabled writes a new summaries-enabled on one agent-setting record.
+func SetAgentSettingSummariesEnabled(sandbox *api.Sandbox, self *AgentDb, id int64, value int64) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "agent-setting")
+	if err != nil {
+		return err
+	}
+	record, ok, failure := collection.FindByID(id)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("agent-setting %d not found", id)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("summaries-enabled", value))
+}
+
+// SetAgentSettingSummaryRetentionDays writes a new summary-retention-days on one agent-setting record.
+func SetAgentSettingSummaryRetentionDays(sandbox *api.Sandbox, self *AgentDb, id int64, value int64) error {
+	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "agent-setting")
+	if err != nil {
+		return err
+	}
+	record, ok, failure := collection.FindByID(id)
+	if failure != nil {
+		return sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
+	}
+	if !ok {
+		return sandbox.Deps.StdDeps.Errorf("agent-setting %d not found", id)
+	}
+	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("summary-retention-days", value))
+}
+
 // RemoveAgentSetting deletes one agent-setting record and everything nested under it.
 func RemoveAgentSetting(sandbox *api.Sandbox, self *AgentDb, id int64) error {
 	collection, err := sandbox.Deps.OpinionatedAgnosDatabase.Collection(self.database, "agent-setting")
@@ -888,14 +920,16 @@ func RemoveAgentSummary(sandbox *api.Sandbox, self *AgentDb, id int64) error {
 // newAgentSettingFields is one insert into agent-setting as the stored field map.
 func newAgentSettingFields(props AgentSettingInput) map[string]any {
 	return map[string]any{
-		"enabled":         props.Enabled,
-		"base-url":        props.BaseUrl,
-		"api-key":         props.ApiKey,
-		"model":           props.Model,
-		"max-tokens":      props.MaxTokens,
-		"daily-limit":     props.DailyLimit,
-		"ip-daily-limit":  props.IpDailyLimit,
-		"rate-per-minute": props.RatePerMinute,
+		"enabled":                props.Enabled,
+		"base-url":               props.BaseUrl,
+		"api-key":                props.ApiKey,
+		"model":                  props.Model,
+		"max-tokens":             props.MaxTokens,
+		"daily-limit":            props.DailyLimit,
+		"ip-daily-limit":         props.IpDailyLimit,
+		"rate-per-minute":        props.RatePerMinute,
+		"summaries-enabled":      props.SummariesEnabled,
+		"summary-retention-days": props.SummaryRetentionDays,
 	}
 }
 
@@ -953,6 +987,18 @@ func buildAgentSettingRecord(sandbox *api.Sandbox, record databasedeps.Record) (
 	}
 	built.RatePerMinute = valueRatePerMinute
 
+	valueSummariesEnabled, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadInt(record, "summaries-enabled")
+	if err != nil {
+		return built, err
+	}
+	built.SummariesEnabled = valueSummariesEnabled
+
+	valueSummaryRetentionDays, err := sandbox.Deps.OpinionatedAgnosDatabase.ReadInt(record, "summary-retention-days")
+	if err != nil {
+		return built, err
+	}
+	built.SummaryRetentionDays = valueSummaryRetentionDays
+
 	return built, nil
 }
 
@@ -981,6 +1027,12 @@ func matchAgentSetting(sandbox *api.Sandbox, item AgentSettingRecord, filter Age
 		return false
 	}
 	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.RatePerMinute, filter.RatePerMinuteMin, filter.RatePerMinuteMax) {
+		return false
+	}
+	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.SummariesEnabled, filter.SummariesEnabledMin, filter.SummariesEnabledMax) {
+		return false
+	}
+	if !sandbox.Deps.OpinionatedAgnosDatabase.IntInRange(item.SummaryRetentionDays, filter.SummaryRetentionDaysMin, filter.SummaryRetentionDaysMax) {
 		return false
 	}
 	return true

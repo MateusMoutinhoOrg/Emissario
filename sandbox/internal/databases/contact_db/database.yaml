@@ -29,4 +29,6 @@ tables:
           type: integer
         - name: ip-daily-limit
           type: integer
+        - name: retention-days
+          type: integer
       name: contact-setting

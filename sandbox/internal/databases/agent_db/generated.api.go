@@ -14,49 +14,57 @@ import (
 // AgentSettingRecord is one stored agent-setting record: its permanent id and every
 // plain field the declaration gives it.
 type AgentSettingRecord struct {
-	Id            int64
-	Enabled       int64
-	BaseUrl       string
-	ApiKey        string
-	Model         string
-	MaxTokens     int64
-	DailyLimit    int64
-	IpDailyLimit  int64
-	RatePerMinute int64
+	Id                   int64
+	Enabled              int64
+	BaseUrl              string
+	ApiKey               string
+	Model                string
+	MaxTokens            int64
+	DailyLimit           int64
+	IpDailyLimit         int64
+	RatePerMinute        int64
+	SummariesEnabled     int64
+	SummaryRetentionDays int64
 }
 
 // AgentSettingInput is one insert into agent-setting: the fields a new record carries.
 type AgentSettingInput struct {
-	Enabled       int64
-	BaseUrl       string
-	ApiKey        string
-	Model         string
-	MaxTokens     int64
-	DailyLimit    int64
-	IpDailyLimit  int64
-	RatePerMinute int64
+	Enabled              int64
+	BaseUrl              string
+	ApiKey               string
+	Model                string
+	MaxTokens            int64
+	DailyLimit           int64
+	IpDailyLimit         int64
+	RatePerMinute        int64
+	SummariesEnabled     int64
+	SummaryRetentionDays int64
 }
 
 // AgentSettingFilter narrows a ListAgentSetting. Every plain field is here, because
 // only a `key` field is indexed and this is the one way to reach the rest. A
 // zero value turns its own filter off.
 type AgentSettingFilter struct {
-	EnabledMin        int64
-	EnabledMax        int64
-	BaseUrlStartsWith string
-	BaseUrlEquals     string
-	ApiKeyStartsWith  string
-	ApiKeyEquals      string
-	ModelStartsWith   string
-	ModelEquals       string
-	MaxTokensMin      int64
-	MaxTokensMax      int64
-	DailyLimitMin     int64
-	DailyLimitMax     int64
-	IpDailyLimitMin   int64
-	IpDailyLimitMax   int64
-	RatePerMinuteMin  int64
-	RatePerMinuteMax  int64
+	EnabledMin              int64
+	EnabledMax              int64
+	BaseUrlStartsWith       string
+	BaseUrlEquals           string
+	ApiKeyStartsWith        string
+	ApiKeyEquals            string
+	ModelStartsWith         string
+	ModelEquals             string
+	MaxTokensMin            int64
+	MaxTokensMax            int64
+	DailyLimitMin           int64
+	DailyLimitMax           int64
+	IpDailyLimitMin         int64
+	IpDailyLimitMax         int64
+	RatePerMinuteMin        int64
+	RatePerMinuteMax        int64
+	SummariesEnabledMin     int64
+	SummariesEnabledMax     int64
+	SummaryRetentionDaysMin int64
+	SummaryRetentionDaysMax int64
 }
 
 // AgentUrlRecord is one stored agent-url record: its permanent id and every
@@ -205,6 +213,10 @@ type AgentDb struct {
 	SetAgentSettingIpDailyLimit func(id int64, value int64) error
 	// SetAgentSettingRatePerMinute writes a new rate-per-minute on one agent-setting record.
 	SetAgentSettingRatePerMinute func(id int64, value int64) error
+	// SetAgentSettingSummariesEnabled writes a new summaries-enabled on one agent-setting record.
+	SetAgentSettingSummariesEnabled func(id int64, value int64) error
+	// SetAgentSettingSummaryRetentionDays writes a new summary-retention-days on one agent-setting record.
+	SetAgentSettingSummaryRetentionDays func(id int64, value int64) error
 	// RemoveAgentSetting deletes one agent-setting record and everything nested under it.
 	RemoveAgentSetting func(id int64) error
 	// AddAgentUrl inserts one agent-url record.

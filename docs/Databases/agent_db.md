@@ -15,6 +15,8 @@
 | `daily-limit` | `integer` |  |  |
 | `ip-daily-limit` | `integer` |  |  |
 | `rate-per-minute` | `integer` |  |  |
+| `summaries-enabled` | `integer` |  |  |
+| `summary-retention-days` | `integer` |  |  |
 
 ## `agent-url`
 
@@ -64,6 +66,8 @@
 | `SetAgentSettingDailyLimit(id int64, value int64) error` | writes a new daily-limit on one agent-setting record |
 | `SetAgentSettingIpDailyLimit(id int64, value int64) error` | writes a new ip-daily-limit on one agent-setting record |
 | `SetAgentSettingRatePerMinute(id int64, value int64) error` | writes a new rate-per-minute on one agent-setting record |
+| `SetAgentSettingSummariesEnabled(id int64, value int64) error` | writes a new summaries-enabled on one agent-setting record |
+| `SetAgentSettingSummaryRetentionDays(id int64, value int64) error` | writes a new summary-retention-days on one agent-setting record |
 | `RemoveAgentSetting(id int64) error` | deletes one agent-setting record and everything nested under it |
 | `AddAgentUrl(props AgentUrlInput) (AgentUrlRecord, error)` | inserts one agent-url record |
 | `FindAgentUrlById(id int64) (AgentUrlRecord, bool)` | reads one agent-url record by its permanent id |

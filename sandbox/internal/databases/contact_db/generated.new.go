@@ -39,6 +39,7 @@ func New(sandbox *api.Sandbox) *ContactDb {
 					{Name: "max-bytes", Type: databasedeps.Int},
 					{Name: "rate-per-minute", Type: databasedeps.Int},
 					{Name: "ip-daily-limit", Type: databasedeps.Int},
+					{Name: "retention-days", Type: databasedeps.Int},
 				},
 			},
 		},
@@ -119,6 +120,9 @@ func New(sandbox *api.Sandbox) *ContactDb {
 	}
 	self.SetContactSettingIpDailyLimit = func(id int64, value int64) error {
 		return SetContactSettingIpDailyLimit(self.sandbox, &self, id, value)
+	}
+	self.SetContactSettingRetentionDays = func(id int64, value int64) error {
+		return SetContactSettingRetentionDays(self.sandbox, &self, id, value)
 	}
 	self.RemoveContactSetting = func(id int64) error {
 		return RemoveContactSetting(self.sandbox, &self, id)

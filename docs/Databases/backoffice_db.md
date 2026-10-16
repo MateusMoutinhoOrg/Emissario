@@ -13,6 +13,10 @@
 | `role` | `integer` |  |  |
 | `session` | `object` |  |  |
 | `session.expires-at` | `integer` | yes |  |
+| `totp-secret` | `string` |  |  |
+| `totp-enabled-at` | `integer` |  |  |
+| `totp-last-step` | `integer` |  |  |
+| `access-log-reader` | `integer` |  |  |
 
 ## `api-token`
 
@@ -41,6 +45,10 @@
 | `SetBackofficeUserEmail(id int64, value string) error` | writes a new email on one backoffice-user record |
 | `SetBackofficeUserPasswordHash(id int64, value string) error` | writes a new password-hash on one backoffice-user record |
 | `SetBackofficeUserRole(id int64, value int64) error` | writes a new role on one backoffice-user record |
+| `SetBackofficeUserTotpSecret(id int64, value string) error` | writes a new totp-secret on one backoffice-user record |
+| `SetBackofficeUserTotpEnabledAt(id int64, value int64) error` | writes a new totp-enabled-at on one backoffice-user record |
+| `SetBackofficeUserTotpLastStep(id int64, value int64) error` | writes a new totp-last-step on one backoffice-user record |
+| `SetBackofficeUserAccessLogReader(id int64, value int64) error` | writes a new access-log-reader on one backoffice-user record |
 | `RemoveBackofficeUser(id int64) error` | deletes one backoffice-user record and everything nested under it |
 | `AddBackofficeUserSession(parentId int64, props BackofficeUserSessionInput) (BackofficeUserSessionRecord, error)` | inserts one session record under one backoffice-user record |
 | `ListBackofficeUserSessions(parentId int64) ([]BackofficeUserSessionRecord, error)` | reads every session record of one backoffice-user record |

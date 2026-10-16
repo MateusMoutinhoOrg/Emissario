@@ -483,6 +483,23 @@
       color: #BFDBFE;
       border-color: rgba(96, 165, 250, 0.4);
     }
+    .banner {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .banner a { text-decoration: underline; font-weight: 600; }
+    .banner-danger {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      color: #FCA5A5;
+    }
+    .banner-warn {
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #FCD34D;
+    }
   </style>
 </head>
 <body>
@@ -501,6 +518,7 @@
         <a href="/admin/list-contact-requests">Contacts</a>
         <a href="/admin/root/list-backups" class="active">Backups</a>
         <a href="/admin/root/set-website-source">Website source</a>
+        <a href="/admin/root/set-privacy-settings">Privacy</a>
       </nav>
     </div>
     <div class="who">
@@ -513,6 +531,7 @@
   </header>
 
   <main>
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
     <section class="head">
       <div>
         <h1>Backups</h1>

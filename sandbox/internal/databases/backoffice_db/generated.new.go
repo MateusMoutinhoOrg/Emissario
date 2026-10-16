@@ -29,6 +29,10 @@ func New(sandbox *api.Sandbox) *BackofficeDb {
 					{Name: "role", Type: databasedeps.Int},
 					{Name: "session", Type: databasedeps.Nested, Fields: []databasedeps.Field{
 						{Name: "expires-at", Type: databasedeps.Int, Required: true}}},
+					{Name: "totp-secret", Type: databasedeps.String},
+					{Name: "totp-enabled-at", Type: databasedeps.Int},
+					{Name: "totp-last-step", Type: databasedeps.Int},
+					{Name: "access-log-reader", Type: databasedeps.Int},
 				},
 			},
 			{
@@ -81,6 +85,18 @@ func New(sandbox *api.Sandbox) *BackofficeDb {
 	}
 	self.SetBackofficeUserRole = func(id int64, value int64) error {
 		return SetBackofficeUserRole(self.sandbox, &self, id, value)
+	}
+	self.SetBackofficeUserTotpSecret = func(id int64, value string) error {
+		return SetBackofficeUserTotpSecret(self.sandbox, &self, id, value)
+	}
+	self.SetBackofficeUserTotpEnabledAt = func(id int64, value int64) error {
+		return SetBackofficeUserTotpEnabledAt(self.sandbox, &self, id, value)
+	}
+	self.SetBackofficeUserTotpLastStep = func(id int64, value int64) error {
+		return SetBackofficeUserTotpLastStep(self.sandbox, &self, id, value)
+	}
+	self.SetBackofficeUserAccessLogReader = func(id int64, value int64) error {
+		return SetBackofficeUserAccessLogReader(self.sandbox, &self, id, value)
 	}
 	self.RemoveBackofficeUser = func(id int64) error {
 		return RemoveBackofficeUser(self.sandbox, &self, id)

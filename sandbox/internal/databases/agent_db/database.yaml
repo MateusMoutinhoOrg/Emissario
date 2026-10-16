@@ -18,6 +18,10 @@ tables:
           type: integer
         - name: rate-per-minute
           type: integer
+        - name: summaries-enabled
+          type: integer
+        - name: summary-retention-days
+          type: integer
       name: agent-setting
     - fields:
         - name: name

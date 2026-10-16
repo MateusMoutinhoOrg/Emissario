@@ -292,6 +292,23 @@
       main { padding: 2rem 1rem; }
       h1 { font-size: 1.6rem; }
     }
+    .banner {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    .banner a { text-decoration: underline; font-weight: 600; }
+    .banner-danger {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.6);
+      color: #FCA5A5;
+    }
+    .banner-warn {
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      color: #FCD34D;
+    }
   </style>
 </head>
 <body>
@@ -310,6 +327,7 @@
         <a href="/admin/list-contact-requests">Contacts</a>
         {{if .Viewer.IsRoot}}<a href="/admin/root/list-backups">Backups</a>{{end}}
         {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">Website source</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">Privacy</a>{{end}}
       </nav>
     </div>
     <div class="who">
@@ -322,6 +340,7 @@
   </header>
 
   <main class="narrow">
+    {{range .Viewer.Banners}}<div class="banner banner-{{.Kind}}" role="alert">{{.Text}}{{if .Href}} <a href="{{.Href}}">{{.Link}}</a>{{end}}</div>{{end}}
     <div class="card denied">
       <div class="code">403 &middot; Forbidden</div>
       <h1>Root access required</h1>

@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serverdeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacyadmin"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeauth"
 )
 
@@ -18,6 +19,8 @@ type HomePage struct {
 	SessionMinutes int
 	// IsRoot shows what only a root may do.
 	IsRoot bool
+	// Banners are what is off in the privacy setup, shown to a root.
+	Banners []privacyadmin.Banner
 	// VisualizationToday and VisualizationWeek are the views of the public
 	// website today and in the last 7 days, bots left out.
 	VisualizationToday string
@@ -48,6 +51,7 @@ func RenderHomePage(sandbox *api.Sandbox, response *serverdeps.Response, user *b
 		Role:           backofficeauth.RoleName(sandbox, backofficeauth.Role(user.Role)),
 		SessionMinutes: sessionMinutes,
 		IsRoot:         backofficeauth.Role(user.Role) == backofficeauth.RoleRoot,
+		Banners:        privacyadmin.Banners(sandbox, user),
 
 		VisualizationToday: formatCount(sandbox, viewsToday),
 		VisualizationWeek:  formatCount(sandbox, viewsWeek),

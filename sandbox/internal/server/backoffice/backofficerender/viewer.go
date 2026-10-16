@@ -3,6 +3,7 @@ package backofficerender
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacyadmin"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/server/backoffice/backofficeauth"
 )
 
@@ -13,6 +14,9 @@ type Viewer struct {
 	Initial string
 	// IsRoot shows what only a root may do.
 	IsRoot bool
+	// Banners are what is off in the privacy setup, shown to a root above
+	// the content of every page.
+	Banners []privacyadmin.Banner
 }
 
 // viewerOf is the Viewer of user.
@@ -21,5 +25,6 @@ func viewerOf(sandbox *api.Sandbox, user *backoffice_db.BackofficeUserRecord) Vi
 		Username: user.Username,
 		Initial:  initialOf(sandbox, user.Username),
 		IsRoot:   backofficeauth.Role(user.Role) == backofficeauth.RoleRoot,
+		Banners:  privacyadmin.Banners(sandbox, user),
 	}
 }

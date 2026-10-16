@@ -19,6 +19,14 @@ tables:
               type: integer
           name: session
           type: object
+        - name: totp-secret
+          type: string
+        - name: totp-enabled-at
+          type: integer
+        - name: totp-last-step
+          type: integer
+        - name: access-log-reader
+          type: integer
       name: backoffice-user
     - fields:
         - name: token-sha256

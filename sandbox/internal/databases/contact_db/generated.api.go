@@ -63,6 +63,7 @@ type ContactSettingRecord struct {
 	MaxBytes      int64
 	RatePerMinute int64
 	IpDailyLimit  int64
+	RetentionDays int64
 }
 
 // ContactSettingInput is one insert into contact-setting: the fields a new record carries.
@@ -71,6 +72,7 @@ type ContactSettingInput struct {
 	MaxBytes      int64
 	RatePerMinute int64
 	IpDailyLimit  int64
+	RetentionDays int64
 }
 
 // ContactSettingFilter narrows a ListContactSetting. Every plain field is here, because
@@ -85,6 +87,8 @@ type ContactSettingFilter struct {
 	RatePerMinuteMax int64
 	IpDailyLimitMin  int64
 	IpDailyLimitMax  int64
+	RetentionDaysMin int64
+	RetentionDaysMax int64
 }
 
 // ContactDb is the contact-db database: the store database it was built over and
@@ -141,6 +145,8 @@ type ContactDb struct {
 	SetContactSettingRatePerMinute func(id int64, value int64) error
 	// SetContactSettingIpDailyLimit writes a new ip-daily-limit on one contact-setting record.
 	SetContactSettingIpDailyLimit func(id int64, value int64) error
+	// SetContactSettingRetentionDays writes a new retention-days on one contact-setting record.
+	SetContactSettingRetentionDays func(id int64, value int64) error
 	// RemoveContactSetting deletes one contact-setting record and everything nested under it.
 	RemoveContactSetting func(id int64) error
 }

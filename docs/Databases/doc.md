@@ -11,6 +11,7 @@ with the `generated.new.go` they render.
 | [`Backup`](backup.md) | `backup` | `backup` |
 | [`ContactDb`](contact_db.md) | `contact_db` | `contactdb` |
 | [`EmissarioDb`](emissario_db.md) | `emissario_db` | `emissariodb` |
+| [`PrivacyDb`](privacy_db.md) | `privacy_db` | `privacydb` |
 | [`VisualizationDb`](visualization_db.md) | `visualization_db` | `visualizationdb` |
 
 ## The files
