@@ -1,0 +1,35 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            acknowledge:
+                items:
+                    type: string
+                type: array
+            also_access_log:
+                type: boolean
+            ip:
+                maxLength: 128
+                type: string
+            text:
+                maxLength: 200
+                type: string
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only. {ip?, text?, also_access_log?, acknowledge?}: deletes every record of that person but the held ones and, unless also_access_log, the access log rows; deleting access log rows answers 409 acknowledgement-required with erase-kept-v1 every time until it is in acknowledge. Answers {erased: {contact_requests, views, agent_usage, agent_summaries, access_log, total}, kept: {held, access_log}}. Nothing records who erased.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootErasePrivacySubject
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/erase-privacy-subject
+priority: 100
+private: true
+response-type: application/json
+summary: Deletes every record of a person but those the law or a hold keeps

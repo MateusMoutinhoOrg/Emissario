@@ -92,7 +92,9 @@ or `403`, for example — or let it through to this route.
 | [`download-backup`](download_backup.md) | depends on the address — `explain-route` gives the exact answer |
 | [`export-access-log`](export_access_log.md) | depends on the address — `explain-route` gives the exact answer |
 | [`export-contact-requests`](export_contact_requests.md) | depends on the address — `explain-route` gives the exact answer |
+| [`export-privacy-subject`](export_privacy_subject.md) | depends on the address — `explain-route` gives the exact answer |
 | [`export-visualization-views`](export_visualization_views.md) | depends on the address — `explain-route` gives the exact answer |
+| [`find-privacy-subject-page`](find_privacy_subject_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-agent-urls-page`](list_agent_urls_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backups-page`](list_backups_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-agent-settings-page`](set_agent_settings_page.md) | depends on the address — `explain-route` gives the exact answer |

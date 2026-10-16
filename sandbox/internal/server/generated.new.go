@@ -35,8 +35,10 @@ import (
 	routes_api_delete_access_log "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_delete_access_log"
 	routes_api_download_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_download_backup"
 	routes_api_download_backup_file "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_download_backup_file"
+	routes_api_erase_privacy_subject "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_erase_privacy_subject"
 	routes_api_export_access_log "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_export_access_log"
 	routes_api_export_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_export_contact_requests"
+	routes_api_find_privacy_subject "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_find_privacy_subject"
 	routes_api_get_agent_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_agent_settings"
 	routes_api_get_contact_settings "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_contact_settings"
 	routes_api_get_privacy_notice_draft "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_get_privacy_notice_draft"
@@ -106,9 +108,12 @@ import (
 	routes_create_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/create_backup_form"
 	routes_delete_access_log_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/delete_access_log_form"
 	routes_download_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/download_backup"
+	routes_erase_privacy_subject_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/erase_privacy_subject_form"
 	routes_export_access_log "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_access_log"
 	routes_export_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_contact_requests"
+	routes_export_privacy_subject "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_privacy_subject"
 	routes_export_visualization_views "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/export_visualization_views"
+	routes_find_privacy_subject_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/find_privacy_subject_page"
 	routes_hash_privacy_ips_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/hash_privacy_ips_form"
 	routes_hold_privacy_records_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/hold_privacy_records_form"
 	routes_list_agent_urls_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/list_agent_urls_page"
@@ -199,8 +204,10 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_delete_access_log.NewRoute(sandbox),
 		routes_api_download_backup.NewRoute(sandbox),
 		routes_api_download_backup_file.NewRoute(sandbox),
+		routes_api_erase_privacy_subject.NewRoute(sandbox),
 		routes_api_export_access_log.NewRoute(sandbox),
 		routes_api_export_contact_requests.NewRoute(sandbox),
+		routes_api_find_privacy_subject.NewRoute(sandbox),
 		routes_api_get_agent_settings.NewRoute(sandbox),
 		routes_api_get_agent_summary.NewRoute(sandbox),
 		routes_api_get_backoffice_user.NewRoute(sandbox),
@@ -258,9 +265,12 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_create_backup_form.NewRoute(sandbox),
 		routes_delete_access_log_form.NewRoute(sandbox),
 		routes_download_backup.NewRoute(sandbox),
+		routes_erase_privacy_subject_form.NewRoute(sandbox),
 		routes_export_access_log.NewRoute(sandbox),
 		routes_export_contact_requests.NewRoute(sandbox),
+		routes_export_privacy_subject.NewRoute(sandbox),
 		routes_export_visualization_views.NewRoute(sandbox),
+		routes_find_privacy_subject_page.NewRoute(sandbox),
 		routes_get_agent_summary_page.NewRoute(sandbox),
 		routes_get_contact_request_page.NewRoute(sandbox),
 		routes_hash_privacy_ips_form.NewRoute(sandbox),

@@ -1,0 +1,29 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            ip:
+                maxLength: 128
+                type: string
+            text:
+                maxLength: 200
+                type: string
+        type: object
+    max-bytes: 4096
+    required: true
+    type: json
+category: Privacy API
+description: 'Root only. {ip?, text?}: answers {contact_requests, views, agent_usage, agent_summaries, access_log, held: {contact-request, agent-summary, access-log}, kept_by_law, ip_key_made_at, total}; access_log is null for a root who is not a reader, held lists ids — never a reason — and kept_by_law the access log rows inside their term. 400 for no ip and no text, a range, or a text under 3 characters.'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootFindPrivacySubject
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/find-privacy-subject
+priority: 100
+private: true
+response-type: application/json
+summary: Finds every record of a person, by IP or by a text they sent

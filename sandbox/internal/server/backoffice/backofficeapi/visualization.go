@@ -110,24 +110,30 @@ func VisualizationVisitorsJSON(sandbox *api.Sandbox, rows []visualization.Visito
 	return document
 }
 
+// VisualizationViewJSON is one view: {id, at, path, page, status, ip,
+// country, device, browser, os, referrer, user_agent}.
+func VisualizationViewJSON(sandbox *api.Sandbox, view visualization_db.VisualizationViewRecord) *serializabledeps.SerializableObject {
+	item := sandbox.Deps.SerializableDeps.CreateObject()
+	item.AddItemToObject("id", view.Id)
+	item.AddItemToObject("at", view.At)
+	item.AddItemToObject("path", view.Path)
+	item.AddItemToObject("page", view.Page)
+	item.AddItemToObject("status", view.Status)
+	item.AddItemToObject("ip", view.Ip)
+	item.AddItemToObject("country", view.Country)
+	item.AddItemToObject("device", view.Device)
+	item.AddItemToObject("browser", view.Browser)
+	item.AddItemToObject("os", view.Os)
+	item.AddItemToObject("referrer", view.Referrer)
+	item.AddItemToObject("user_agent", view.UserAgent)
+	return item
+}
+
 // VisualizationViewsJSON is {views, total, page, pages, limit}.
 func VisualizationViewsJSON(sandbox *api.Sandbox, views []visualization_db.VisualizationViewRecord, paging visualization.Paging) *serializabledeps.SerializableObject {
 	array := sandbox.Deps.SerializableDeps.CreateArray()
 	for _, view := range views {
-		item := sandbox.Deps.SerializableDeps.CreateObject()
-		item.AddItemToObject("id", view.Id)
-		item.AddItemToObject("at", view.At)
-		item.AddItemToObject("path", view.Path)
-		item.AddItemToObject("page", view.Page)
-		item.AddItemToObject("status", view.Status)
-		item.AddItemToObject("ip", view.Ip)
-		item.AddItemToObject("country", view.Country)
-		item.AddItemToObject("device", view.Device)
-		item.AddItemToObject("browser", view.Browser)
-		item.AddItemToObject("os", view.Os)
-		item.AddItemToObject("referrer", view.Referrer)
-		item.AddItemToObject("user_agent", view.UserAgent)
-		array.AddItemToArray(item)
+		array.AddItemToArray(VisualizationViewJSON(sandbox, view))
 	}
 	document := sandbox.Deps.SerializableDeps.CreateObject()
 	document.AddItemToObject("views", array)

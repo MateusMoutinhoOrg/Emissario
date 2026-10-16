@@ -142,7 +142,9 @@ it prints the address it took. Change it to wherever your server runs.
 | Route | What it does |
 | --- | --- |
 | [`POST /api/admin/root/delete-access-log`](api_delete_access_log.md) | Deletes access log rows, to its readers |
+| [`POST /api/admin/root/erase-privacy-subject`](api_erase_privacy_subject.md) | Deletes every record of a person but those the law or a hold keeps |
 | [`POST /api/admin/root/export-access-log`](api_export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`POST /api/admin/root/find-privacy-subject`](api_find_privacy_subject.md) | Finds every record of a person, by IP or by a text they sent |
 | [`POST /api/admin/root/get-privacy-notice-draft`](api_get_privacy_notice_draft.md) | Answers the privacy notice draft of the settings in use |
 | [`POST /api/admin/root/get-privacy-settings`](api_get_privacy_settings.md) | Answers the privacy settings, the encryption and what this server keeps |
 | [`POST /api/admin/root/hash-privacy-ips`](api_hash_privacy_ips.md) | Turns every full IP the records keep into its hash |
@@ -224,7 +226,10 @@ it prints the address it took. Change it to wherever your server runs.
 | --- | --- |
 | [`GET /admin/root/access-log`](access_log_page.md) | Shows the access log of the Marco Civil, to its readers |
 | [`POST /admin/root/delete-access-log`](delete_access_log_form.md) | Deletes access log rows, to its readers |
+| [`POST /admin/root/erase-privacy-subject`](erase_privacy_subject_form.md) | Deletes every record of a person but those the law or a hold keeps |
 | [`GET /admin/root/export-access-log`](export_access_log.md) | Exports the access log rows a filter keeps, to its readers |
+| [`GET /admin/root/export-privacy-subject`](export_privacy_subject.md) | Downloads every record of a person as JSON |
+| [`GET /admin/root/find-privacy-subject`](find_privacy_subject_page.md) | Finds every record of a person, by IP or by a text they sent |
 | [`POST /admin/root/hash-privacy-ips`](hash_privacy_ips_form.md) | Turns every full IP the records keep into its hash |
 | [`POST /admin/root/hold-privacy-records`](hold_privacy_records_form.md) | Puts rows on a legal hold |
 | [`POST /admin/root/release-privacy-hold`](release_privacy_hold_form.md) | Releases a legal hold |

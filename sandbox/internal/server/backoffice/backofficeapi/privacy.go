@@ -189,3 +189,99 @@ func HashedIpsJSON(sandbox *api.Sandbox, hashed privacyadmin.HashedIps) *seriali
 	document.AddItemToObject("hashed", counts)
 	return document
 }
+
+// SubjectJSON is every record of a person Find and erase found:
+// {contact_requests, views, agent_usage, agent_summaries, access_log, held,
+// kept_by_law, ip_key_made_at, total}. access_log is null for a root who does
+// not read it; held lists the ids of each table on a legal hold — never the
+// reason — and kept_by_law the access log rows still inside their term.
+func SubjectJSON(sandbox *api.Sandbox, found privacyadmin.Found) *serializabledeps.SerializableObject {
+	serial := sandbox.Deps.SerializableDeps
+	contacts := serial.CreateArray()
+	for _, request := range found.Contacts {
+		contacts.AddItemToArray(ContactRequestJSON(sandbox, request, true))
+	}
+	views := serial.CreateArray()
+	for _, view := range found.Views {
+		views.AddItemToArray(VisualizationViewJSON(sandbox, view))
+	}
+	usages := serial.CreateArray()
+	for _, usage := range found.Usages {
+		item := serial.CreateObject()
+		item.AddItemToObject("id", usage.Id)
+		item.AddItemToObject("at", usage.At)
+		item.AddItemToObject("ip", usage.Ip)
+		item.AddItemToObject("kind", usage.Kind)
+		item.AddItemToObject("input_tokens", usage.InputTokens)
+		item.AddItemToObject("output_tokens", usage.OutputTokens)
+		usages.AddItemToArray(item)
+	}
+	summaries := serial.CreateArray()
+	for _, summary := range found.Summaries {
+		summaries.AddItemToArray(AgentSummaryJSON(sandbox, summary, true))
+	}
+	held := serial.CreateObject()
+	for _, table := range privacy.HoldTables {
+		ids := serial.CreateArray()
+		add := func(id int64) {
+			if found.Held[table][id] {
+				ids.AddItemToArray(id)
+			}
+		}
+		switch table {
+		case privacy.TableContactRequest:
+			for _, request := range found.Contacts {
+				add(request.Id)
+			}
+		case privacy.TableAgentSummary:
+			for _, summary := range found.Summaries {
+				add(summary.Id)
+			}
+		case privacy.TableAccessLog:
+			for _, row := range found.Access {
+				add(row.Id)
+			}
+		}
+		held.AddItemToObject(table, ids)
+	}
+	keptByLaw := serial.CreateArray()
+	for _, row := range found.Access {
+		if found.InsideTerm[row.Id] {
+			keptByLaw.AddItemToArray(row.Id)
+		}
+	}
+	document := serial.CreateObject()
+	document.AddItemToObject("contact_requests", contacts)
+	document.AddItemToObject("views", views)
+	document.AddItemToObject("agent_usage", usages)
+	document.AddItemToObject("agent_summaries", summaries)
+	if found.AccessShown {
+		document.AddItemToObject("access_log", AccessRowsJSON(sandbox, found.Access))
+	} else {
+		document.AddItemToObject("access_log", serial.CreateNull())
+	}
+	document.AddItemToObject("held", held)
+	document.AddItemToObject("kept_by_law", keptByLaw)
+	document.AddItemToObject("ip_key_made_at", found.IpKeyMadeAt)
+	document.AddItemToObject("total", found.Total())
+	return document
+}
+
+// ErasedJSON is {erased: {contact_requests, views, agent_usage,
+// agent_summaries, access_log, total}, kept: {held, access_log}}.
+func ErasedJSON(sandbox *api.Sandbox, erased privacyadmin.Erased) *serializabledeps.SerializableObject {
+	counts := sandbox.Deps.SerializableDeps.CreateObject()
+	counts.AddItemToObject("contact_requests", erased.Contacts)
+	counts.AddItemToObject("views", erased.Views)
+	counts.AddItemToObject("agent_usage", erased.Usages)
+	counts.AddItemToObject("agent_summaries", erased.Summaries)
+	counts.AddItemToObject("access_log", erased.Access)
+	counts.AddItemToObject("total", erased.Total())
+	kept := sandbox.Deps.SerializableDeps.CreateObject()
+	kept.AddItemToObject("held", erased.Held)
+	kept.AddItemToObject("access_log", erased.KeptByLaw)
+	document := sandbox.Deps.SerializableDeps.CreateObject()
+	document.AddItemToObject("erased", counts)
+	document.AddItemToObject("kept", kept)
+	return document
+}

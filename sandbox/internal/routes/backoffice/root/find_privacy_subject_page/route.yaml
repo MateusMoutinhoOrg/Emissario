@@ -1,0 +1,48 @@
+category: Privacy
+description: 'Root only. With ip — one address, hashed with the current IP key to match the hashes, or a hash h:… — and/or text — 3 to 200 characters an email, a phone or a name holds — every contact request, view, agent usage and agent summary of that person, and for an access log reader its access log rows, each marked deleted or kept by Delete all: the access log rows (LGPD art. 16 I; GDPR art. 17(3)(b)) and the rows on a legal hold, whose reason is never shown. A search that shows access log rows is inventoried. Hashes made before a Rotate IP key no longer match (GDPR art. 11).'
+methods:
+    - GET
+parameters:
+    - description: 'the ip of the person: one address, or a hash h:…'
+      id: Ip
+      key: ip
+      sources:
+        - query
+      type: string
+    - description: 'a text the person sent: an email, a phone, a name'
+      id: Text
+      key: text
+      sources:
+        - query
+      type: string
+    - description: the outcome code of the last erasure
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many rows the last erasure deleted
+      id: Count
+      key: count
+      sources:
+        - query
+      type: integer
+    - default: "0"
+      description: how many rows the last erasure kept
+      id: Kept
+      key: kept
+      sources:
+        - query
+      type: integer
+paths:
+    - end: -1
+      id: AdminRootFindPrivacySubject
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/find-privacy-subject
+priority: 100
+private: true
+response-type: text/html
+summary: Finds every record of a person, by IP or by a text they sent

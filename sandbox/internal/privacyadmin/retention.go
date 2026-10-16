@@ -336,7 +336,8 @@ func StartCleanup(sandbox *api.Sandbox) {
 // watchRestores is the body of the watcher goroutine: once a restore ends,
 // the privacy settings and the IP key are read again from the store — a
 // restore that included the backoffice put privacy-db back — and so are the
-// banners. It never returns.
+// banners, and every erasure kept is applied again, so erased data does not
+// come back with the snapshot. It never returns.
 func watchRestores(sandbox *api.Sandbox) {
 	seen := snapshots.RestoresEnded(sandbox)
 	for {
@@ -344,6 +345,12 @@ func watchRestores(sandbox *api.Sandbox) {
 			seen = ended
 			privacy.InvalidateCache(sandbox)
 			InvalidateBanners(sandbox)
+			replayed, err := ReplayErasures(sandbox)
+			if err != nil {
+				sandbox.Deps.StdDeps.Eprintf("warning: the erasures could not be applied again after the restore: %s\n", err.Error())
+			} else if replayed > 0 {
+				sandbox.Deps.StdDeps.Logf("privacy: %d rows erased before were deleted again after the restore\n", replayed)
+			}
 		}
 		sandbox.Deps.SleepDeps.Sleep(watchMilliseconds)
 	}
@@ -374,6 +381,11 @@ func RunCleanup(sandbox *api.Sandbox) {
 	if swept.Total() > 0 || swept.Released > 0 {
 		sandbox.Deps.StdDeps.Logf("privacy: retention cleanup deleted %d contact requests, %d views, %d agent summaries, %d access log rows and %d snapshots; blanked %d contact request ips, %d view ips and %d agent usage ips; released %d holds\n",
 			swept.Contacts, swept.Views, swept.Summaries, swept.AccessLog, swept.Snapshots, swept.ContactIps, swept.ViewIps, swept.UsageIps, swept.Released)
+	}
+	if forgotten, err := ForgetErasures(sandbox); err != nil {
+		sandbox.Deps.StdDeps.Eprintf("warning: the retention cleanup could not forget the old erasures: %s\n", err.Error())
+	} else if forgotten > 0 {
+		sandbox.Deps.StdDeps.Logf("privacy: %d erasures older than every snapshot forgotten\n", forgotten)
 	}
 	InvalidateBanners(sandbox)
 }
