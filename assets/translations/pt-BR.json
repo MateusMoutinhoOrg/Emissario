@@ -3,6 +3,8 @@
   "text": {
     "common": {
       "access_log": "Log de acesso",
+      "ip_blocks": "Bloqueios de IP",
+      "block": "Bloquear",
       "back_office": "Back<span>office</span>",
       "home": "Início",
       "users": "Usuários",
@@ -476,7 +478,39 @@
       "snapshot_every_database_download_snapshot": "Faça snapshot de todos os bancos de dados, baixe um snapshot como zip, envie um de volta ou restaure um sobre os dados atuais.",
       "view_backups": "Ver backups",
       "pick_git_repository_branch_public": "Escolha o repositório git e o branch de onde o site público é servido, e com que frequência ele é puxado.",
-      "set_website_source": "Definir fonte do site"
+      "set_website_source": "Definir fonte do site",
+      "turn_away_ip_range_country": "Recuse as requisições de um ip, uma faixa CIDR, um ip com hash ou um país inteiro, antes que o site, o formulário de contato ou o agente as respondam.",
+      "open_ip_blocks": "Abrir bloqueios de IP"
+    },
+    "ip_blocks": {
+      "ip_blocks": "Bloqueios de IP",
+      "requests_from_blocked_turned_away": "Requisições de um ip, faixa, ip com hash ou país bloqueado são respondidas com 403 antes de qualquer rota lê-las: o site, o formulário de contato, o agente e o login. Uma requisição autenticada por uma sessão do backoffice ou por um token de API nunca é bloqueada.",
+      "no_country_database_open": "Nenhuma base de países está aberta neste processo: um bloqueio de país não pega ninguém até o start-server abrir uma.",
+      "block_ip": "Bloquear um IP",
+      "ip_range_or_hashed_ip": "IP, faixa CIDR ou IP com hash",
+      "hashed_mode_hint": "Os registros guardam IPs com hash: copie o hash (h:…) de um visitante ou de um contato, ou siga o link Bloquear dele. Um ip ou uma faixa digitados são guardados como digitados.",
+      "full_mode_hint": "Um ip (203.0.113.7), uma faixa CIDR (203.0.113.0/24), ou um IP com hash (h:…) que um registro guardou antes.",
+      "ipv6_blocked_by_64": "Um endereço IPv6 é bloqueado pelo seu /64.",
+      "reason_placeholder": "spam pelo formulário de contato",
+      "days": "Dias",
+      "until_root_removes_it": "Até que um root o remova",
+      "days_hint": "De 1 a 36500; em branco bloqueia até que um root o remova. Um bloqueio encerrado é excluído pela limpeza de hora em hora.",
+      "block": "Bloquear",
+      "block_country": "Bloquear um país",
+      "choose_country": "Escolha um país…",
+      "country_hint": "Consultado na mesma base de países das visualizações de página. Um visitante atrás de uma VPN ou de um proxy em outro país passa.",
+      "block_country_button": "Bloquear país",
+      "you_are_connected_from": "Você está conectado de {0} ({1}): um bloqueio que o pega é recusado, então você não consegue bloquear a si mesmo.",
+      "blocked": "Bloqueado",
+      "kind": "Tipo",
+      "since": "Desde",
+      "requests_turned_away": "Recusadas",
+      "ended": "encerrado",
+      "stale": "obsoleto",
+      "stale_title": "Feito antes do último Rotacionar chave de IP: não pega mais ninguém.",
+      "remove_block_confirm": "Remover o bloqueio de {0}? As requisições dele voltam a ser respondidas.",
+      "no_block_yet": "Nenhum bloqueio ainda: toda requisição é respondida.",
+      "counted_since_server_started": "Recusadas conta as requisições desde que o servidor iniciou. No máximo {0} bloqueios. Um root que o login recusa remove um bloqueio com o comando remove-ip-blocks."
     },
     "login": {
       "backoffice_login": "Login do backoffice",
@@ -908,6 +942,22 @@
     "who read the access log, when, for how long, what and with which filter": "quem leu o log de acesso, quando, por quanto tempo, o quê e com qual filtro",
     "the backoffice users could not be read": "os usuários do backoffice não puderam ser lidos",
     "the privacy settings could not be read": "as configurações de privacidade não puderam ser lidas",
-    "the readers could not be saved": "os leitores não puderam ser salvos"
+    "the readers could not be saved": "os leitores não puderam ser salvos",
+    "Blocked: requests from it are turned away from now on.": "Bloqueado: as requisições dele são recusadas a partir de agora.",
+    "1 block removed.": "1 bloqueio removido.",
+    "Range": "Faixa",
+    "Hashed IP": "IP com hash",
+    "Type an ip, a CIDR range, a hashed ip or a country code.": "Digite um ip, uma faixa CIDR, um ip com hash ou um código de país.",
+    "This is no country code: a country is its ISO 3166-1 alpha-2 code, such as BR.": "Isto não é um código de país: um país é o seu código ISO 3166-1 alfa-2, como BR.",
+    "A hashed IP is h: followed by 32 hex digits.": "Um IP com hash é h: seguido de 32 dígitos hexadecimais.",
+    "Type one ip (203.0.113.7), one CIDR range (203.0.113.0/24), one hashed IP (h:…) or one country code (BR).": "Digite um ip (203.0.113.7), uma faixa CIDR (203.0.113.0/24), um IP com hash (h:…) ou um código de país (BR).",
+    "The reason is at most 200 characters.": "O motivo tem no máximo 200 caracteres.",
+    "The days are a number from 1 to 36500, or blank to block until a root removes it.": "Os dias são um número de 1 a 36500, ou em branco para bloquear até que um root o remova.",
+    "This block matches the IP you are connected from: you would block yourself.": "Este bloqueio pega o IP de onde você está conectado: você bloquearia a si mesmo.",
+    "This value is blocked already.": "Este valor já está bloqueado.",
+    "There are 10000 blocks already: remove one first.": "Já existem 10000 bloqueios: remova um antes.",
+    "Select at least one block.": "Selecione pelo menos um bloqueio.",
+    "Remove at most 100 blocks at once.": "Remova no máximo 100 bloqueios de uma vez.",
+    "No block has this id.": "Nenhum bloqueio tem este id."
   }
 }

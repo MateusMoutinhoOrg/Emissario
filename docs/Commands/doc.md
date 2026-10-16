@@ -15,6 +15,7 @@ lists the flags of the middlewares in front of it too.
 | Command | Does |
 | --- | --- |
 | [`add-backoffice-user`](add-backoffice-user.md) | Create a backoffice user with a generated password, printed once |
+| [`remove-ip-blocks`](remove-ip-blocks.md) | Remove IP blocks: the one of a value, or every one |
 | [`reset-backoffice-totp`](reset-backoffice-totp.md) | Turn off the two-factor sign-in of a backoffice user |
 
 ## Info

@@ -28,6 +28,7 @@ import (
 	routes_api_add_backup_blob "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_add_backup_blob"
 	routes_api_add_backup_file "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_add_backup_file"
 	routes_api_add_backup_reference "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_add_backup_reference"
+	routes_api_add_ip_block "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_add_ip_block"
 	routes_api_apply_privacy_preset "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_apply_privacy_preset"
 	routes_api_archive_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_archive_contact_requests"
 	routes_api_check_privacy_preset "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_check_privacy_preset"
@@ -56,6 +57,7 @@ import (
 	routes_api_list_agent_urls "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_agent_urls"
 	routes_api_list_backup_files "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_backup_files"
 	routes_api_list_backups "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_backups"
+	routes_api_list_ip_blocks "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_ip_blocks"
 	routes_api_list_privacy_access "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_privacy_access"
 	routes_api_list_privacy_holds "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_privacy_holds"
 	routes_api_list_privacy_presets "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_list_privacy_presets"
@@ -68,6 +70,7 @@ import (
 	routes_api_remove_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_backoffice_user"
 	routes_api_remove_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_backup"
 	routes_api_remove_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_contact_requests"
+	routes_api_remove_ip_blocks "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_remove_ip_blocks"
 	routes_api_reset_backoffice_totp "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_reset_backoffice_totp"
 	routes_api_restore_backup "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_restore_backup"
 	routes_api_rotate_privacy_ip_key "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/api/backoffice/root/api_rotate_privacy_ip_key"
@@ -114,6 +117,7 @@ import (
 	routes_add_agent_url_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/add_agent_url_page"
 	routes_add_backoffice_user_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/add_backoffice_user_form"
 	routes_add_backoffice_user_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/add_backoffice_user_page"
+	routes_add_ip_block_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/add_ip_block_form"
 	routes_apply_privacy_preset_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/apply_privacy_preset_form"
 	routes_archive_contact_requests_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/archive_contact_requests_form"
 	routes_create_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/create_backup_form"
@@ -131,6 +135,7 @@ import (
 	routes_hash_privacy_ips_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/hash_privacy_ips_form"
 	routes_hold_privacy_records_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/hold_privacy_records_form"
 	routes_import_privacy_preset_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/import_privacy_preset_form"
+	routes_ip_blocks_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/ip_blocks_page"
 	routes_list_agent_urls_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/list_agent_urls_page"
 	routes_list_backups_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/list_backups_page"
 	routes_optimize_backup_storage_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/optimize_backup_storage_form"
@@ -143,6 +148,7 @@ import (
 	routes_remove_backoffice_user_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_backoffice_user_form"
 	routes_remove_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_backup_form"
 	routes_remove_contact_requests_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_contact_requests_form"
+	routes_remove_ip_blocks_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/remove_ip_blocks_form"
 	routes_reset_backoffice_totp_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/reset_backoffice_totp_form"
 	routes_restore_backup_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/restore_backup_form"
 	routes_rotate_privacy_ip_key_form "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/root/rotate_privacy_ip_key_form"
@@ -171,6 +177,7 @@ import (
 	routes_set_totp_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/set_totp_page"
 	routes_set_totp_qr "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/set_totp_qr"
 	routes_visualization_dashboard_page "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/backoffice/visualization_dashboard_page"
+	routes_ip_blocker "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/blocker/middleware/ip_blocker"
 	routes_contact_requests "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/contact/contact_requests"
 	routes_front "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/front"
 	routes_health "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/routes/health"
@@ -199,6 +206,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_backoffice_session_auth.NewRoute(sandbox),
 		routes_backoffice_api_root_guard.NewRoute(sandbox),
 		routes_backoffice_root_guard.NewRoute(sandbox),
+		routes_ip_blocker.NewRoute(sandbox),
 		routes_access_log_page.NewRoute(sandbox),
 		routes_add_agent_url_form.NewRoute(sandbox),
 		routes_add_agent_url_page.NewRoute(sandbox),
@@ -206,6 +214,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_add_backoffice_api_token_page.NewRoute(sandbox),
 		routes_add_backoffice_user_form.NewRoute(sandbox),
 		routes_add_backoffice_user_page.NewRoute(sandbox),
+		routes_add_ip_block_form.NewRoute(sandbox),
 		routes_agent_dashboard_page.NewRoute(sandbox),
 		routes_agent_messages.NewRoute(sandbox),
 		routes_agent_summaries.NewRoute(sandbox),
@@ -215,6 +224,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_add_backup_blob.NewRoute(sandbox),
 		routes_api_add_backup_file.NewRoute(sandbox),
 		routes_api_add_backup_reference.NewRoute(sandbox),
+		routes_api_add_ip_block.NewRoute(sandbox),
 		routes_api_agent_usage.NewRoute(sandbox),
 		routes_api_apply_privacy_preset.NewRoute(sandbox),
 		routes_api_archive_contact_requests.NewRoute(sandbox),
@@ -251,6 +261,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_list_backup_files.NewRoute(sandbox),
 		routes_api_list_backups.NewRoute(sandbox),
 		routes_api_list_contact_requests.NewRoute(sandbox),
+		routes_api_list_ip_blocks.NewRoute(sandbox),
 		routes_api_list_privacy_access.NewRoute(sandbox),
 		routes_api_list_privacy_holds.NewRoute(sandbox),
 		routes_api_list_privacy_presets.NewRoute(sandbox),
@@ -266,6 +277,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_api_remove_backoffice_user.NewRoute(sandbox),
 		routes_api_remove_backup.NewRoute(sandbox),
 		routes_api_remove_contact_requests.NewRoute(sandbox),
+		routes_api_remove_ip_blocks.NewRoute(sandbox),
 		routes_api_reset_backoffice_totp.NewRoute(sandbox),
 		routes_api_restore_backup.NewRoute(sandbox),
 		routes_api_rotate_privacy_ip_key.NewRoute(sandbox),
@@ -309,6 +321,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_health.NewRoute(sandbox),
 		routes_hold_privacy_records_form.NewRoute(sandbox),
 		routes_import_privacy_preset_form.NewRoute(sandbox),
+		routes_ip_blocks_page.NewRoute(sandbox),
 		routes_list_agent_summaries_page.NewRoute(sandbox),
 		routes_list_agent_urls_page.NewRoute(sandbox),
 		routes_list_backoffice_api_tokens_page.NewRoute(sandbox),
@@ -329,6 +342,7 @@ func NewServer(sandbox *api.Sandbox) api.Server {
 		routes_remove_backoffice_user_form.NewRoute(sandbox),
 		routes_remove_backup_form.NewRoute(sandbox),
 		routes_remove_contact_requests_form.NewRoute(sandbox),
+		routes_remove_ip_blocks_form.NewRoute(sandbox),
 		routes_reset_backoffice_totp_form.NewRoute(sandbox),
 		routes_restore_backup_form.NewRoute(sandbox),
 		routes_revoke_backoffice_api_token_form.NewRoute(sandbox),

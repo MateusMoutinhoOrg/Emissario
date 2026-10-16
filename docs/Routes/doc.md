@@ -118,6 +118,7 @@ it prints the address it took. Change it to wherever your server runs.
 | [`ANY /admin/*`](backoffice_same_origin.md) | Refuses a request to /admin another site's page sent |
 | [`ANY /*`](backoffice_security_headers.md) | Sends the security headers on every /admin and /api/admin response, and the basic ones on every other |
 | [`ANY /admin/* !(/admin/login)`](backoffice_session_auth.md) | Requires a valid backoffice session on /admin, except /admin/login |
+| [`ANY /*`](ip_blocker.md) | Turns away a request whose ip a root blocked: one ip, a CIDR range, a hashed ip or a country |
 
 ## Backoffice Backups API
 
@@ -137,6 +138,14 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /api/admin/root/remove-backup`](api_remove_backup.md) | Deletes a snapshot; the contents only it held stay stored until the backups size is optimized |
 | [`POST /api/admin/root/restore-backup`](api_restore_backup.md) | Starts putting a snapshot back over every database, after a pre-restore snapshot of them, and answers 202 at once |
 | [`POST /api/admin/root/upload-backup`](api_upload_backup.md) | Stores a zip archive a download built as a new snapshot |
+
+## IP Blocks API
+
+| Route | What it does |
+| --- | --- |
+| [`POST /api/admin/root/add-ip-block`](api_add_ip_block.md) | Blocks an ip, a CIDR range, a hashed ip or a country |
+| [`POST /api/admin/root/list-ip-blocks`](api_list_ip_blocks.md) | Lists the IP blocks |
+| [`POST /api/admin/root/remove-ip-blocks`](api_remove_ip_blocks.md) | Removes IP blocks |
 
 ## Privacy API
 
@@ -255,6 +264,14 @@ it prints the address it took. Change it to wherever your server runs.
 | [`POST /admin/root/set-access-log-readers`](set_access_log_readers_form.md) | Names the roots who read the access log |
 | [`POST /admin/root/set-privacy-settings`](set_privacy_settings_form.md) | Saves the privacy settings, after the notices they need |
 | [`GET /admin/root/set-privacy-settings`](set_privacy_settings_page.md) | Shows the Privacy page: the privacy settings, what this server keeps, the legal holds and the notices |
+
+## IP Blocks
+
+| Route | What it does |
+| --- | --- |
+| [`POST /admin/root/add-ip-block`](add_ip_block_form.md) | Blocks an ip, a CIDR range, a hashed ip or a country |
+| [`GET /admin/root/ip-blocks`](ip_blocks_page.md) | Lists the IP blocks and adds one: an ip, a CIDR range, a hashed ip or a country |
+| [`POST /admin/root/remove-ip-blocks`](remove_ip_blocks_form.md) | Removes the IP blocks selected |
 
 ## Backoffice Backups
 

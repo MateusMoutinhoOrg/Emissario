@@ -8,6 +8,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/cli/errors"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commandprops"
 	add_backoffice_user "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/backoffice/add_backoffice_user"
+	remove_ip_blocks "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/backoffice/remove_ip_blocks"
 	reset_backoffice_totp "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/backoffice/reset_backoffice_totp"
 	help "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/info/help"
 	version "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/commands/info/version"
@@ -48,6 +49,7 @@ func NewCli(sandbox *api.Sandbox) api.Cli {
 		add_backoffice_user.NewCommand(sandbox),
 		generate_encrypt_key.NewCommand(sandbox),
 		help.NewCommand(sandbox),
+		remove_ip_blocks.NewCommand(sandbox),
 		reset_backoffice_totp.NewCommand(sandbox),
 		rotate_encrypt_key.NewCommand(sandbox),
 		start_server.NewCommand(sandbox),

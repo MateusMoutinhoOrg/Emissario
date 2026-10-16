@@ -25,8 +25,10 @@ type VisualizationVisitorsPage struct {
 type VisualizationVisitorLine struct {
 	// Ip is masked to a viewer.
 	Ip string
-	// ViewsHref is the views of this ip, for a root alone.
+	// ViewsHref is the views of this ip, and BlockHref the blocks page
+	// ready to block it, for a root alone.
 	ViewsHref string
+	BlockHref string
 	Flag      string
 	Country   string
 	Device    string
@@ -73,6 +75,7 @@ func RenderVisualizationVisitorsPage(sandbox *api.Sandbox, response *serverdeps.
 		}
 		if viewer.IsRoot {
 			line.ViewsHref = visualization.Href(sandbox, visualization.ViewsPath, visualization.SetParam(params, visualization.KeyIp, row.Ip))
+			line.BlockHref = IpBlockHref(sandbox, row.Ip)
 		}
 		page.Rows = append(page.Rows, line)
 	}

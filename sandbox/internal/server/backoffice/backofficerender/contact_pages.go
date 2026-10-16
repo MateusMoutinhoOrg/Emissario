@@ -278,6 +278,8 @@ type ContactRequestPage struct {
 	Back          string
 	// Hold is the form a root holds the request with, nil for a viewer.
 	Hold *HoldBox
+	// BlockHref is the blocks page ready to block the ip, "" for a viewer.
+	BlockHref string
 }
 
 // RenderContactRequestPage answers one contact request whole, with the
@@ -309,6 +311,7 @@ func RenderContactRequestPage(sandbox *api.Sandbox, response *serverdeps.Respons
 		page.ArchiveAction = contact.ArchivePath
 		page.RemoveAction = contact.RemovePath
 		page.Back = contact.RequestPath + "?id=" + request.Ref
+		page.BlockHref = IpBlockHref(sandbox, request.Ip)
 		hold, err := holdBoxOf(sandbox, privacy.TableContactRequest, request.Id, page.Back)
 		if err != nil {
 			return err

@@ -734,6 +734,7 @@
         {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
         {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
         {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/ip-blocks">{{t "common.ip_blocks"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
@@ -804,7 +805,7 @@
           <dt>{{t "common.received"}}</dt>
           <dd>{{.At}}</dd>
           <dt>{{t "common.ip"}}</dt>
-          <dd><code>{{.Ip}}</code></dd>
+          <dd><code>{{.Ip}}</code>{{if .BlockHref}} <a class="see-all" href="{{.BlockHref}}">{{t "common.block"}}</a>{{end}}</dd>
           <dt>{{t "common.country"}}</dt>
           <dd><a href="{{.CountryHref}}" title="{{t "contact_request.every_contact_request_this_country"}}"><span class="flag">{{.Flag}}</span> {{.Country}}</a></dd>
           <dt>{{t "common.size"}}</dt>

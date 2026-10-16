@@ -1,0 +1,77 @@
+# `GET /admin/root/ip-blocks`
+
+Lists the IP blocks and adds one: an ip, a CIDR range, a hashed ip or a country
+
+Root only. Every block, the newest first, with what it is, why, until when and how many requests it turned away since the server started; beside them the form that adds one and the countries to block. A blocked request is answered 403 {"error":"blocked"} before any route; a request a backoffice session or API token authenticated is never blocked.
+
+## Try it
+
+Only what is required:
+
+```bash
+curl localhost:3000/admin/root/ip-blocks
+```
+
+With every value it reads:
+
+```bash
+curl 'localhost:3000/admin/root/ip-blocks?notice=my-notice&count=0&value=my-value&lang=my-lang' \
+  -H 'x-client-ip: my-x-client-ip' \
+  -H 'x-forwarded-for: my-x-forwarded-for' \
+  -H 'x-client-port: my-x-client-port' \
+  -H 'x-request-method: my-x-request-method' \
+  -H 'origin: my-origin' \
+  -H 'host: my-host' \
+  -b 'backoffice_language=my-backoffice-language'
+```
+
+More examples:
+
+```bash
+curl -b "backoffice_session=$SESSION" localhost:3000/admin/root/ip-blocks
+```
+
+## Query string, headers and cookies
+
+| Name | Sent in | What goes there | Required | Example | Description |
+| --- | --- | --- | --- | --- | --- |
+| `notice` | query string | text | no | `my-notice` | the outcome code of the last change |
+| `count` | query string | whole number | no — `0` when left out | `0` | how many blocks the last removal removed |
+| `value` | query string | text | no | `my-value` | the value the add form is filled with: the Block link of a visitor or a contact request sends it |
+| `x-client-ip` | header | text | no | `my-x-client-ip` | the ip of the connection, set by the server and never by the client — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
+| `x-forwarded-for` | header | text | no | `my-x-forwarded-for` | the client chain a reverse proxy appended to, read only with --allow-x-forwarded-for — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
+| `x-client-port` | header | text | no | `my-x-client-port` | the source port of the visitor's connection, set by the server and never by the client — or by the reverse proxy start-server trusts with --client-port-header — read by [`backoffice-client-ip`](backoffice_client_ip.md), which runs first |
+| `lang` | query string | text | no | `my-lang` | the language a page is asked in, pt-BR — kept in the backoffice_language cookie for the next pages — read by [`backoffice-language`](backoffice_language.md), which runs first |
+| `backoffice_language` | cookie | text | no | `my-backoffice-language` | the language chosen before, set by ?lang= — read by [`backoffice-language`](backoffice_language.md), which runs first |
+| `x-request-method` | header | text | no | `my-x-request-method` | the method of the request, set by the server and never by the client — read by [`backoffice-maintenance`](backoffice_maintenance.md), which runs first |
+| `origin` | header | text | no | `my-origin` | the origin of the page that sent the request, sent by the browser — read by [`backoffice-same-origin`](backoffice_same_origin.md), which runs first |
+| `host` | header | text | no | `my-host` | the host the request was sent to — read by [`backoffice-same-origin`](backoffice_same_origin.md), which runs first |
+
+## What comes back
+
+| Status | Means |
+| --- | --- |
+| `200` | It worked. The answer comes as `text/html`. |
+| `400` | Something you sent is missing or has the wrong type or format. The answer's `field` names it. |
+
+Any route may also answer `404`, `405` or `500`: see [when something goes wrong](doc.md#when-something-goes-wrong).
+
+## Runs first
+
+These routes run before this one, on the same request. Any of them may refuse it — with `401`
+or `403`, for example — or let it through to this route.
+
+| Route | When |
+| --- | --- |
+| [`backoffice-client-ip`](backoffice_client_ip.md) | always |
+| [`backoffice-language`](backoffice_language.md) | always |
+| [`backoffice-maintenance`](backoffice_maintenance.md) | always |
+| [`backoffice-root-guard`](backoffice_root_guard.md) | always |
+| [`backoffice-same-origin`](backoffice_same_origin.md) | always |
+| [`backoffice-security-headers`](backoffice_security_headers.md) | always |
+| [`backoffice-session-auth`](backoffice_session_auth.md) | depends on the address — `explain-route` gives the exact answer |
+| [`ip-blocker`](ip_blocker.md) | always |
+
+---
+
+For developers: `sandbox/internal/routes/ip_blocks_page/` · IP Blocks · [every route](doc.md) · [RouteYaml](../RouteYaml/doc.md)

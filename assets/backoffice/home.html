@@ -314,6 +314,7 @@
         {{if .IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
         {{if .IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
         {{if .IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
+        {{if .IsRoot}}<a href="/admin/root/ip-blocks">{{t "common.ip_blocks"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
@@ -433,6 +434,16 @@
         </p>
         <div class="links">
           <a class="btn btn-primary" href="/admin/root/set-website-source">{{t "home.set_website_source"}}</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>{{t "common.ip_blocks"}}</h2>
+        <p class="muted">
+          {{t "home.turn_away_ip_range_country"}}
+        </p>
+        <div class="links">
+          <a class="btn btn-primary" href="/admin/root/ip-blocks">{{t "home.open_ip_blocks"}}</a>
         </div>
       </article>
       {{end}}

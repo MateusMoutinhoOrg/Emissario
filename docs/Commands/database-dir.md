@@ -14,6 +14,7 @@ Runs in front of every command line and answers none of them. It reads --databas
 | Runs in front of | When |
 | --- | --- |
 | [`add-backoffice-user`](add-backoffice-user.md) | always |
+| [`remove-ip-blocks`](remove-ip-blocks.md) | always |
 | [`reset-backoffice-totp`](reset-backoffice-totp.md) | always |
 | [`help`](help.md) | always |
 | [`version`](version.md) | always |

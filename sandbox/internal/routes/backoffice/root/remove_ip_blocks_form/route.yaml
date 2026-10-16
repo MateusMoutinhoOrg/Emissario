@@ -1,0 +1,31 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            ids:
+                items:
+                    maxLength: 20
+                    type: string
+                maxItems: 100
+                type: array
+        type: object
+    max-bytes: 4096
+    required: true
+    type: form
+category: IP Blocks
+description: Root only. ids are the ids of the blocks, at most 100. Answers 303 to the blocks with ?notice=removed&count=; ids no block holds are skipped, and none found answers the page under a 404.
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/remove-ip-blocks -H ''Origin: http://localhost:3000'' --data ''ids=1&ids=2'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootRemoveIpBlocks
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/remove-ip-blocks
+priority: 100
+private: true
+response-type: text/html
+summary: Removes the IP blocks selected

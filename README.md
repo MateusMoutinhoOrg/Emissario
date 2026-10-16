@@ -19,6 +19,7 @@ nothing to an analytics service and installs no runtime. The only thing the host
 | **Contact form** | `POST /api/contact-requests` keeps any JSON the site sends, with its time, IP and country, limited per IP. The backoffice reads, searches and archives it. [Contact Requests](docs/ContactRequests/doc.md) |
 | **AI agent** | A public chat API backed by any OpenAI-compatible model (OpenAI, OpenRouter, Groq, Ollama…), with its instructions kept in a git repository. The conversation stays in the visitor's browser. [Agent](docs/Agent/doc.md) |
 | **Privacy by default** | Every database encrypted at rest, visitor IPs hashed, contact requests and summaries off until turned on, retentions deleted every hour, a Marco Civil access log, find and erase, legal holds, and LGPD/GDPR presets — each risky choice behind a notice that names the law. [Privacy](docs/Privacy/doc.md) |
+| **IP blocks** | A root blocks one ip, a CIDR range, a hashed ip or a whole country; their requests are answered `403` before the website, the contact form, the agent or the sign-in reads them. [IP Blocks](docs/IpBlocks/doc.md) |
 | **Backups** | Snapshots of every database, taken in the background, then downloaded, uploaded and restored from the backoffice. [Backups](docs/Backups/doc.md) |
 
 Every database is embedded and lives in one folder, `./data` by default.
@@ -68,6 +69,7 @@ Serving http - bring the server up, declare routes, read a body
 | [Privacy](docs/Privacy/doc.md) | Privacy by default under the LGPD, the Marco Civil da Internet and the GDPR: every database encrypted at rest, IPs hashed, a Marco Civil access log a root turns on, retentions with their references, notices before every risky choice, find and erase, legal holds and presets, at /admin/root/set-privacy-settings |
 | [Agent](docs/Agent/doc.md) | The public agent of the website: an anonymous visitor talks to a configurable model through /api/agent/messages, its instructions synced from a git repository, its urls, limits, signed history and anonymous summaries set and read in the backoffice at /admin/agent |
 | [Contact Requests](docs/ContactRequests/doc.md) | The contact form of the website: any JSON the website sends to /api/contact-requests, kept as sent with its time, ip and country, read, searched, archived and deleted in the backoffice at /admin/list-contact-requests |
+| [IP Blocks](docs/IpBlocks/doc.md) | Turn away the requests of an ip, a CIDR range, a hashed ip or a whole country before any route answers them: set by a root in the backoffice at /admin/root/ip-blocks, its JSON api, and remove-ip-blocks on the command line |
 | [Visualization](docs/Visualization/doc.md) | Page views of the public website, recorded on the server: which page, when, from which ip, country, device, browser and os, searched and counted in the backoffice at /admin/visualization and its JSON api |
 | [Website Source](docs/WebsiteSource/doc.md) | Serve the public website from a git repository: the root sets the repository, branch and sync time in the backoffice, start-server keeps it pulled, and Sync or its API syncs it on demand |
 

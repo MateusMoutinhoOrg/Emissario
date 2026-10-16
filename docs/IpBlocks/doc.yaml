@@ -1,0 +1,4 @@
+description: 'Turn away the requests of an ip, a CIDR range, a hashed ip or a whole country before any route answers them: set by a root in the backoffice at /admin/root/ip-blocks, its JSON api, and remove-ip-blocks on the command line'
+name: IP Blocks
+themes:
+    - server-usage

@@ -644,6 +644,7 @@
         {{if .Viewer.IsRoot}}<a href="/admin/root/set-website-source">{{t "common.website_source"}}</a>{{end}}
         {{if .Viewer.IsRoot}}<a href="/admin/root/set-privacy-settings">{{t "common.privacy"}}</a>{{end}}
         {{if .Viewer.IsRoot}}<a href="/admin/root/access-log">{{t "common.access_log"}}</a>{{end}}
+        {{if .Viewer.IsRoot}}<a href="/admin/root/ip-blocks">{{t "common.ip_blocks"}}</a>{{end}}
       </nav>
     </div>
     <div class="who">
@@ -777,7 +778,7 @@
         <tbody>
           {{range .Rows}}
           <tr>
-            <td class="nowrap" data-label="{{t "common.ip"}}">{{if .ViewsHref}}<a href="{{.ViewsHref}}"><code>{{.Ip}}</code></a>{{else}}<code>{{.Ip}}</code>{{end}}</td>
+            <td class="nowrap" data-label="{{t "common.ip"}}">{{if .ViewsHref}}<a href="{{.ViewsHref}}"><code>{{.Ip}}</code></a>{{else}}<code>{{.Ip}}</code>{{end}}{{if .BlockHref}} <a class="see-all" href="{{.BlockHref}}">{{t "common.block"}}</a>{{end}}</td>
             <td data-label="{{t "common.country"}}"><span class="flag">{{.Flag}}</span> {{.Country}}</td>
             <td data-label="{{t "common.device"}}">{{.Device}}</td>
             <td data-label="{{t "common.browser"}}">{{.Browser}}</td>

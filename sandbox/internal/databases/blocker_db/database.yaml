@@ -1,0 +1,17 @@
+key-prefix: blockerdb
+name: blocker-db
+tables:
+    - fields:
+        - name: value
+          required: true
+          type: key
+        - name: kind
+          required: true
+          type: string
+        - name: reason
+          type: string
+        - name: created-at
+          type: integer
+        - name: expires-at
+          type: integer
+      name: ip-block

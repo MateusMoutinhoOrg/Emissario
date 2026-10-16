@@ -4,6 +4,7 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/databasedeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/agent"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/blocker"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/contact"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/agent_db"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backup"
@@ -20,11 +21,12 @@ import (
 // past their retention, blanks the ip of the views, contact requests and
 // agent usage past the IP retention — hashed or full — releases the holds
 // whose end date passed, and removes the snapshots past the backup
-// retention. A row on a legal hold is skipped, ip included, until its hold
-// ends. Retention is counted from a row's at, in whole days of the server's
-// time zone: with 90 days, a row of a day is kept while that day is one of
-// the 90 before today, and today. It waits while a backup is taken or
-// restored, as every writer does, and logs counts alone, never a value.
+// retention, and the ip blocks that ended. A row on a legal hold is
+// skipped, ip included, until its hold ends. Retention is counted from a
+// row's at, in whole days of the server's time zone: with 90 days, a row of a
+// day is kept while that day is one of the 90 before today, and today. It
+// waits while a backup is taken or restored, as every writer does, and logs
+// counts alone, never a value.
 
 // cleanupMilliseconds is how long the cleanup waits between two runs.
 const cleanupMilliseconds = 60 * 60 * 1000
@@ -386,6 +388,11 @@ func RunCleanup(sandbox *api.Sandbox) {
 		sandbox.Deps.StdDeps.Eprintf("warning: the retention cleanup could not forget the old erasures: %s\n", err.Error())
 	} else if forgotten > 0 {
 		sandbox.Deps.StdDeps.Logf("privacy: %d erasures older than every snapshot forgotten\n", forgotten)
+	}
+	if expired, err := blocker.RemoveExpired(sandbox); err != nil {
+		sandbox.Deps.StdDeps.Eprintf("warning: the retention cleanup could not remove the ip blocks that ended: %s\n", err.Error())
+	} else if expired > 0 {
+		sandbox.Deps.StdDeps.Logf("privacy: %d ip blocks that ended removed\n", expired)
 	}
 	InvalidateBanners(sandbox)
 }

@@ -1,0 +1,13 @@
+category: Middleware
+methods:
+    - ANY
+paths:
+    - end: -1
+      id: Root
+      start: 0
+      trigger:
+        type: prefix
+        value: /
+priority: 12
+response-type: text/plain
+summary: 'Turns away a request whose ip a root blocked: one ip, a CIDR range, a hashed ip or a country'

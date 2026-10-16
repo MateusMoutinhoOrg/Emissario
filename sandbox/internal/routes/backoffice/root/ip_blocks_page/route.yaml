@@ -1,0 +1,37 @@
+category: IP Blocks
+description: Root only. Every block, the newest first, with what it is, why, until when and how many requests it turned away since the server started; beside them the form that adds one and the countries to block. A blocked request is answered 403 {"error":"blocked"} before any route; a request a backoffice session or API token authenticated is never blocked.
+examples:
+    - curl -b "backoffice_session=$SESSION" localhost:3000/admin/root/ip-blocks
+methods:
+    - GET
+parameters:
+    - description: the outcome code of the last change
+      id: Notice
+      key: notice
+      sources:
+        - query
+      type: string
+    - default: "0"
+      description: how many blocks the last removal removed
+      id: Count
+      key: count
+      sources:
+        - query
+      type: integer
+    - description: 'the value the add form is filled with: the Block link of a visitor or a contact request sends it'
+      id: Value
+      key: value
+      sources:
+        - query
+      type: string
+paths:
+    - end: -1
+      id: AdminRootIpBlocks
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/ip-blocks
+priority: 100
+private: true
+response-type: text/html
+summary: 'Lists the IP blocks and adds one: an ip, a CIDR range, a hashed ip or a country'

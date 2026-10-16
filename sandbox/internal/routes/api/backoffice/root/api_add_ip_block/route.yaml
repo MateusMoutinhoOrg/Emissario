@@ -1,0 +1,37 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            days:
+                maximum: 36500
+                minimum: 0
+                type: integer
+            reason:
+                maxLength: 200
+                type: string
+            value:
+                maxLength: 64
+                type: string
+        required:
+            - value
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: IP Blocks API
+description: 'Root only. value is one ip (203.0.113.7), a CIDR range (203.0.113.0/24), a hashed ip (h: and 32 hex digits, as the records keep it) or a country code (BR); an IPv6 address is blocked by its /64. reason is at most 200 characters; days from 1 to 36500, 0 or absent to block until a root removes it. Answers 201 {ip_block}; 400 for a value refused, with the field; 409 for a value blocked already or one matching the ip the request came from.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/add-ip-block -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"value":"203.0.113.0/24","reason":"spam","days":30}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootAddIpBlock
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/add-ip-block
+priority: 100
+private: true
+response-type: application/json
+summary: Blocks an ip, a CIDR range, a hashed ip or a country

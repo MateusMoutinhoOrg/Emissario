@@ -58,6 +58,7 @@ or `403`, for example — or let it through to this route.
 | [`backoffice-same-origin`](backoffice_same_origin.md) | always |
 | [`backoffice-security-headers`](backoffice_security_headers.md) | always |
 | [`backoffice-session-auth`](backoffice_session_auth.md) | depends on the address — `explain-route` gives the exact answer |
+| [`ip-blocker`](ip_blocker.md) | always |
 
 ---
 

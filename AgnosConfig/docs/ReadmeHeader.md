@@ -19,6 +19,7 @@ nothing to an analytics service and installs no runtime. The only thing the host
 | **Contact form** | `POST /api/contact-requests` keeps any JSON the site sends, with its time, IP and country, limited per IP. The backoffice reads, searches and archives it. [Contact Requests](docs/ContactRequests/doc.md) |
 | **AI agent** | A public chat API backed by any OpenAI-compatible model (OpenAI, OpenRouter, Groq, Ollama…), with its instructions kept in a git repository. The conversation stays in the visitor's browser. [Agent](docs/Agent/doc.md) |
 | **Privacy by default** | Every database encrypted at rest, visitor IPs hashed, contact requests and summaries off until turned on, retentions deleted every hour, a Marco Civil access log, find and erase, legal holds, and LGPD/GDPR presets — each risky choice behind a notice that names the law. [Privacy](docs/Privacy/doc.md) |
+| **IP blocks** | A root blocks one ip, a CIDR range, a hashed ip or a whole country; their requests are answered `403` before the website, the contact form, the agent or the sign-in reads them. [IP Blocks](docs/IpBlocks/doc.md) |
 | **Backups** | Snapshots of every database, taken in the background, then downloaded, uploaded and restored from the backoffice. [Backups](docs/Backups/doc.md) |
 
 Every database is embedded and lives in one folder, `./data` by default.

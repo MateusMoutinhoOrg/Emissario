@@ -1,0 +1,17 @@
+category: IP Blocks API
+description: 'Root only. Answers {ip_blocks: [{id, value, kind, reason, created_at, expires_at, expired, stale, hits}], total}, the newest first. kind is ip, range, hash or country; expires_at is 0 for a block until a root removes it; stale is true for a hashed ip made before the last Rotate IP key, which matches no one; hits is how many requests it turned away since the server started.'
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/list-ip-blocks -H "Authorization: Bearer $TOKEN"'
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootListIpBlocks
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/list-ip-blocks
+priority: 100
+private: true
+response-type: application/json
+summary: Lists the IP blocks

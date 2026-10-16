@@ -1,0 +1,20 @@
+args:
+    - end: 0
+      id: Verb
+      start: 0
+      trigger:
+        type: equal
+        value: remove-ip-blocks
+category: Backoffice
+description: 'Removes the IP block of --value, or every one with --all. It is the way back in for a root whose network a block turns away from /admin/login: a request a backoffice session authenticated is never blocked, but a sign-in is.'
+examples:
+    - remove-ip-blocks --value 203.0.113.0/24
+    - remove-ip-blocks --all
+flags:
+    - description: 'the value of the block: an ip, a CIDR range, a hashed ip or a country code, as the IP blocks page shows it'
+      id: Value
+    - description: remove every block
+      id: All
+      type: boolean
+priority: 100
+summary: 'Remove IP blocks: the one of a value, or every one'

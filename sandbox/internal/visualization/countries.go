@@ -79,3 +79,21 @@ func CountryFlag(sandbox *api.Sandbox, code string) string {
 	const regionalA = 0x1F1E6
 	return string([]rune{rune(regionalA + int(code[0]-'A')), rune(regionalA + int(code[1]-'A'))})
 }
+
+// Countries is the code of every country of the table, ordered by its
+// English name.
+func Countries(sandbox *api.Sandbox) []string {
+	codes := []string{}
+	for code := range countryNames {
+		codes = append(codes, code)
+	}
+	sandbox.Deps.SortDeps.Slice(codes, func(i int, j int) bool { return countryNames[codes[i]] < countryNames[codes[j]] })
+	return codes
+}
+
+// IsKnownCountry tells whether code is one of the table: an ISO 3166-1
+// alpha-2 code, or XK.
+func IsKnownCountry(sandbox *api.Sandbox, code string) bool {
+	_, ok := countryNames[code]
+	return ok
+}

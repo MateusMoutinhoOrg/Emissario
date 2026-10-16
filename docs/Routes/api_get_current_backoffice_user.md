@@ -56,6 +56,7 @@ or `403`, for example — or let it through to this route.
 | [`backoffice-client-ip`](backoffice_client_ip.md) | always |
 | [`backoffice-maintenance`](backoffice_maintenance.md) | always |
 | [`backoffice-security-headers`](backoffice_security_headers.md) | always |
+| [`ip-blocker`](ip_blocker.md) | always |
 
 ---
 

@@ -14,6 +14,7 @@ Runs in front of every command line that may open a database, and answers none o
 | Runs in front of | When |
 | --- | --- |
 | [`add-backoffice-user`](add-backoffice-user.md) | always |
+| [`remove-ip-blocks`](remove-ip-blocks.md) | always |
 | [`reset-backoffice-totp`](reset-backoffice-totp.md) | always |
 | [`start-server`](start-server.md) | always |
 

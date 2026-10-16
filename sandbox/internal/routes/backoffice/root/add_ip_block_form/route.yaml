@@ -1,0 +1,34 @@
+body:
+    content-type: application/x-www-form-urlencoded
+    form-schema:
+        properties:
+            days:
+                maxLength: 16
+                type: string
+            reason:
+                maxLength: 200
+                type: string
+            value:
+                maxLength: 64
+                type: string
+        type: object
+    max-bytes: 4096
+    required: true
+    type: form
+category: IP Blocks
+description: 'Root only. value is one ip (203.0.113.7), a CIDR range (203.0.113.0/24), a hashed ip (h: and 32 hex digits, as the records keep it) or a country code (BR); an IPv6 address is blocked by its /64. reason is at most 200 characters; days from 1 to 36500, blank to block until a root removes it. Adding answers 303 to the blocks with ?notice=added; a refused value answers the page under a 400 with the reason, a value blocked already or one matching the ip you are connected from under a 409.'
+examples:
+    - 'curl -b "backoffice_session=$SESSION" -X POST localhost:3000/admin/root/add-ip-block -H ''Origin: http://localhost:3000'' --data ''value=203.0.113.7&reason=spam&days=30'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: AdminRootAddIpBlock
+      start: 0
+      trigger:
+        type: equal
+        value: /admin/root/add-ip-block
+priority: 100
+private: true
+response-type: text/html
+summary: Blocks an ip, a CIDR range, a hashed ip or a country

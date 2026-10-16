@@ -97,6 +97,7 @@ or `403`, for example — or let it through to this route.
 | [`export-privacy-subject`](export_privacy_subject.md) | depends on the address — `explain-route` gives the exact answer |
 | [`export-visualization-views`](export_visualization_views.md) | depends on the address — `explain-route` gives the exact answer |
 | [`find-privacy-subject-page`](find_privacy_subject_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`ip-blocks-page`](ip_blocks_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-agent-urls-page`](list_agent_urls_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`list-backups-page`](list_backups_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`preview-privacy-preset-page`](preview_privacy_preset_page.md) | depends on the address — `explain-route` gives the exact answer |
@@ -112,6 +113,7 @@ or `403`, for example — or let it through to this route.
 | [`set-totp-page`](set_totp_page.md) | depends on the address — `explain-route` gives the exact answer |
 | [`set-totp-qr`](set_totp_qr.md) | depends on the address — `explain-route` gives the exact answer |
 | [`visualization-dashboard-page`](visualization_dashboard_page.md) | depends on the address — `explain-route` gives the exact answer |
+| [`ip-blocker`](ip_blocker.md) | always |
 | [`health`](health.md) | depends on the address — `explain-route` gives the exact answer |
 | [`openapi`](openapi.md) | depends on the address — `explain-route` gives the exact answer |
 

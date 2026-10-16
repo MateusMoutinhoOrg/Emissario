@@ -1,0 +1,34 @@
+body:
+    content-type: application/json
+    json-schema:
+        properties:
+            ids:
+                items:
+                    minimum: 1
+                    type: integer
+                maxItems: 100
+                minItems: 1
+                type: array
+        required:
+            - ids
+        type: object
+    max-bytes: 65536
+    required: true
+    type: json
+category: IP Blocks API
+description: Root only. ids are the ids of the blocks, at most 100. Answers {removed}; ids no block holds are skipped, and none found answers 404.
+examples:
+    - 'curl -X POST localhost:3000/api/admin/root/remove-ip-blocks -H "Authorization: Bearer $TOKEN" -H ''Content-Type: application/json'' -d ''{"ids":[1,2]}'''
+methods:
+    - POST
+paths:
+    - end: -1
+      id: ApiAdminRootRemoveIpBlocks
+      start: 0
+      trigger:
+        type: equal
+        value: /api/admin/root/remove-ip-blocks
+priority: 100
+private: true
+response-type: application/json
+summary: Removes IP blocks
