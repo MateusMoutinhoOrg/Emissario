@@ -392,7 +392,7 @@
         <div class="form-group">
           <label for="role">{{t "common.role"}}</label>
           <select id="role" name="role" required>
-            {{range .Roles}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{html .Name}}</option>{{end}}
+            {{range .Roles}}<option value="{{.Value}}"{{if .Selected}} selected{{end}}>{{tr .Name}}</option>{{end}}
           </select>
           <p class="hint">{{t "backoffice_user_form.root_can_add_edit_remove"}}</p>
         </div>
@@ -407,7 +407,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">{{html .Submit}}</button>
+          <button type="submit" class="btn btn-primary">{{tr .Submit}}</button>
           <a class="btn" href="/admin/list-backoffice-users">{{t "common.cancel"}}</a>
         </div>
       </form>

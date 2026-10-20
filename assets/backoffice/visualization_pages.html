@@ -740,12 +740,12 @@
         {{range .Filters.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{tr .Label}}</a>
         {{end}}
       </div>
-      <span class="muted">{{if .Filters.Period}}{{.Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
+      <span class="muted">{{if .Filters.Period}}{{tr .Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
     </div>
 
     {{if .Filters.Chips}}
     <div class="chips" aria-label="{{t "common.active_filters"}}">
-      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{.Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" .Label}}">✕</a></span>
+      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{if .Flag}}{{.Flag}} {{end}}{{tr .Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" (tr .Label)}}">✕</a></span>
       {{end}}
     </div>
     {{end}}

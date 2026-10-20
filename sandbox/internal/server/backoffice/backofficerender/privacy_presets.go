@@ -63,9 +63,13 @@ type PrivacyPresetsPage struct {
 	Found       bool
 	Conform     bool
 	Differences []DifferenceLine
-	Newer       string
-	NewerHref   string
-	NewerText   string
+	// Newer is a newer version of the preset applied, "" for none, spelled
+	// by its name, version and changes.
+	Newer        string
+	NewerHref    string
+	NewerName    string
+	NewerVersion string
+	NewerChanges string
 	Checklist   []privacyadmin.ChecklistItem
 	Presets     []PresetLine
 	ReapplyHref string
@@ -142,7 +146,8 @@ func RenderPrivacyPresetsPage(sandbox *api.Sandbox, response *serverdeps.Respons
 	}
 	if state.Newer != nil {
 		page.Newer = state.Newer.Ref()
-		page.NewerText = state.Newer.Name + " v" + sandbox.Deps.StringsDeps.FormatInt(state.Newer.Version, 10) + ": " + state.Newer.Changes
+		page.NewerName, page.NewerChanges = state.Newer.Name, state.Newer.Changes
+		page.NewerVersion = sandbox.Deps.StringsDeps.FormatInt(state.Newer.Version, 10)
 		page.NewerHref = visualization.Href(sandbox, privacy.PresetPreviewPth, []visualization.Param{{Key: "preset", Value: state.Newer.Ref()}})
 	}
 	return RenderHTML(sandbox, response, status, "backoffice/privacy_presets.html", page)

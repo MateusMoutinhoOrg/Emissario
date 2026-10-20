@@ -766,7 +766,7 @@
             <label for="country">{{t "common.country"}}</label>
             <select id="country" name="value" required>
               <option value="">{{t "ip_blocks.choose_country"}}</option>
-              {{range .Countries}}<option value="{{.Code}}">{{.Flag}} {{.Name}} ({{.Code}})</option>
+              {{range .Countries}}<option value="{{.Code}}">{{.Flag}} {{tr .Name}} ({{.Code}})</option>
               {{end}}
             </select>
             <span class="hint">{{t "ip_blocks.country_hint"}}</span>
@@ -784,7 +784,7 @@
       </div>
     </div>
 
-    <p class="muted where">{{t "ip_blocks.you_are_connected_from" .ClientIp .ClientCountry}}</p>
+    <p class="muted where">{{t "ip_blocks.you_are_connected_from" .ClientIp (tr .ClientCountry)}}</p>
 
     <div class="card table-card">
       {{if .Rows}}
@@ -803,7 +803,7 @@
         <tbody>
           {{range .Rows}}
           <tr>
-            <td data-label="{{t "ip_blocks.blocked"}}">{{if .Flag}}<span class="flag">{{.Flag}}</span> {{end}}<code>{{.Value}}</code>{{if .Expired}}<span class="tag tag-muted">{{t "ip_blocks.ended"}}</span>{{end}}{{if .Stale}}<span class="tag tag-muted" title="{{t "ip_blocks.stale_title"}}">{{t "ip_blocks.stale"}}</span>{{end}}</td>
+            <td data-label="{{t "ip_blocks.blocked"}}">{{if .Flag}}<span class="flag">{{.Flag}}</span> {{end}}<code>{{.Value}}{{if .Country}} · {{tr .Country}}{{end}}</code>{{if .Expired}}<span class="tag tag-muted">{{t "ip_blocks.ended"}}</span>{{end}}{{if .Stale}}<span class="tag tag-muted" title="{{t "ip_blocks.stale_title"}}">{{t "ip_blocks.stale"}}</span>{{end}}</td>
             <td class="nowrap" data-label="{{t "ip_blocks.kind"}}"><span class="badge">{{tr .Label}}</span></td>
             <td class="preview" data-label="{{t "common.reason"}}">{{if .Reason}}{{.Reason}}{{else}}<span class="muted">—</span>{{end}}</td>
             <td class="nowrap" data-label="{{t "ip_blocks.since"}}">{{.Created}}</td>

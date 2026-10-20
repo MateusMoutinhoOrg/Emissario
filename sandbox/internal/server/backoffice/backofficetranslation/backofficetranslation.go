@@ -23,6 +23,18 @@ import (
 // {{tr .Error}}; a text it does not list stays in English. Adding a language
 // is adding its file: nothing else changes.
 //
+// A message whose English text holds {0}, {1}… is a pattern: each one stands
+// for any text the server put there — a count, a name — and the translation
+// puts it back where its own {0}, {1}… are:
+//
+//	"{0} contact requests deleted.": "{0} pedidos de contato excluídos."
+//
+// A text the messages list as it is wins over a pattern, and of the patterns
+// it matches the one with the most text of its own wins. What a placeholder
+// matched is translated in turn, so "{0} and {1}." with "{0} views": "{0}
+// visualizações" reads "3 views and 1 IP." whole, and "Preset {0} applied."
+// shows the translated name of a built-in preset.
+//
 // Only the backoffice pages are translated: the JSON of /api/admin, the
 // command line and the docs stay in English.
 
@@ -58,6 +70,23 @@ type Catalog struct {
 	// Messages is the translation of every server message it lists, by its
 	// English text.
 	Messages map[string]string
+	// Patterns are the messages holding {0}, {1}…, the one with the most
+	// text of its own first.
+	Patterns []Pattern
+}
+
+// Pattern is a message whose English text holds {0}, {1}…, each standing for
+// any text.
+type Pattern struct {
+	// Parts is the English text cut at its placeholders: the text before the
+	// first, between each two and after the last.
+	Parts []string
+	// Slots is the number of each placeholder, in the order they appear.
+	Slots []int
+	// Fixed is how long the English text is without its placeholders.
+	Fixed int
+	// Translation is the translation, holding the same placeholders.
+	Translation string
 }
 
 // catalogs is every language, DefaultLang first, read once from the assets
@@ -161,9 +190,119 @@ func readCatalog(sandbox *api.Sandbox, code string) (Catalog, error) {
 				return Catalog{}, sandbox.Deps.StdDeps.Errorf("%s: messages: %s: %s", path, key, err.Error())
 			}
 			catalog.Messages[key] = value
+			if pattern, ok := parsePattern(sandbox, key, value); ok {
+				catalog.Patterns = insertPattern(catalog.Patterns, pattern)
+			}
 		}
 	}
 	return catalog, nil
+}
+
+// parsePattern is the pattern of the message text translated as translation,
+// false when text holds no {0}, {1}… or nothing else: a pattern that is only
+// placeholders would match every text.
+func parsePattern(sandbox *api.Sandbox, text string, translation string) (Pattern, bool) {
+	pattern := Pattern{Translation: translation}
+	part := ""
+	for i := 0; i < len(text); i++ {
+		if text[i] == '{' {
+			end := i + 1
+			for end < len(text) && text[end] >= '0' && text[end] <= '9' {
+				end++
+			}
+			if end > i+1 && end < len(text) && text[end] == '}' {
+				slot, err := sandbox.Deps.StringsDeps.Atoi(text[i+1 : end])
+				if err == nil {
+					pattern.Parts = append(pattern.Parts, part)
+					pattern.Slots = append(pattern.Slots, slot)
+					pattern.Fixed += len(part)
+					part = ""
+					i = end
+					continue
+				}
+			}
+		}
+		part += text[i : i+1]
+	}
+	if len(pattern.Slots) == 0 {
+		return Pattern{}, false
+	}
+	pattern.Parts = append(pattern.Parts, part)
+	pattern.Fixed += len(part)
+	if pattern.Fixed == 0 {
+		return Pattern{}, false
+	}
+	return pattern, true
+}
+
+// insertPattern is patterns with pattern put after every one with as much
+// text of its own or more, so the most specific is tried first.
+func insertPattern(patterns []Pattern, pattern Pattern) []Pattern {
+	at := len(patterns)
+	for at > 0 && patterns[at-1].Fixed < pattern.Fixed {
+		at--
+	}
+	patterns = append(patterns, Pattern{})
+	copy(patterns[at+1:], patterns[at:])
+	patterns[at] = pattern
+	return patterns
+}
+
+// translateMessage is the translation of message in catalog: the one it
+// lists for message as it is, else that of the first pattern message matches,
+// what each placeholder matched translated the same way, else message itself.
+// A placeholder matches less than the whole message, so this ends.
+func translateMessage(sandbox *api.Sandbox, catalog Catalog, message string) string {
+	if value, ok := catalog.Messages[message]; ok {
+		return value
+	}
+	for _, pattern := range catalog.Patterns {
+		captured, ok := matchPattern(sandbox, pattern.Parts, message)
+		if !ok {
+			continue
+		}
+		args := []string{}
+		for i, slot := range pattern.Slots {
+			for len(args) <= slot {
+				args = append(args, "{"+sandbox.Deps.StringsDeps.FormatInt(int64(len(args)), 10)+"}")
+			}
+			args[slot] = translateMessage(sandbox, catalog, captured[i])
+		}
+		return fill(sandbox, pattern.Translation, args)
+	}
+	return message
+}
+
+// matchPattern is what each placeholder between parts matched in text, in
+// the order they appear, each at least one byte long; false when text does
+// not read as parts with something between each two.
+func matchPattern(sandbox *api.Sandbox, parts []string, text string) ([]string, bool) {
+	if !sandbox.Deps.StringsDeps.HasPrefix(text, parts[0]) {
+		return nil, false
+	}
+	return matchPlaceholders(sandbox, parts[1:], text[len(parts[0]):])
+}
+
+// matchPlaceholders matches text against a placeholder followed by parts[0],
+// another followed by parts[1]…, trying every length of each placeholder.
+func matchPlaceholders(sandbox *api.Sandbox, parts []string, text string) ([]string, bool) {
+	if len(parts) == 1 {
+		end := len(text) - len(parts[0])
+		if end < 1 || !sandbox.Deps.StringsDeps.HasSuffix(text, parts[0]) {
+			return nil, false
+		}
+		return []string{text[:end]}, true
+	}
+	for end := 1; end <= len(text); end++ {
+		if !sandbox.Deps.StringsDeps.HasPrefix(text[end:], parts[0]) {
+			continue
+		}
+		rest, ok := matchPlaceholders(sandbox, parts[1:], text[end+len(parts[0]):])
+		if ok {
+			return append([]string{text[:end]}, rest...), true
+		}
+	}
+	return nil, false
 }
 
 // flatten puts every string under node into into, each under its dotted key.
@@ -305,10 +444,7 @@ func Translator(sandbox *api.Sandbox, lang string) (embeddeps.Translator, error)
 			return fill(sandbox, text(key), escaped)
 		},
 		Message: func(message string) string {
-			if value, ok := current.Messages[message]; ok {
-				return value
-			}
-			return message
+			return translateMessage(sandbox, current, message)
 		},
 	}, nil
 }

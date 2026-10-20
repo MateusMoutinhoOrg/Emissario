@@ -28,8 +28,10 @@ type IpBlockLine struct {
 	// Kind is the kind of the block, and Label how the page names it.
 	Kind  string
 	Label string
-	// Flag is the flag of a country block, "" for any other.
+	// Flag and Country are the flag and the name of a country block, "" for
+	// any other.
 	Flag    string
+	Country string
 	Reason  string
 	Created string
 	// Expires is when the block ends, "" for never; Expired is true once it
@@ -149,7 +151,7 @@ func RenderIpBlocksPage(sandbox *api.Sandbox, response *serverdeps.Response, sta
 		}
 		if block.Kind == blocker.KindCountry {
 			line.Flag = visualization.CountryFlag(sandbox, block.Value)
-			line.Value = block.Value + " · " + visualization.CountryName(sandbox, block.Value)
+			line.Country = visualization.CountryName(sandbox, block.Value)
 		}
 		page.Rows = append(page.Rows, line)
 	}

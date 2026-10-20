@@ -101,9 +101,9 @@ func accessRef(row privacy_db.AccessLogRecord) string {
 func AccessLogNotice(sandbox *api.Sandbox, code string, count int) Notice {
 	switch code {
 	case AccessNoticeDeleted:
-		return Notice{Text: plural(sandbox, count, "1 row deleted.", formatCount(sandbox, count)+" rows deleted."), Kind: "ok"}
+		return Notice{Text: plural(sandbox, count, "row", "rows") + " deleted.", Kind: "ok"}
 	case AccessNoticeHeld:
-		return Notice{Text: plural(sandbox, count, "1 row put on hold.", formatCount(sandbox, count)+" rows put on hold."), Kind: "ok"}
+		return Notice{Text: plural(sandbox, count, "row", "rows") + " put on hold.", Kind: "ok"}
 	}
 	return Notice{}
 }

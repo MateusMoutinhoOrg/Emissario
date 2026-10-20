@@ -740,12 +740,12 @@
         {{range .Filters.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{tr .Label}}</a>
         {{end}}
       </div>
-      <span class="muted">{{if .Filters.Period}}{{.Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
+      <span class="muted">{{if .Filters.Period}}{{tr .Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
     </div>
 
     {{if .Filters.Chips}}
     <div class="chips" aria-label="{{t "common.active_filters"}}">
-      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{.Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" .Label}}">✕</a></span>
+      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{if .Flag}}{{.Flag}} {{end}}{{tr .Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" (tr .Label)}}">✕</a></span>
       {{end}}
     </div>
     {{end}}
@@ -779,10 +779,10 @@
           {{range .Rows}}
           <tr>
             <td class="nowrap" data-label="{{t "common.ip"}}">{{if .ViewsHref}}<a href="{{.ViewsHref}}"><code>{{.Ip}}</code></a>{{else}}<code>{{.Ip}}</code>{{end}}{{if .BlockHref}} <a class="see-all" href="{{.BlockHref}}">{{t "common.block"}}</a>{{end}}</td>
-            <td data-label="{{t "common.country"}}"><span class="flag">{{.Flag}}</span> {{.Country}}</td>
-            <td data-label="{{t "common.device"}}">{{.Device}}</td>
-            <td data-label="{{t "common.browser"}}">{{.Browser}}</td>
-            <td data-label="{{t "common.os"}}">{{.Os}}</td>
+            <td data-label="{{t "common.country"}}"><span class="flag">{{.Flag}}</span> {{tr .Country}}</td>
+            <td data-label="{{t "common.device"}}">{{tr .Device}}</td>
+            <td data-label="{{t "common.browser"}}">{{tr .Browser}}</td>
+            <td data-label="{{t "common.os"}}">{{tr .Os}}</td>
             <td class="right num" data-label="{{t "common.views"}}">{{.Views}}</td>
             <td class="right num" data-label="{{t "common.pages"}}">{{.Pages}}</td>
             <td class="nowrap" data-label="{{t "visualization_visitors.first_seen"}}">{{.FirstAt}}</td>

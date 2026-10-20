@@ -797,7 +797,7 @@
 
     {{if .Bar.Chips}}
     <div class="chips" aria-label="{{t "common.active_filters"}}">
-      {{range .Bar.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{.Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" .Label}}">✕</a></span>
+      {{range .Bar.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{if .Flag}}{{.Flag}} {{end}}{{tr .Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" (tr .Label)}}">✕</a></span>
       {{end}}
     </div>
     {{end}}
@@ -832,7 +832,7 @@
           <tr>
             {{if $root}}<td class="check" data-label="{{t "common.select"}}"><input type="checkbox" name="ids" value="{{.Id}}" form="selection" aria-label="{{t "contact_requests.select_contact_request" .Id}}"></td>{{end}}
             <td class="nowrap" data-label="{{t "common.received"}}"><a href="{{.Href}}">{{.At}}</a><br><code class="id">{{.Id}}</code>{{if .Archived}} <span class="badge badge-archived">{{t "common.archived"}}</span>{{end}}</td>
-            <td class="nowrap" data-label="{{t "common.country"}}"><a href="{{.CountryHref}}" title="{{t "contact_requests.only_this_country"}}"><span class="flag">{{.Flag}}</span> {{.Country}}</a></td>
+            <td class="nowrap" data-label="{{t "common.country"}}"><a href="{{.CountryHref}}" title="{{t "contact_requests.only_this_country"}}"><span class="flag">{{.Flag}}</span> {{tr .Country}}</a></td>
             <td class="nowrap" data-label="{{t "common.ip"}}"><code>{{.Ip}}</code></td>
             <td class="preview" data-label="{{t "contact_requests.contact"}}"><a href="{{.Href}}"><code class="preview">{{.Preview}}</code></a></td>
             <td class="num nowrap" data-label="{{t "common.size"}}">{{.Size}}</td>

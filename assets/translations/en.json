@@ -328,7 +328,8 @@
       "revoke_token_anything_using_will": "Revoke the token {0}? Anything using it will stop working.",
       "revoke": "Revoke",
       "no_api_tokens_yet_create": "No API tokens yet. Create one to call /api/admin.",
-      "copied": "Copied"
+      "copied": "Copied",
+      "from_ip": "from {0}"
     },
     "backoffice_user_form": {
       "back_users": "← Back to users",

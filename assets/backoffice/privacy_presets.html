@@ -810,24 +810,24 @@
     <article class="card">
       <div class="card-head"><h2>{{t "privacy_presets.this_server"}}</h2></div>
       {{if .Active}}
-        {{if .Found}}<p>{{th "privacy_presets.preset" .ActiveName .Active}} {{if .Conform}}<span class="badge badge-ok">{{t "privacy_presets.follows"}}</span>{{else}}<span class="badge badge-failed">{{t "privacy_presets.settings_differ" (len .Differences)}}</span>{{end}}</p>
+        {{if .Found}}<p>{{th "privacy_presets.preset" (tr .ActiveName) .Active}} {{if .Conform}}<span class="badge badge-ok">{{t "privacy_presets.follows"}}</span>{{else}}<span class="badge badge-failed">{{t "privacy_presets.settings_differ" (len .Differences)}}</span>{{end}}</p>
         {{else}}<p>{{th "privacy_presets.preset_no_longer_exists" .Active}}</p>{{end}}
         {{if .Differences}}<table>
           <thead><tr><th>{{t "common.setting"}}</th><th>{{t "common.now"}}</th><th>{{t "common.preset"}}</th></tr></thead>
-          <tbody>{{range .Differences}}<tr><td data-label="{{t "common.setting"}}"><code>{{.Setting}}</code></td><td data-label="{{t "common.now"}}">{{.Current}}</td><td data-label="{{t "common.preset"}}">{{.Preset}}</td></tr>{{end}}</tbody>
+          <tbody>{{range .Differences}}<tr><td data-label="{{t "common.setting"}}"><code>{{.Setting}}</code></td><td data-label="{{t "common.now"}}">{{tr .Current}}</td><td data-label="{{t "common.preset"}}">{{tr .Preset}}</td></tr>{{end}}</tbody>
         </table>{{end}}
         <div class="section-links" style="margin-top: 1rem;">
           {{if .ReapplyHref}}<a class="btn btn-small" href="{{.ReapplyHref}}">{{t "privacy_presets.re_apply"}}</a>{{end}}
           <form action="{{.DetachPath}}" method="POST" data-confirm="{{t "privacy_presets.detach_preset_settings_stay_they"}}"><button type="submit" class="btn btn-small">{{t "privacy_presets.detach"}}</button></form>
         </div>
-        {{if .Newer}}<p class="hint">{{th "privacy_presets.nothing_applied_itself" .NewerText}} <a href="{{.NewerHref}}">{{t "privacy_presets.preview"}}</a>.</p>{{end}}
+        {{if .Newer}}<p class="hint">{{th "privacy_presets.nothing_applied_itself" (printf "%s v%s: %s" (tr .NewerName) .NewerVersion (tr .NewerChanges))}} <a href="{{.NewerHref}}">{{t "privacy_presets.preview"}}</a>.</p>{{end}}
       {{else}}<p>{{t "privacy_presets.no_preset_install_defaults_custom"}}</p>{{end}}
     </article>
 
     {{if .Active}}<article class="card">
       <div class="card-head"><h2>{{t "privacy_presets.controller_checklist"}}</h2></div>
       <p class="hint">{{t "privacy_presets.what_emissario_cannot_do_you"}}</p>
-      {{if .Checklist}}<ul class="checklist">{{range .Checklist}}<li>{{tr .Text}}{{if .Reference}}<span class="ref">{{.Reference}}</span>{{end}}</li>{{end}}</ul>{{else}}<p class="hint">{{t "privacy_presets.this_preset_holds_no_checklist"}}</p>{{end}}
+      {{if .Checklist}}<ul class="checklist">{{range .Checklist}}<li>{{tr .Text}}{{if .Reference}}<span class="ref">{{tr .Reference}}</span>{{end}}</li>{{end}}</ul>{{else}}<p class="hint">{{t "privacy_presets.this_preset_holds_no_checklist"}}</p>{{end}}
     </article>{{end}}
 
     <div class="card table-card">
@@ -836,7 +836,7 @@
         <thead><tr><th>{{t "common.preset_2"}}</th><th>{{t "privacy_presets.for"}}</th><th></th><th></th></tr></thead>
         <tbody>
           {{range .Presets}}<tr>
-            <td data-label="{{t "common.preset_2"}}"><strong>{{.Name}}</strong> <code>{{.Ref}}</code>{{if .Active}} <span class="badge badge-ok">{{t "privacy_presets.applied"}}</span>{{end}}<br><span class="ref">{{.Description}}</span></td>
+            <td data-label="{{t "common.preset_2"}}"><strong>{{tr .Name}}</strong> <code>{{.Ref}}</code>{{if .Active}} <span class="badge badge-ok">{{t "privacy_presets.applied"}}</span>{{end}}<br><span class="ref">{{tr .Description}}</span></td>
             <td data-label="{{t "privacy_presets.for"}}">{{.Jurisdictions}}</td>
             <td data-label="">{{if .BuiltIn}}<span class="badge">{{t "privacy_presets.built"}}</span>{{else}}<span class="badge">{{t "privacy_presets.custom"}}</span>{{end}}</td>
             <td data-label=""><div class="row-actions">

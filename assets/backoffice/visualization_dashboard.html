@@ -740,12 +740,12 @@
         {{range .Filters.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{tr .Label}}</a>
         {{end}}
       </div>
-      <span class="muted">{{if .Filters.Period}}{{.Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
+      <span class="muted">{{if .Filters.Period}}{{tr .Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
     </div>
 
     {{if .Filters.Chips}}
     <div class="chips" aria-label="{{t "common.active_filters"}}">
-      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{.Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" .Label}}">✕</a></span>
+      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{if .Flag}}{{.Flag}} {{end}}{{tr .Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" (tr .Label)}}">✕</a></span>
       {{end}}
     </div>
     {{end}}
@@ -762,7 +762,7 @@
     <section class="card chart-card">
       <div class="card-head">
         <h2>{{t "visualization_dashboard.views_over_time"}}</h2>
-        <div class="legend"><span class="key key-views"></span>{{th "visualization_dashboard.views_unique_visitors" .Chart.Every}}</div>
+        <div class="legend"><span class="key key-views"></span>{{th "visualization_dashboard.views_unique_visitors" (tr .Chart.Every)}}</div>
       </div>
       {{if .Chart.Empty}}
       <p class="empty">{{t "visualization_dashboard.no_views_this_period"}}</p>
@@ -789,7 +789,7 @@
         <table>
           <thead>
             <tr>
-              <th>{{.Column}}</th>
+              <th>{{tr .Column}}</th>
               <th class="right">{{t "common.views"}}</th>
               <th class="right">{{t "visualization_dashboard.unique"}}</th>
               <th>{{t "visualization_dashboard.share"}}</th>

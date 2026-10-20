@@ -173,7 +173,7 @@ func contactFilterBar(sandbox *api.Sandbox, raw contact.RawFilter, filter contac
 		bar.Chips = append(bar.Chips, VisualizationChip{Label: "Until", Value: filter.To, Remove: without(contact.KeyTo)})
 	}
 	if filter.Country != "" {
-		bar.Chips = append(bar.Chips, VisualizationChip{Label: "Country", Value: visualization.CountryFlag(sandbox, filter.Country) + " " + visualization.CountryName(sandbox, filter.Country), Remove: without(contact.KeyCountry)})
+		bar.Chips = append(bar.Chips, VisualizationChip{Label: "Country", Value: visualization.CountryName(sandbox, filter.Country), Flag: visualization.CountryFlag(sandbox, filter.Country), Remove: without(contact.KeyCountry)})
 	}
 	if filter.Contains != "" {
 		bar.Chips = append(bar.Chips, VisualizationChip{Label: "Contains", Value: filter.Contains, Remove: without(contact.KeyContains)})

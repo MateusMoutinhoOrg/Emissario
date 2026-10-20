@@ -741,12 +741,12 @@
         {{range .Filters.Quick}}<a class="btn btn-small{{if .Active}} active{{end}}" href="{{.Href}}">{{tr .Label}}</a>
         {{end}}
       </div>
-      <span class="muted">{{if .Filters.Period}}{{.Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
+      <span class="muted">{{if .Filters.Period}}{{tr .Filters.Period}} · {{end}}{{t "common.days_counted" .Filters.Zone}}</span>
     </div>
 
     {{if .Filters.Chips}}
     <div class="chips" aria-label="{{t "common.active_filters"}}">
-      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{.Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" .Label}}">✕</a></span>
+      {{range .Filters.Chips}}<span class="chip"><span class="chip-label">{{tr .Label}}</span> {{if .Flag}}{{.Flag}} {{end}}{{tr .Value}} <a href="{{.Remove}}" title="{{t "common.remove_this_filter"}}" aria-label="{{t "common.remove_filter" (tr .Label)}}">✕</a></span>
       {{end}}
     </div>
     {{end}}
@@ -800,10 +800,10 @@
             <td data-label="{{t "visualization_views.path"}}">{{.Path}}</td>
             <td data-label="{{t "common.status"}}">{{if .NotFound}}<span class="badge badge-404">404</span>{{else}}<span class="badge">{{tr .Status}}</span>{{end}}</td>
             <td class="nowrap" data-label="{{t "common.ip"}}">{{if .IpHref}}<a href="{{.IpHref}}"><code>{{.Ip}}</code></a>{{else}}<code>{{.Ip}}</code>{{end}}</td>
-            <td class="nowrap" data-label="{{t "common.country"}}"><span class="flag">{{.Flag}}</span> {{.Country}}</td>
-            <td data-label="{{t "common.device"}}">{{.Device}}</td>
-            <td data-label="{{t "common.browser"}}">{{.Browser}}</td>
-            <td data-label="{{t "common.os"}}">{{.Os}}</td>
+            <td class="nowrap" data-label="{{t "common.country"}}"><span class="flag">{{.Flag}}</span> {{tr .Country}}</td>
+            <td data-label="{{t "common.device"}}">{{tr .Device}}</td>
+            <td data-label="{{t "common.browser"}}">{{tr .Browser}}</td>
+            <td data-label="{{t "common.os"}}">{{tr .Os}}</td>
             <td data-label="{{t "visualization_views.referrer"}}">{{if .Referrer}}{{.Referrer}}{{else}}<span class="muted-value">{{t "visualization_views.direct"}}</span>{{end}}</td>
           </tr>
           {{end}}

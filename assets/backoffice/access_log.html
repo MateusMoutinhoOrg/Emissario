@@ -816,7 +816,7 @@
         <label for="kind">{{t "access_log.kind"}}</label>
         <select id="kind" name="kind">
           <option value="">{{t "access_log.any"}}</option>
-          {{$kind := .Kind}}{{range .Kinds}}<option value="{{.}}"{{if eq . $kind}} selected{{end}}>{{.}}</option>{{end}}
+          {{$kind := .Kind}}{{range .Kinds}}<option value="{{.}}"{{if eq . $kind}} selected{{end}}>{{tr .}}</option>{{end}}
         </select>
       </div>
       <div class="actions">

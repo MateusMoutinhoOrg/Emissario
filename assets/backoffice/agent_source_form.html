@@ -735,7 +735,7 @@
     <section class="settings">
       <div class="card">
         {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
-        {{if .Notice}}<div class="notice {{if .NoticeIsError}}notice-error{{else}}notice-ok{{end}}" role="status">{{html .Notice}}</div>{{end}}
+        {{if .Notice}}<div class="notice {{if .NoticeIsError}}notice-error{{else}}notice-ok{{end}}" role="status">{{tr .Notice}}</div>{{end}}
 
         <form action="{{html .Action}}" method="POST">
           <div class="form-group">

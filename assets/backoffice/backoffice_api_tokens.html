@@ -546,9 +546,9 @@
             <td data-label="{{t "common.name"}}"><span>{{html .Name}}<br><code class="prefix">{{html .Prefix}}&hellip;</code></span></td>
             {{if $.ShowOwner}}<td data-label="{{t "backoffice_api_tokens.owner"}}"><span>{{html .Owner}}{{if .IsOwn}}<span class="tag">{{t "common.you"}}</span>{{end}}</span></td>{{end}}
             <td data-label="{{t "backoffice_api_tokens.created"}}">{{html .Created}}</td>
-            <td data-label="{{t "backoffice_api_tokens.expires"}}">{{if .IsExpired}}<span class="badge badge-expired">{{t "backoffice_api_tokens.expired"}}</span> {{end}}{{html .Expires}}</td>
-            <td data-label="{{t "backoffice_api_tokens.allowed_ips"}}"><span class="mono">{{html .Ips}}</span></td>
-            <td data-label="{{t "backoffice_api_tokens.last_used"}}">{{html .LastUsed}}</td>
+            <td data-label="{{t "backoffice_api_tokens.expires"}}">{{if .IsExpired}}<span class="badge badge-expired">{{t "backoffice_api_tokens.expired"}}</span> {{end}}{{tr .Expires}}</td>
+            <td data-label="{{t "backoffice_api_tokens.allowed_ips"}}"><span class="mono">{{tr .Ips}}</span></td>
+            <td data-label="{{t "backoffice_api_tokens.last_used"}}">{{tr .LastUsed}}{{if .LastUsedIp}} {{t "backoffice_api_tokens.from_ip" .LastUsedIp}}{{end}}</td>
             <td data-label="{{t "common.actions"}}">
               <div class="row-actions">
                 <form action="/admin/revoke-backoffice-api-token/{{.Id}}" method="POST" data-confirm="{{t "backoffice_api_tokens.revoke_token_anything_using_will" .Name}}">

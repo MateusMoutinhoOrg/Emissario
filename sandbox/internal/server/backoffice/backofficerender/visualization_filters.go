@@ -29,6 +29,9 @@ type VisualizationLink struct {
 type VisualizationChip struct {
 	Label string
 	Value string
+	// Flag is the flag shown before the value of a country, "" for any
+	// other filter.
+	Flag string
 	// Remove is the page with every filter but this one.
 	Remove string
 }
@@ -218,7 +221,7 @@ func visualizationChips(sandbox *api.Sandbox, action string, filter visualizatio
 	add("Pages starting with", filter.Prefix, visualization.KeyPrefix)
 	add("Ip", filter.Ip, visualization.KeyIp)
 	if filter.Country != "" {
-		add("Country", visualization.CountryFlag(sandbox, filter.Country)+" "+visualization.CountryName(sandbox, filter.Country), visualization.KeyCountry)
+		chips = append(chips, VisualizationChip{Label: "Country", Value: visualization.CountryName(sandbox, filter.Country), Flag: visualization.CountryFlag(sandbox, filter.Country), Remove: without(visualization.KeyCountry)})
 	}
 	if filter.Device != "" {
 		add("Device", visualizationDevice(sandbox, filter.Device), visualization.KeyDevice)

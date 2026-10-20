@@ -800,8 +800,8 @@
     <a class="back" href="{{.PresetsHref}}">{{t "privacy_preset_preview.presets"}}</a>
     <section class="head">
       <div>
-        <h1>{{.Name}} <code>{{.Ref}}</code></h1>
-        <p class="muted">{{.Description}}{{if .Changes}} — {{.Changes}}{{end}}</p>
+        <h1>{{tr .Name}} <code>{{.Ref}}</code></h1>
+        <p class="muted">{{tr .Description}}{{if .Changes}} — {{tr .Changes}}{{end}}</p>
       </div>
     </section>
     {{if .Error}}<div class="alert" role="alert">{{tr .Error}}</div>{{end}}
@@ -810,14 +810,14 @@
       <div class="card-head"><h2>{{t "common.settings"}}</h2></div>
       <table>
         <thead><tr><th>{{t "common.setting"}}</th><th>{{t "common.now"}}</th><th>{{t "common.preset"}}</th><th>{{t "privacy_preset_preview.reference"}}</th></tr></thead>
-        <tbody>{{range .Lines}}<tr{{if not .Differs}} class="same"{{end}}><td data-label="{{t "common.setting"}}"><code>{{.Setting}}</code></td><td data-label="{{t "common.now"}}">{{.Current}}</td><td data-label="{{t "common.preset"}}">{{if .Differs}}<strong>{{.Preset}}</strong>{{else}}{{.Preset}}{{end}}</td><td data-label="{{t "privacy_preset_preview.reference"}}"><span class="ref">{{.Reference}}</span></td></tr>{{end}}</tbody>
+        <tbody>{{range .Lines}}<tr{{if not .Differs}} class="same"{{end}}><td data-label="{{t "common.setting"}}"><code>{{.Setting}}</code></td><td data-label="{{t "common.now"}}">{{tr .Current}}</td><td data-label="{{t "common.preset"}}">{{if .Differs}}<strong>{{tr .Preset}}</strong>{{else}}{{tr .Preset}}{{end}}</td><td data-label="{{t "privacy_preset_preview.reference"}}"><span class="ref">{{tr .Reference}}</span></td></tr>{{end}}</tbody>
       </table>
     </div>
 
     <form class="card" action="{{.ApplyAction}}" method="POST"{{if .Deletes}} data-confirm="{{t "privacy_preset_preview.applying_this_preset_deletes_data"}}"{{end}}>
       <div class="card-head"><h2>{{t "common.apply"}}</h2></div>
       <input type="hidden" name="preset" value="{{.Ref}}">
-      {{if .Effects}}<ul class="checklist">{{range .Effects}}<li>{{.}}</li>{{end}}</ul>{{else}}<p class="hint">{{t "privacy_preset_preview.nothing_stored_changes"}}</p>{{end}}
+      {{if .Effects}}<ul class="checklist">{{range .Effects}}<li>{{tr .}}</li>{{end}}</ul>{{else}}<p class="hint">{{t "privacy_preset_preview.nothing_stored_changes"}}</p>{{end}}
       <p class="hint">{{t "privacy_preset_preview.who_sees_full_ips_access"}}</p>
       {{if .Notices}}<div class="law-panel" role="alert">
         <p class="law-lead">{{t "common.read_before_you_confirm_these"}}</p>

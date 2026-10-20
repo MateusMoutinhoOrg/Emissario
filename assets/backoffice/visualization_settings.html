@@ -725,7 +725,7 @@
         <div class="card-head"><h2>{{t "common.state"}}</h2></div>
         <dl class="facts">
           <dt>{{t "visualization_settings.country_database"}}</dt>
-          <dd>{{.GeoipSource}}{{if .GeoipKind}} <span class="muted">({{.GeoipKind}})</span>{{end}}</dd>
+          <dd>{{tr .GeoipSource}}{{if .GeoipKind}} <span class="muted">({{.GeoipKind}})</span>{{end}}</dd>
           <dt>{{t "visualization_settings.built"}}</dt>
           <dd>{{.GeoipBuilt}}</dd>
           <dt>{{t "visualization_settings.views_stored"}}</dt>

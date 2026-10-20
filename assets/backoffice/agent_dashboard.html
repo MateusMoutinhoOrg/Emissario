@@ -746,7 +746,7 @@
       <article class="card stat">
         <span class="stat-label">{{t "agent_dashboard.ips_their_limit"}}</span>
         <span class="stat-value">{{.AtLimit}}</span>
-        <span class="stat-note">{{t "agent_dashboard.limit_per_ip" .IpDailyLimit}}</span>
+        <span class="stat-note">{{t "agent_dashboard.limit_per_ip" (tr .IpDailyLimit)}}</span>
       </article>
     </section>
 

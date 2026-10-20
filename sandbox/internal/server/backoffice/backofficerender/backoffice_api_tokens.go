@@ -46,9 +46,10 @@ type BackofficeApiTokenRow struct {
 	IsExpired bool
 	// Ips are the ips the token is accepted from, or "Any".
 	Ips string
-	// LastUsed is the instant and the ip of the token's last request, or
-	// "Never".
-	LastUsed string
+	// LastUsed is the instant of the token's last request, or "Never";
+	// LastUsedIp the ip it came from, "" for none.
+	LastUsed   string
+	LastUsedIp string
 }
 
 // apiTokenNoticeOf is how the list page words a backofficeapitokens notice code;
@@ -91,7 +92,7 @@ func apiTokenRow(sandbox *api.Sandbox, user *backoffice_db.BackofficeUserRecord,
 		row.Ips = sandbox.Deps.StringsDeps.Join(ips, ", ")
 	}
 	if token.LastUsedAt != 0 {
-		row.LastUsed = instantOf(sandbox, token.LastUsedAt) + " from " + token.LastUsedIp
+		row.LastUsed, row.LastUsedIp = instantOf(sandbox, token.LastUsedAt), token.LastUsedIp
 	}
 	return row
 }
