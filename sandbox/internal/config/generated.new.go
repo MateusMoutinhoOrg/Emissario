@@ -14,7 +14,7 @@ import (
 func NewConfig(sandbox *api.Sandbox) api.Config {
 	return api.Config{
 		ProjectName:    "emissario",
-		Version:        "v0.0.6",
+		Version:        "v0.1.0",
 		DatabaseConfig: api.DatabaseConfig{DatabaseDir: api.DefaultDatabaseDir},
 	}
 }
