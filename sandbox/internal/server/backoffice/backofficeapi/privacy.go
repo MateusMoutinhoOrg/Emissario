@@ -5,6 +5,7 @@ import (
 	serializabledeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/serializabledeps"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backoffice_db"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/privacy_db"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/encryption"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacy"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/privacyadmin"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/totp"
@@ -150,10 +151,10 @@ func PrivacySettingsResponseJSON(sandbox *api.Sandbox, settings privacy.Settings
 // oldest_at}]}: what the Privacy page shows. key_id reveals nothing about
 // the key; oldest_at is null for a table with no row or no time.
 func PrivacyStateJSON(sandbox *api.Sandbox, settings privacy.Settings, ipKeyMadeAt int64, kept []privacyadmin.Kept) *serializabledeps.SerializableObject {
-	encryption := sandbox.Deps.SerializableDeps.CreateObject()
-	encryption.AddItemToObject("encrypted", sandbox.Config.Encrypted)
-	encryption.AddItemToObject("algorithm", "XChaCha20-Poly1305")
-	encryption.AddItemToObject("key_id", sandbox.Config.EncryptionKeyId)
+	atRest := sandbox.Deps.SerializableDeps.CreateObject()
+	atRest.AddItemToObject("encrypted", sandbox.Config.Encrypted)
+	atRest.AddItemToObject("algorithm", encryption.Algorithm)
+	atRest.AddItemToObject("key_id", sandbox.Config.EncryptionKeyId)
 	tables := sandbox.Deps.SerializableDeps.CreateArray()
 	for _, table := range kept {
 		item := sandbox.Deps.SerializableDeps.CreateObject()
@@ -172,7 +173,7 @@ func PrivacyStateJSON(sandbox *api.Sandbox, settings privacy.Settings, ipKeyMade
 	}
 	document := sandbox.Deps.SerializableDeps.CreateObject()
 	document.AddItemToObject("settings", PrivacySettingsJSON(sandbox, settings))
-	document.AddItemToObject("encryption", encryption)
+	document.AddItemToObject("encryption", atRest)
 	document.AddItemToObject("ip_key_made_at", ipKeyMadeAt)
 	document.AddItemToObject("kept", tables)
 	return document

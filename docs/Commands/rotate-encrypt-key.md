@@ -6,7 +6,7 @@ Re-encrypt every database and backup from an old key to the one in EMISSARIO_ENC
 emissario rotate-encrypt-key --old-key-env <old-key-env> [--database <database>] [--help]
 ```
 
-Reseals every database under --database, and every file every snapshot keeps, from the key in the variable --old-key-env names to the one in EMISSARIO_ENCRYPT_KEY: the path after a key leaked. There is no migration from a folder in clear. It takes a snapshot first, works file by file and writes encryption.json last, so a rotation interrupted is run again with both keys and reseals only what is left. Run it with the server stopped. Snapshots stay restorable with the new key; archives downloaded before stay sealed under the old one.
+Moves every database under --database, and every file every snapshot keeps, from the key in the variable --old-key-env names to the one in EMISSARIO_ENCRYPT_KEY: the path after a key leaked. There is no migration from a folder in clear. It takes a snapshot first and records rotating_to in encryption.json; then it reseals every file under the new key one by one and removes every index entry, whose name is a digest of the old key; then, under the new key, it rebuilds every index with Keep's Repair, reseals every snapshot — leaving its index entries out, which a restore rebuilds — and writes encryption.json last. A rotation interrupted is run again with both keys and reseals only what is left; until it finishes, every other command refuses the folder. Run it with the server stopped. Archives downloaded before stay sealed under the old key.
 
 | Flag | Type | Default | Description | From |
 | --- | --- | --- | --- | --- |

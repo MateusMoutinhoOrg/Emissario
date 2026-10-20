@@ -11,6 +11,7 @@ import (
 	encryptedkeep "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/encryptedkeep"
 	goembed "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/goembed"
 	golangjwt "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/golangjwt"
+	keepencryption "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/keepencryption"
 	maxmindgeoip "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/maxmindgeoip"
 	memoryratelimit "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/memoryratelimit"
 	nethttprequest "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/nethttprequest"
@@ -30,7 +31,6 @@ import (
 	stdsort "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdsort"
 	stdstrings "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdstrings"
 	stdtime "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/stdtime"
-	xchachaencryption "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/xchachaencryption"
 	ziparchive "github.com/MateusMoutinhoOrg/Emissario/adapters/impls/ziparchive"
 	deps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps"
 )
@@ -45,6 +45,7 @@ func New() deps.Deps {
 	encryptedkeep.Bind(&deps)
 	goembed.Bind(&deps)
 	golangjwt.Bind(&deps)
+	keepencryption.Bind(&deps)
 	maxmindgeoip.Bind(&deps)
 	memoryratelimit.Bind(&deps)
 	nethttprequest.Bind(&deps)
@@ -64,7 +65,6 @@ func New() deps.Deps {
 	stdsort.Bind(&deps)
 	stdstrings.Bind(&deps)
 	stdtime.Bind(&deps)
-	xchachaencryption.Bind(&deps)
 	ziparchive.Bind(&deps)
 	return deps
 }

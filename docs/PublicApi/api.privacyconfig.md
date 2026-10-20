@@ -7,7 +7,7 @@ PrivacyConfig is the part of the Config the privacy mechanic reads — the encry
 | Field | Type | Description |
 | --- | --- | --- |
 | `Encrypted` | `bool` | Encrypted is true when every database under DatabaseDir is encrypted at rest with the key of EMISSARIO_ENCRYPT_KEY, false when the command runs with --notencrypt. |
-| `EncryptionKeyId` | `string` | EncryptionKeyId is the id of that key: the hex of four bytes derived from it, which every value and <database>/encryption.json carry. It reveals nothing about the key. Empty with --notencrypt. |
+| `EncryptionKeyId` | `string` | EncryptionKeyId is the id of that key: the hex of four bytes derived from it, which <database>/encryption.json and every snapshot carry. It reveals nothing about the key. Empty with --notencrypt. |
 | `NotEncrypt` | `bool` | NotEncrypt is true when the command runs with --notencrypt: the databases are in clear, for local debugging only, and every backoffice page says so. |
 | `ClientPortHeader` | `string` | ClientPortHeader is the header a reverse proxy sets to the source port of the visitor's connection — `--client-port-header`, X-Client-Port in the nginx example — trusted only with --allow-x-forwarded-for. Empty, the access log records the port of the connection the server itself accepted. |
 

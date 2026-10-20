@@ -5,11 +5,13 @@ import (
 )
 
 // A snapshot copies the files of every database as they are on the disk, so
-// in an encrypted --database folder it holds them sealed: it records the id
-// of the key they are sealed under (KeyId, blank for a folder in clear), the
-// archive of it carries that id in its manifest, and only a server running
-// with the same key restores or uploads it. A key rotation reseals every file
-// of every snapshot, so they stay restorable with the new key.
+// in an encrypted --database folder it holds them as Keep sealed them: it
+// records the id of the key they are sealed under (KeyId, blank for a folder
+// in clear), the archive of it carries that id in its manifest, and only a
+// server running with the same key restores or uploads it. A key rotation
+// reseals every file of every snapshot and leaves out its index entries —
+// named by a digest of the old key — so they stay restorable with the new
+// key: a restore reindexes every database once its files are written.
 
 // currentKeyId is the id of the key the databases here are encrypted with,
 // "" when they are in clear (--notencrypt).
@@ -33,19 +35,14 @@ func keyRefusal(sandbox *api.Sandbox, keyId string) string {
 }
 
 // contentRefusal answers why the file at path, holding content, cannot be
-// restored here, "" when it can: in an encrypted folder every file is sealed
-// under the current key.
+// restored here, "" when it can: in an encrypted folder every file Keep wrote
+// decrypts under the current key.
 func contentRefusal(sandbox *api.Sandbox, path string, content []byte) string {
-	current := currentKeyId(sandbox)
-	if current == "" {
+	if currentKeyId(sandbox) == "" {
 		return ""
 	}
-	keyId, encrypted := sandbox.Deps.EncryptionDeps.KeyIdOf(content)
-	if !encrypted {
-		return "the file " + path + " is not encrypted, and the databases here are"
-	}
-	if keyId != current {
-		return "the file " + path + " is encrypted with another key (key_id " + keyId + ")"
+	if !sandbox.Deps.EncryptionDeps.Opens(content) {
+		return "the file " + path + " does not decrypt with this server's key: it is in clear, encrypted with another key, or was changed"
 	}
 	return ""
 }

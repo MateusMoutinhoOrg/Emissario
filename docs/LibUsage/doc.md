@@ -123,6 +123,7 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/encryptedkeep` | `encryptedkeep.Bind(&deps)` |
 | `adapters/impls/goembed` | `goembed.Bind(&deps)` |
 | `adapters/impls/golangjwt` | `golangjwt.Bind(&deps)` |
+| `adapters/impls/keepencryption` | `keepencryption.Bind(&deps)` |
 | `adapters/impls/maxmindgeoip` | `maxmindgeoip.Bind(&deps)` |
 | `adapters/impls/memoryratelimit` | `memoryratelimit.Bind(&deps)` |
 | `adapters/impls/nethttprequest` | `nethttprequest.Bind(&deps)` |
@@ -142,7 +143,6 @@ exposing the same `Bind(deps *deps.Deps)` entry point:
 | `adapters/impls/stdsort` | `stdsort.Bind(&deps)` |
 | `adapters/impls/stdstrings` | `stdstrings.Bind(&deps)` |
 | `adapters/impls/stdtime` | `stdtime.Bind(&deps)` |
-| `adapters/impls/xchachaencryption` | `xchachaencryption.Bind(&deps)` |
 | `adapters/impls/ziparchive` | `ziparchive.Bind(&deps)` |
 
 Starting from `standard.New()` is the safe default: an unfilled field is a nil func that

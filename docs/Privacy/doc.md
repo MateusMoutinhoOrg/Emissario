@@ -58,11 +58,27 @@ default rests on them.
 
 `EMISSARIO_ENCRYPT_KEY` is 32 random bytes in base64 or hex (`emissario generate-encrypt-key`); a
 passphrase is refused. It is read once and removed from the process environment, so the `git` Emissario
-runs never inherits it, and it never reaches a log or a page. Every value is sealed with
-XChaCha20-Poly1305 (`0xE1 | key id | 24-byte nonce | ciphertext`), its additional data the path it lives
-at. Every command that opens a database checks the key against `<database>/encryption.json`
-([database-encryption](../Commands/database-encryption.md)); `rotate-encrypt-key` re-encrypts to a new
-key, snapshots included. Snapshots stay encrypted and restore only on the same key.
+runs never inherits it, and it never reaches a log or a page. The encryption is **Keep's own**: every
+database is opened with `Props.EncryptKey` set to a key derived from it (HKDF-SHA256), so Keep seals
+every value with AES-256-GCM (`12-byte nonce | ciphertext | 16-byte tag`) and names every index entry by
+`SHA-256(EncryptKey ‖ 0 ‖ value)`. Every command that opens a database checks the key against
+`<database>/encryption.json` — `{"version":2,"algorithm":"AES-256-GCM","key_id":"<8 hex>"}`
+([database-encryption](../Commands/database-encryption.md)). A folder encrypted by Emissario v0.0.6
+(version 1, XChaCha20-Poly1305) is refused: start a new one. Snapshots stay encrypted and restore only
+on the same key.
+
+**Rotating the key** — `rotate-encrypt-key --old-key-env <VAR>`, with the server stopped
+([rotate-encrypt-key](../Commands/rotate-encrypt-key.md)):
+
+| Step | Does | `encryption.json` |
+|---|---|---|
+| 1 | a `pre-rotation` snapshot, the databases opened under the old key | `rotating_to` names the new key |
+| 2 | every file resealed under the new key; every index entry removed — its name is a digest of the old key | |
+| 3 | under the new key, every database reindexed by Keep's `Repair`, every snapshot resealed and its index entries left out | `key_id` names the new key alone |
+
+One interrupted is run again with both keys and reseals only what is left; until then every other
+command refuses the folder. A restore reindexes every database once it has written the files, so a
+snapshot a rotation resealed comes back whole.
 
 **Who holds the key.** The controller generates it and keeps it — a secret manager injecting the
 variable. Whoever installs, hosts or supports Emissario for them and can reach its data is their
@@ -72,8 +88,10 @@ copy of the key once the work is delivered.
 **What it does not do.** It protects a stolen disk, a stolen backup or a misconfigured volume (GDPR art.
 32(1)(a); LGPD art. 46). It does **not** protect against an attacker inside the running server, which
 holds the key in memory. An incident is still recorded for 5 years and reported when it may bring
-relevant risk. In clear stay folder names (databases, tables, fields, ids), Keep's bookkeeping and index
-file names: personal data is never a `key` field, since its SHA-256 would be a file name.
+relevant risk. In clear stay folder names (databases, tables, fields, ids, positions) and how many
+records a table holds. Index file names are keyed digests, which no one without the key can check against
+a guessed value; personal data is still never a `key` field. A value is not bound to the place it lives
+at: whoever can write to the disk can move one ciphertext to another key of the same database.
 
 `--notencrypt` keeps a folder in clear for local debugging: a warning at every start and a red banner
 on every page. The IP key then sits in clear too, so the hashes protect nothing.
@@ -222,7 +240,8 @@ Every request and answer is in [Routes](../Routes/doc.md).
 
 | Path | What |
 |---|---|
-| `sandbox/internal/encryption/`, `adapters/impls/xchachaencryption/` | key parsing, `encryption.json`, the storage wrapper |
+| `sandbox/internal/encryption/` | `encryption.json`, the start-up table, index entries and the reindex |
+| `adapters/impls/keepencryption/`, `adapters/impls/encryptedkeep/` | the key: read, derived into Keep's `EncryptKey`, set on every `Props`; the file-level reseal of a rotation |
 | `sandbox/internal/privacy/` | settings and IP key, IP hashes, retention rules, notices, access log writer, holds |
 | `sandbox/internal/privacyadmin/` | banners, retention cleanup, what this server keeps, notice draft, find and erase, presets |
 | `sandbox/internal/databases/privacy_db/` | `privacy-setting`, `privacy-preset`, `access-log`, `privacy-access`, `privacy-hold`, `privacy-erasure` ([privacy_db](../Databases/privacy_db.md)) |

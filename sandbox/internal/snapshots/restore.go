@@ -3,6 +3,7 @@ package snapshots
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backup"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/encryption"
 )
 
 // A restore never leaves DataDir half written. Before it removes anything it
@@ -260,8 +261,10 @@ func Conflict(sandbox *api.Sandbox, paths []string) string {
 }
 
 // write removes every database directory of DataDir but BackupDir — and
-// BackofficeDir and PrivacyDir, unless includeBackoffice — and writes every
-// one of contents in their place.
+// BackofficeDir and PrivacyDir, unless includeBackoffice — writes every one
+// of contents in their place, and reindexes every database: a snapshot a key
+// rotation resealed holds no index entry, since their names are digests of
+// the old key.
 func write(sandbox *api.Sandbox, db *backup.Backup, contents []backup.SnapshotContentRecord, includeBackoffice bool) error {
 	io := sandbox.Deps.IoDeps
 	root := DataDir(sandbox)
@@ -286,7 +289,7 @@ func write(sandbox *api.Sandbox, db *backup.Backup, contents []backup.SnapshotCo
 			return err
 		}
 	}
-	return nil
+	return encryption.Reindex(sandbox)
 }
 
 // rollBack puts safety — the pre-restore snapshot of a restore that did not

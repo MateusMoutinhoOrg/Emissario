@@ -59,6 +59,7 @@ Props is the declarative description a database is created from. It is the only 
 | --- | --- | --- |
 | `Path` | `string` | Path is the prefix every key of the database is written under. It is split on slashes into the leading segments of every key, so a backend that maps keys to files reads it as a directory; empty segments are dropped, which makes a trailing slash optional. A "." or ".." segment is refused: where the tree lands is the backend's base, not the Path. |
 | `Schemas` | `[]Schema` | Schemas are the collections the database holds. |
+| `EncryptKey` | `string` | EncryptKey, when not empty, encrypts the database: every value it writes passes through Deps.CryptoDeps.Encrypt under this key, every value it reads through Decrypt, and the unique index addresses a value by a digest keyed by it, so the backend holds no value in the clear. What a key names — Path, schema and field names, ids, positions — is not encrypted. A database opened with another key fails with Internal on the first value it reads. One opened with none never takes its ciphertext for data: a lookup finds nothing, and an insert, a listing or a repair fails with Internal before it writes. Empty, the default, stores every value as given. |
 
 ## `Error`
 
@@ -151,6 +152,6 @@ Sandbox is the whole library: every part declared in a sandbox/api/<x>sandbox.go
 | Field | Type | Description |
 | --- | --- | --- |
 | `ProjectSandbox` | `ProjectSandbox` | ProjectSandbox is a part of the Sandbox, declared in sandbox/api/projectsandbox.go. Embedded, so each of its fields is read as sandbox.<Field> like any contract. Every struct of a sandbox/api/<x>sandbox.go file is one: each mechanic writes its own, the project writes projectsandbox.go. |
-| `Config` | `Config` | Config is what the project knows about itself, built from AgnosConfig/project.yaml (see sandbox/api/config.go). |
+| `Config` | `Config` | Config is what the project knows about itself, built from AgnosConfig/project.yaml (see sandbox/api/generated.config.go). |
 
 [every contract](doc.md)

@@ -3,17 +3,15 @@ package snapshots
 import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/databases/backup"
+	"github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/encryption"
 )
 
-// RotationResult is what Rotate did.
+// RotationResult is what Reseal did to the snapshots.
 type RotationResult struct {
-	// Snapshot is the name of the snapshot taken before anything was
-	// resealed.
-	Snapshot string
-	// Files is how many files of the databases were resealed.
-	Files int
 	// Contents is how many files kept by snapshots were resealed.
 	Contents int
+	// Dropped is how many index entries were left out of snapshots.
+	Dropped int
 	// Snapshots is how many snapshots hold only files sealed under the new
 	// key now.
 	Snapshots int
@@ -22,33 +20,31 @@ type RotationResult struct {
 // preRotationPrefix starts the name of the snapshot a rotation takes first.
 const preRotationPrefix = "pre-rotation"
 
-// Rotate reseals everything under DataDir from the old key to the new one of
-// newKeyId, the store already armed for a rotation (EncryptionDeps.Rotate):
-// a snapshot of what DataDir holds first, then every file of every database
-// — the backup database's own included — and then every file every snapshot
-// keeps, each under the path it is restored at, so every snapshot stays
-// restorable with the new key; the blobs no snapshot holds anymore are
-// removed. Run again after an interruption, it reseals only what is left.
-// The caller writes encryption.json once it returns, and runs it with no
-// server writing DataDir.
-func Rotate(sandbox *api.Sandbox, newKeyId string) (RotationResult, error) {
+// PreRotation takes the snapshot a rotation takes before it reseals
+// anything: what DataDir holds, the databases still armed under the old key.
+func PreRotation(sandbox *api.Sandbox) (backup.SnapshotRecord, error) {
+	if !acquire(sandbox) {
+		return backup.SnapshotRecord{}, sandbox.Deps.StdDeps.Errorf("a backup job is running")
+	}
+	defer release(sandbox)
+	return create(sandbox, backup.New(sandbox), preRotationPrefix)
+}
+
+// Reseal moves every file every snapshot keeps from the old key to the new
+// one of newKeyId, once the files of every database — the backup database's
+// own included — are resealed and the databases armed under the new key: the
+// content of each file is resealed, and an index entry is left out of its
+// snapshot, since its name is a digest of the old key — a restore reindexes
+// every database once it has written the files. The blobs no snapshot holds
+// anymore are removed. Run again after an interruption, it reseals only what
+// is left. The caller runs it with no server writing DataDir.
+func Reseal(sandbox *api.Sandbox, newKeyId string) (RotationResult, error) {
 	result := RotationResult{}
 	if !acquire(sandbox) {
 		return result, sandbox.Deps.StdDeps.Errorf("a backup job is running")
 	}
 	defer release(sandbox)
 	db := backup.New(sandbox)
-
-	safety, err := create(sandbox, db, preRotationPrefix)
-	if err != nil {
-		return result, sandbox.Deps.StdDeps.Errorf("the snapshot taken before the rotation failed, nothing was resealed: %s", err.Error())
-	}
-	result.Snapshot = safety.Name
-
-	result.Files, err = sandbox.Deps.EncryptionDeps.RotateFiles(DataDir(sandbox))
-	if err != nil {
-		return result, err
-	}
 
 	listed, err := db.ListSnapshots(backup.SnapshotFilter{})
 	if err != nil {
@@ -61,16 +57,22 @@ func Rotate(sandbox *api.Sandbox, newKeyId string) (RotationResult, error) {
 			return result, err
 		}
 		for _, content := range contents {
-			memo := content.Sha + "\x00" + content.Path
-			sha, done := resealed[memo]
+			if encryption.IndexEntry(sandbox, content.Path) {
+				if err := backup.RemoveSnapshotContent(sandbox, db, snapshot.Id, content.Id); err != nil {
+					return result, err
+				}
+				result.Dropped++
+				continue
+			}
+			sha, done := resealed[content.Sha]
 			if !done {
 				blob, ok := db.FindBlobBySha(content.Sha)
 				if !ok {
 					return result, sandbox.Deps.StdDeps.Errorf("snapshot %s: the content of %s is missing", snapshot.Name, content.Path)
 				}
-				value, changed, err := sandbox.Deps.EncryptionDeps.Reseal(blob.Value, content.Path)
+				value, changed, err := sandbox.Deps.EncryptionDeps.Reseal(blob.Value)
 				if err != nil {
-					return result, sandbox.Deps.StdDeps.Errorf("snapshot %s: %s", snapshot.Name, err.Error())
+					return result, sandbox.Deps.StdDeps.Errorf("snapshot %s: the file %s %s", snapshot.Name, content.Path, err.Error())
 				}
 				sha = content.Sha
 				if changed {
@@ -79,7 +81,7 @@ func Rotate(sandbox *api.Sandbox, newKeyId string) (RotationResult, error) {
 					}
 					result.Contents++
 				}
-				resealed[memo] = sha
+				resealed[content.Sha] = sha
 			}
 			if sha != content.Sha {
 				if err := backup.SetSnapshotContentSha(sandbox, db, snapshot.Id, content.Id, sha); err != nil {

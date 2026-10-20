@@ -1,0 +1,45 @@
+cli-output: |
+    == a folder encrypted with the old key
+    exit 0
+    {"algorithm":"AES-256-GCM","key_id":"ff0344ff","version":2}
+    == the same key twice: refused
+    the old key and the new one are the same key
+    exit status 1
+    exit 1
+    == an old key the folder was not encrypted with: refused
+    the key in OLD_KEY does not match the databases under data (key_id ff0344ff)
+    exit status 1
+    exit 1
+    == the rotation
+    snapshot pre-rotation-<instant> ready: 12 files
+    rotated data from key_id ff0344ff to 9443089c: 120 database files resealed, 13 index entries removed and every index rebuilt under the new key; 12 files of 1 snapshots resealed and 0 index entries left out of them
+    snapshot pre-rotation-<instant> holds what the databases held before
+    archives downloaded before the rotation stay sealed under the old key: keep it to read them, or download them again
+    exit 0
+    {"algorithm":"AES-256-GCM","key_id":"9443089c","version":2}
+    == the old key is refused, the new one opens every database
+    EMISSARIO_ENCRYPT_KEY does not match the databases under data: they were encrypted with another key (key_id 9443089c, this one is ff0344ff)
+    exit status 1
+    exit 1
+    0 ip blocks removed
+    exit 0
+    == run again: nothing to do
+    the databases under data are already encrypted with the new key (key_id 9443089c): nothing to do
+    exit 0
+    == a rotation to a third key that stopped part-way
+    the rotation of the databases under data from key_id 9443089c to c9561f74 did not finish: run `emissario rotate-encrypt-key` again with both keys, it reseals only what is left
+    exit status 1
+    exit 1
+    == run again with both keys, it finishes
+    rotated data from key_id 9443089c to c9561f74: 120 database files resealed, 13 index entries removed and every index rebuilt under the new key; 12 files of 1 snapshots resealed and 0 index entries left out of them
+    archives downloaded before the rotation stay sealed under the old key: keep it to read them, or download them again
+    exit 0
+    {"algorithm":"AES-256-GCM","key_id":"c9561f74","version":2}
+    0 ip blocks removed
+    exit 0
+    == nothing in clear under data/
+    no email found in data/
+exit-code: 0
+tree:
+    - file: encryption.json
+      sha: 9a844abe45a0ca6e3b9b660fa28d57d3dbf4e7e573cdcf75513e90d9263d7820

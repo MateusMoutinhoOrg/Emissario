@@ -56,8 +56,9 @@ func convDatabases(v remoteapi.Databases) databasedeps.Databases {
 // revProps carries one value between the two copies of the contract.
 func revProps(v databasedeps.Props) remoteapi.Props {
 	return remoteapi.Props{
-		Path:    v.Path,
-		Schemas: revSliceSchema(v.Schemas),
+		Path:       v.Path,
+		Schemas:    revSliceSchema(v.Schemas),
+		EncryptKey: v.EncryptKey,
 	}
 }
 
@@ -122,8 +123,9 @@ func convDatabase(v remoteapi.Database) databasedeps.Database {
 // convProps carries one value between the two copies of the contract.
 func convProps(v remoteapi.Props) databasedeps.Props {
 	return databasedeps.Props{
-		Path:    v.Path,
-		Schemas: convSliceSchema(v.Schemas),
+		Path:       v.Path,
+		Schemas:    convSliceSchema(v.Schemas),
+		EncryptKey: v.EncryptKey,
 	}
 }
 

@@ -3,6 +3,7 @@ package privacy_db
 import (
 	api "github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	databasedeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/databasedeps"
+	reindex "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/reindex"
 )
 
 // AccessLogRecords is every access-log row, none of its fields read yet: no
@@ -33,4 +34,12 @@ func PrivacyAccessRecords(sandbox *api.Sandbox, db *PrivacyDb) ([]databasedeps.R
 		return nil, sandbox.Deps.OpinionatedAgnosDatabase.Fail(failure)
 	}
 	return records, nil
+}
+
+// ReindexPrivacyDb gives every live record of every table of the database that
+// indexes a key field back every index entry it is missing — the ones a key
+// rotation removes included — through the store's Repair. No generated method
+// reaches Repair, so it is written here.
+func ReindexPrivacyDb(sandbox *api.Sandbox, db *PrivacyDb) error {
+	return reindex.Database(sandbox, db.database)
 }

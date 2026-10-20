@@ -1,0 +1,5 @@
+dep: encryptiondeps
+help: Encryption at rest by Keep's own Props.EncryptKey and AES-256-GCM, the key read once from the environment
+module: github.com/MateusMoutinhoOrg/Keep@v0.11.0
+name: keepencryption
+origin: project

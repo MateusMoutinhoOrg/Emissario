@@ -4,29 +4,37 @@ import (
 	"github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 )
 
-// Every database under the --database folder is encrypted at rest: every
-// value the store writes is sealed with XChaCha20-Poly1305 under a key read
-// once from the environment (deps.Deps.EncryptionDeps, which never hands the
-// key to the sandbox). The folder records which key in FileName, at its root:
-// {"version":1,"algorithm":"XChaCha20-Poly1305","key_id":"<8 hex>"}, which
-// reveals nothing about the key. Open decides, in front of every command that
-// opens a database, whether the command runs and how the store is armed.
+// Every database under the --database folder is encrypted at rest by Keep
+// itself: its Props carries an EncryptKey derived from a key read once from
+// the environment (deps.Deps.EncryptionDeps, which never hands the key to the
+// sandbox), so every value Keep writes is sealed with AES-256-GCM and every
+// entry of a unique index is named by a SHA-256 keyed by it. The folder
+// records which key in FileName, at its root:
+// {"version":2,"algorithm":"AES-256-GCM","key_id":"<8 hex>"}, which reveals
+// nothing about the key, and "rotating_to" while a rotation has not finished.
+// Open decides, in front of every command that opens a database, whether the
+// command runs and how the databases are armed.
 
 // FileName is the file at the root of the --database folder naming the key
 // its databases are encrypted with.
 const FileName = "encryption.json"
 
-// Algorithm is the cipher every value is sealed with.
-const Algorithm = "XChaCha20-Poly1305"
+// Algorithm is the cipher every value is sealed with: Keep's CryptoDeps.
+const Algorithm = "AES-256-GCM"
 
-// Version is the format of FileName and of every sealed value.
-const Version = 1
+// Version is the format of FileName and of every sealed value: 2 is Keep's
+// own encryption, 1 the XChaCha20-Poly1305 storage emissario v0.0.6 wrapped
+// Keep in, which this version no longer reads.
+const Version = 2
 
 // Info is what FileName holds.
 type Info struct {
 	Version   int64
 	Algorithm string
 	KeyId     string
+	// RotatingTo is the id of the key a rotation that has not finished
+	// moves the databases to, "" when none runs.
+	RotatingTo string
 }
 
 // The states a --database folder is found in.
@@ -63,19 +71,6 @@ func Path(sandbox *api.Sandbox) string {
 	return sandbox.Deps.IoDeps.Join(sandbox.Config.DatabaseDir, FileName)
 }
 
-// Skip is how many leading segments of every key the store writes name the
-// --database folder: they are left out of what a value is bound to, so a
-// snapshot restored into another folder still opens.
-func Skip(sandbox *api.Sandbox) int {
-	count := 0
-	for _, segment := range sandbox.Deps.StringsDeps.Split(sandbox.Config.DatabaseDir, "/") {
-		if segment != "" && segment != "." {
-			count++
-		}
-	}
-	return count
-}
-
 // ReadInfo reads FileName. found is false when the folder holds none.
 func ReadInfo(sandbox *api.Sandbox) (info Info, found bool, err error) {
 	io := sandbox.Deps.IoDeps
@@ -100,22 +95,29 @@ func ReadInfo(sandbox *api.Sandbox) (info Info, found bool, err error) {
 	if item, err := document.GetObjectItem("key_id"); err == nil && item != nil && item.IsString() {
 		info.KeyId, _ = item.GetString()
 	}
+	if item, err := document.GetObjectItem("rotating_to"); err == nil && item != nil && item.IsString() {
+		info.RotatingTo, _ = item.GetString()
+	}
 	if info.KeyId == "" {
 		return info, true, sandbox.Deps.StdDeps.Errorf("%s names no key_id", path)
 	}
 	if info.Version != Version || info.Algorithm != Algorithm {
-		return info, true, sandbox.Deps.StdDeps.Errorf("%s records version %d of %s, and this emissario reads version %d of %s", path, info.Version, info.Algorithm, Version, Algorithm)
+		return info, true, sandbox.Deps.StdDeps.Errorf("%s records version %d of %s, and this emissario reads version %d of %s: the databases under %s were encrypted by an earlier emissario and cannot be opened by this one; start a new folder (--database)", path, info.Version, info.Algorithm, Version, Algorithm, sandbox.Config.DatabaseDir)
 	}
 	return info, true, nil
 }
 
-// WriteInfo writes FileName for the key of keyId.
-func WriteInfo(sandbox *api.Sandbox, keyId string) error {
+// WriteInfo writes FileName for the key of keyId, and the key of rotatingTo
+// a rotation moves to while it has not finished — "" once it has.
+func WriteInfo(sandbox *api.Sandbox, keyId string, rotatingTo string) error {
 	serializable := sandbox.Deps.SerializableDeps
 	document := serializable.CreateObject()
 	document.AddItemToObject("version", int64(Version))
 	document.AddItemToObject("algorithm", Algorithm)
 	document.AddItemToObject("key_id", keyId)
+	if rotatingTo != "" {
+		document.AddItemToObject("rotating_to", rotatingTo)
+	}
 	sandbox.Deps.IoDeps.CreateDir(sandbox.Config.DatabaseDir)
 	return sandbox.Deps.IoDeps.WriteFile(Path(sandbox), []byte(serializable.SerializeToJson(document)+"\n"))
 }
@@ -138,7 +140,8 @@ func Folder(sandbox *api.Sandbox) (string, Info, error) {
 }
 
 // Open reads the key, removes it from the environment, checks it against the
-// --database folder and arms the store, as the table of docs/Privacy says:
+// --database folder and arms the databases, as the table of docs/Privacy
+// says:
 //
 //	folder              key  --notencrypt  result
 //	empty               yes  -             encrypted, FileName written
@@ -148,6 +151,7 @@ func Folder(sandbox *api.Sandbox) (string, Info, error) {
 //	encrypted           its  -             encrypted
 //	encrypted           other -            refused: another key
 //	encrypted           no   yes           refused: the key is needed
+//	encrypted, rotating any  -             refused: finish the rotation
 //	plaintext           yes  -             refused: start a new folder
 //
 // The error, when the command may not run, says why and what to do; it
@@ -176,6 +180,9 @@ func Open(sandbox *api.Sandbox, notEncrypt bool) error {
 		if notEncrypt {
 			return std.Errorf("the databases under %s are encrypted: they cannot be opened without their key; set %s instead of passing --notencrypt", sandbox.Config.DatabaseDir, env)
 		}
+		if info.RotatingTo != "" {
+			return std.Errorf("the rotation of the databases under %s from key_id %s to %s did not finish: run `%s rotate-encrypt-key` again with both keys, it reseals only what is left", sandbox.Config.DatabaseDir, info.KeyId, info.RotatingTo, sandbox.Config.ProjectName)
+		}
 		if keyId != info.KeyId {
 			return std.Errorf("%s does not match the databases under %s: they were encrypted with another key (key_id %s, this one is %s)", env, sandbox.Config.DatabaseDir, info.KeyId, keyId)
 		}
@@ -185,7 +192,7 @@ func Open(sandbox *api.Sandbox, notEncrypt bool) error {
 		}
 	case FolderEmpty:
 		if present {
-			if err := WriteInfo(sandbox, keyId); err != nil {
+			if err := WriteInfo(sandbox, keyId, ""); err != nil {
 				return err
 			}
 		}
@@ -195,7 +202,7 @@ func Open(sandbox *api.Sandbox, notEncrypt bool) error {
 		sandbox.Config.NotEncrypt = true
 		return nil
 	}
-	if err := encryption.Encrypt(Skip(sandbox)); err != nil {
+	if err := encryption.Encrypt(); err != nil {
 		return err
 	}
 	sandbox.Config.Encrypted = true

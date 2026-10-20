@@ -13,6 +13,6 @@ type Sandbox struct {
 	ProjectSandbox
 
 	// Config is what the project knows about itself, built from
-	// AgnosConfig/project.yaml (see sandbox/api/config.go).
+	// AgnosConfig/project.yaml (see sandbox/api/generated.config.go).
 	Config Config
 }

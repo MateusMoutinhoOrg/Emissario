@@ -2,6 +2,7 @@ package backup
 
 import (
 	api "github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
+	reindex "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/reindex"
 )
 
 // BlobSha is one blob record without its value: its permanent id and its sha.
@@ -124,4 +125,12 @@ func SetSnapshotContentSha(sandbox *api.Sandbox, db *Backup, snapshotId int64, c
 		return sandbox.Deps.StdDeps.Errorf("content %d of snapshot %d not found", contentId, snapshotId)
 	}
 	return sandbox.Deps.OpinionatedAgnosDatabase.Fail(record.Update("sha", sha))
+}
+
+// ReindexBackup gives every live record of every table of the database that
+// indexes a key field back every index entry it is missing — the ones a key
+// rotation removes included — through the store's Repair. No generated method
+// reaches Repair, so it is written here.
+func ReindexBackup(sandbox *api.Sandbox, db *Backup) error {
+	return reindex.Database(sandbox, db.database)
 }

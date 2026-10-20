@@ -7,6 +7,7 @@ adapters:
     - encryptedkeep
     - goembed
     - golangjwt
+    - keepencryption
     - maxmindgeoip
     - memoryratelimit
     - nethttprequest
@@ -26,5 +27,4 @@ adapters:
     - stdsort
     - stdstrings
     - stdtime
-    - xchachaencryption
     - ziparchive

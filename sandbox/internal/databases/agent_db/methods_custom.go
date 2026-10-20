@@ -3,6 +3,7 @@ package agent_db
 import (
 	api "github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	databasedeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/databasedeps"
+	reindex "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/reindex"
 )
 
 // Only a `key` field is indexed, so every query by time scans the table. The
@@ -132,4 +133,12 @@ func AgentSummaryRecords(sandbox *api.Sandbox, db *AgentDb) ([]databasedeps.Reco
 // AgentUsageRecords is every agent-usage, none of its fields read yet.
 func AgentUsageRecords(sandbox *api.Sandbox, db *AgentDb) ([]databasedeps.Record, error) {
 	return listCollection(sandbox, db, "agent-usage")
+}
+
+// ReindexAgentDb gives every live record of every table of the database that
+// indexes a key field back every index entry it is missing — the ones a key
+// rotation removes included — through the store's Repair. No generated method
+// reaches Repair, so it is written here.
+func ReindexAgentDb(sandbox *api.Sandbox, db *AgentDb) error {
+	return reindex.Database(sandbox, db.database)
 }

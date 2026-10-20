@@ -3,6 +3,7 @@ package contact_db
 import (
 	api "github.com/MateusMoutinhoOrg/Emissario/sandbox/api"
 	databasedeps "github.com/MateusMoutinhoOrg/Emissario/sandbox/deps/databasedeps"
+	reindex "github.com/MateusMoutinhoOrg/Emissario/sandbox/internal/reindex"
 )
 
 // Only a `key` field is indexed, so every query by time scans the table. The
@@ -119,4 +120,12 @@ func listCollection(sandbox *api.Sandbox, db *ContactDb, collection string) ([]d
 // ones it touches.
 func ContactRequestRecords(sandbox *api.Sandbox, db *ContactDb) ([]databasedeps.Record, error) {
 	return listCollection(sandbox, db, "contact-request")
+}
+
+// ReindexContactDb gives every live record of every table of the database that
+// indexes a key field back every index entry it is missing — the ones a key
+// rotation removes included — through the store's Repair. No generated method
+// reaches Repair, so it is written here.
+func ReindexContactDb(sandbox *api.Sandbox, db *ContactDb) error {
+	return reindex.Database(sandbox, db.database)
 }

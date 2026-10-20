@@ -7,23 +7,21 @@ package encryptiondeps
 // restated here, and the adapter — which lives outside the sandbox — is what
 // fills it.
 //
+// The encryption itself is Keep's: a database whose Props carries an
+// EncryptKey has every value it writes sealed by Keep's CryptoDeps —
+// AES-256-GCM, stored as nonce (12 bytes, random) | ciphertext | tag (16
+// bytes) — and every entry of its unique indexes named by a SHA-256 keyed by
+// that EncryptKey. The adapter of the databases sets the EncryptKey of every
+// Props it opens from the key this contract loaded, and blanks it on the
+// Props a database hands back.
+//
 // The key never crosses this boundary. The adapter reads it out of the
-// environment, removes it from there, and keeps it for the storage every
-// database is written through; the sandbox only ever sees its id, the hex of
-// four bytes derived from it, which reveals nothing about it. Until the
-// storage is armed — Encrypt, Plaintext or Rotate — every read and write of
-// every database fails: a command that forgot to decide never writes in
-// clear by accident.
-//
-// Every value the storage writes is sealed whole with XChaCha20-Poly1305 and
-// carries a header naming the key it was sealed under:
-//
-//	0xE1 | key id (4 bytes) | nonce (24 bytes, random) | ciphertext and tag
-//
-// Its additional data is the path the value lives at relative to the
-// --database folder, so a value moved to another field or another record
-// fails to open, while a snapshot restored into another folder opens as it
-// was. Only builtin types cross this boundary.
+// environment, removes it from there, and keeps the EncryptKey it derives
+// from it in memory; the sandbox only ever sees its id, the hex of four bytes
+// derived from it, which reveals nothing about it. Until the databases are
+// armed — Encrypt, EncryptOld or Plaintext — every database refuses to open:
+// a command that forgot to decide never writes in clear by accident. Only
+// builtin types cross this boundary.
 
 // Contract is the encryption at rest injected whole as the
 // Deps.EncryptionDeps field.
@@ -34,49 +32,47 @@ type Contract struct {
 
 	// LoadKey reads the key out of the environment variable name, removes
 	// that variable from the process environment whatever it held, and
-	// keeps the key in memory as the one every value is sealed under.
+	// keeps it in memory as the one Encrypt arms the databases with.
 	// present is false when the variable is unset or empty. The key is 32
 	// bytes in base64 or hex; anything else — a passphrase — is an error
 	// that never quotes the value. keyId is the hex of the four bytes that
-	// name it in every value and in encryption.json.
+	// name it in encryption.json and in every snapshot.
 	LoadKey func(name string) (keyId string, present bool, err error)
 
 	// LoadOldKey reads, the same way, the key a rotation moves away from:
-	// values sealed under it are still opened once Rotate arms the storage,
-	// and resealed under the one LoadKey read.
+	// the one EncryptOld arms the databases with, and Reseal and RotateFiles
+	// open what they reseal under.
 	LoadOldKey func(name string) (keyId string, present bool, err error)
 
-	// Encrypt arms the storage: every value is sealed under the key LoadKey
-	// read, and a value read back that is not sealed under it is an error.
-	// skip is how many leading segments of every key name the --database
-	// folder, left out of the additional data.
-	Encrypt func(skip int) error
+	// Encrypt arms the databases: every one opened from then on is
+	// encrypted by Keep under the key LoadKey read.
+	Encrypt func() error
 
-	// Plaintext arms the storage in clear, for --notencrypt: values are
-	// written and read as they are.
+	// EncryptOld arms the databases under the key LoadOldKey read: what a
+	// rotation opens them with before it reseals them.
+	EncryptOld func() error
+
+	// Plaintext arms the databases in clear, for --notencrypt: every one
+	// opened from then on stores its values as they are.
 	Plaintext func()
 
-	// Rotate arms the storage for a rotation: a value sealed under the old
-	// key or the new one opens, and every value written is sealed under the
-	// new one.
-	Rotate func(skip int) error
+	// Opens reports whether value — a whole file as Keep wrote it — decrypts
+	// under the key the databases are armed with. It is false in clear and
+	// before the databases are armed.
+	Opens func(value []byte) bool
 
-	// RotateFiles reseals under the new key every file below dir — the
-	// --database folder — still sealed under the old one, each written
-	// whole to a temporary file and renamed over it, and answers how many
-	// it resealed. The store's temporary and lock files, and any file
-	// whose name holds a '.', are left alone. A file sealed under neither
-	// key is an error naming its path. It runs after Rotate, and running
-	// it again after an interruption reseals only what is left.
-	RotateFiles func(dir string) (resealed int, err error)
+	// Reseal answers value, sealed under the old key, sealed under the new
+	// one: as it is, with changed false, when it already opens under the new
+	// one. A value that opens under neither is an error that never quotes
+	// it. It needs both LoadKey and LoadOldKey.
+	Reseal func(value []byte) (resealed []byte, changed bool, err error)
 
-	// Reseal answers value, a whole file as the storage wrote it at path
-	// — slash-separated and relative to the --database folder — sealed
-	// under the new key: as it is, with changed false, when it already is.
-	// It runs after Rotate, on the files a snapshot keeps.
-	Reseal func(value []byte, path string) (resealed []byte, changed bool, err error)
-
-	// KeyIdOf answers the id of the key value names in its header, and
-	// whether value carries one at all.
-	KeyIdOf func(value []byte) (keyId string, encrypted bool)
+	// RotateFiles walks every file below dir — the --database folder. A file
+	// drop accepts — its path slash-separated and relative to dir — is
+	// removed; every other one is resealed as Reseal does, written whole to
+	// a temporary file and renamed over it. It answers how many files it
+	// resealed and how many it removed. The store's temporary and lock
+	// files, and any file whose name holds a '.', are left alone. Running it
+	// again after an interruption reseals only what is left.
+	RotateFiles func(dir string, drop func(path string) bool) (resealed int, dropped int, err error)
 }

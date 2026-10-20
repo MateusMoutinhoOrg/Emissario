@@ -8,12 +8,14 @@ import (
 
 // Handle runs in front of every command line that may open a database —
 // every one but help, version, generate-encrypt-key, rotate-encrypt-key,
-// drop-front-skills and drop-agents-skills — right after database-dir has set the folder, and answers nothing. It reads
-// the key out of the environment, removes it from there, checks it against
-// the folder and arms the store every database is written through
-// (encryption.Open); until it does, every read and write of a database
-// fails. A command line that cannot run — no key, another key, a folder in
-// clear — ends here with exit 1. An empty command line opens nothing.
+// drop-front-skills and drop-agents-skills — right after database-dir has
+// set the folder, and answers nothing. It reads the key out of the
+// environment, removes it from there, checks it against the folder and arms
+// the databases: Keep opens every one under the EncryptKey derived from the
+// key, or in clear with --notencrypt (encryption.Open); until then, every
+// database refuses to open. A command line that cannot run — no key, another
+// key, a folder in clear, a rotation that did not finish — ends here with
+// exit 1. An empty command line opens nothing.
 func Handle(sandbox *api.Sandbox, props *commandprops.CommandProps, input *Input, response *api.CommandResponse) error {
 	if input.Verb == "" {
 		return nil

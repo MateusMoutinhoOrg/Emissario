@@ -13,7 +13,7 @@ type PrivacyConfig struct {
 	Encrypted bool
 
 	// EncryptionKeyId is the id of that key: the hex of four bytes derived
-	// from it, which every value and <database>/encryption.json carry. It
+	// from it, which <database>/encryption.json and every snapshot carry. It
 	// reveals nothing about the key. Empty with --notencrypt.
 	EncryptionKeyId string
 

@@ -136,6 +136,17 @@ type Props struct {
 	Path string
 	// Schemas are the collections the database holds.
 	Schemas []Schema
+	// EncryptKey, when not empty, encrypts the database: every value it
+	// writes passes through Deps.CryptoDeps.Encrypt under this key, every
+	// value it reads through Decrypt, and the unique index addresses a value
+	// by a digest keyed by it, so the backend holds no value in the clear.
+	// What a key names — Path, schema and field names, ids, positions — is
+	// not encrypted. A database opened with another key fails with Internal
+	// on the first value it reads. One opened with none never takes its
+	// ciphertext for data: a lookup finds nothing, and an insert, a listing or
+	// a repair fails with Internal before it writes. Empty, the default,
+	// stores every value as given.
+	EncryptKey string
 }
 
 // Error describes one failure reported by a database operation. It carries

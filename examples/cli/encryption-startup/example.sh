@@ -1,7 +1,8 @@
-# Every database is encrypted at rest with the key of EMISSARIO_ENCRYPT_KEY,
-# or kept in clear with --notencrypt for local debugging. This example walks
-# every row of the start-up table of docs/Privacy against one --database
-# folder, and checks that no value is left in clear on the disk.
+# Every database is encrypted at rest by Keep itself, under an EncryptKey
+# derived from EMISSARIO_ENCRYPT_KEY, or kept in clear with --notencrypt for
+# local debugging. This example walks every row of the start-up table of
+# docs/Privacy against one --database folder, and checks that no value is
+# left in clear on the disk.
 #
 # The keys are fixed so the output is the same at every run; a real key comes
 # from `emissario generate-encrypt-key` and lives in a secret manager.
@@ -37,6 +38,11 @@ run env EMISSARIO_ENCRYPT_KEY=$OTHER emissario add-backoffice-user --username a 
 echo "== an encrypted folder and --notencrypt: refused"
 run emissario add-backoffice-user --username a --email a@example.com --notencrypt
 
+echo "== a folder of emissario v0.0.6, sealed with XChaCha20-Poly1305: refused"
+mkdir -p v1/backofficedb
+echo '{"algorithm":"XChaCha20-Poly1305","key_id":"e395e1f8","version":1}' > v1/encryption.json
+run env EMISSARIO_ENCRYPT_KEY=$KEY emissario add-backoffice-user --username a --email a@example.com --database v1
+
 echo "== a passphrase: refused, never quoted"
 run env EMISSARIO_ENCRYPT_KEY="correct horse battery staple" emissario add-backoffice-user --username a --email a@example.com --database other
 
@@ -52,10 +58,7 @@ emissario generate-encrypt-key 2> /dev/null | wc -c | tr -d ' '
 
 echo "== nothing in clear under data/"
 grep -rl -e admin@example.com -e viewer@example.com data || echo "no email found in data/"
-for file in $(find data -type f ! -name encryption.json); do
-  head -c 5 "$file" | od -An -tx1 | tr -d ' \n'
-  echo
-done | sort -u
+echo "files shorter than the 28 bytes of nonce and tag AES-256-GCM adds to every value: $(find data -type f ! -name encryption.json -size -28c | wc -l | tr -d ' ')"
 
 cd ..
 mkdir -p assert-dir
